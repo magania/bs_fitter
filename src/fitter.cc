@@ -1,7 +1,5 @@
 # include "BsFitter.h"
 
-//using namespace RooFit;
-
 int main(int argc, char *argv[]) {
     const char *data = "fit.dat";    
     const char *variables = "variables.txt";
