@@ -1,0 +1,80 @@
+BEGIN{
+ A02=0
+ eA02=0
+ All2=0
+ eAll2=0
+ DeltaGamma=0
+ eDeltaGamma=0
+ delta_1=0
+ edelta_1=0
+ delta_2=0
+ edelta_2=0
+ phi_s=0
+ ephi_s=0
+ tau=0
+ etau=0
+}
+
+{
+if ($1=="A02") {
+     A02 = $3
+     eA02 = $5
+     c1++;
+}
+
+if ($1=="All2") {
+     All2 = $3
+     eAll2 = $5
+     c2++;
+}
+
+if ($1=="DeltaGamma") {
+     DeltaGamma = $3
+     eDeltaGamma = $5
+     c3++
+}
+
+if ($1=="delta_1") {
+     delta_1 = $3
+     edelta_1 = $5
+     c4++;
+}
+
+if ($1=="delta_2") {
+     delta_2 = $3
+     edelta_2 = $5
+     c5++;
+}
+
+if ($1=="phi_s") {
+     phi_s = $3
+     ephi_s = $5
+     c6++;
+}
+
+if ($1=="tau") {
+     tau = $3
+     etau = $5
+     c7++;
+}
+
+if( c1>1 || c2>1 || c3>1 || c4>1 || c5>1 || c6>1 || c7>1){
+   print A02,eA02,All2,eAll2,DeltaGamma,eDeltaGamma,delta_1,edelta_1,delta_2,edelta_2,phi_s,ephi_s,tau,etau
+ A02=0
+ eA02=0
+ All2=0
+ eAll2=0
+ DeltaGamma=0
+ eDeltaGamma=0
+ delta_1=0
+ edelta_1=0
+ delta_2=0
+ edelta_2=0
+ phi_s=0
+ ephi_s=0
+ tau=0
+ etau=0
+   c1--;c2--;c3--;c4--;c5--;c6--;c7--;
+}
+
+}

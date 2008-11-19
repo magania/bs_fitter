@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="45">
+  <logicalFolder name="root" displayName="root" projectFiles="true">
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
+      <logicalFolder name="include" displayName="include" projectFiles="true">
+        <itemPath>include/BsFitter.h</itemPath>
+        <itemPath>include/F.h</itemPath>
+        <itemPath>include/RooBsTimeAngle.h</itemPath>
+        <itemPath>include/TimeAngle.h</itemPath>
+        <itemPath>include/TransAngles.h</itemPath>
+      </logicalFolder>
+    </logicalFolder>
+    <logicalFolder name="ResourceFiles"
+                   displayName="Resource Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <logicalFolder name="src" displayName="src" projectFiles="true">
+        <itemPath>src/BsFitter.cc</itemPath>
+        <itemPath>src/F.cc</itemPath>
+        <itemPath>src/fitter.cc</itemPath>
+        <itemPath>src/RooBsTimeAngle.cc</itemPath>
+        <itemPath>src/TimeAngle.cc</itemPath>
+        <itemPath>src/TransAngles.cc</itemPath>
+      </logicalFolder>
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceEncoding>UTF-8</sourceEncoding>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Debug" type="1">
+      <toolsSet>
+        <compilerSet>GNU|GNU</compilerSet>
+        <platform>2</platform>
+      </toolsSet>
+      <compileType>
+        <ccCompilerTool>
+          <includeDirectories>
+            <directoryPath>/usr/include/root</directoryPath>
+            <directoryPath>include</directoryPath>
+          </includeDirectories>
+        </ccCompilerTool>
+        <linkerTool>
+          <output>bin/run.sh</output>
+          <linkerLibItems>
+          </linkerLibItems>
+        </linkerTool>
+      </compileType>
+      <folder path="HeaderFiles">
+        <ccCompilerTool>
+          <includeDirectories>
+            <directoryPath>include</directoryPath>
+          </includeDirectories>
+        </ccCompilerTool>
+      </folder>
+      <item path="include/BsFitter.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="include/F.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="include/RooBsTimeAngle.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="include/TimeAngle.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="include/TransAngles.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/BsFitter.cc">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/F.cc">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/RooBsTimeAngle.cc">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/TimeAngle.cc">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/TransAngles.cc">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/fitter.cc">
+        <itemTool>1</itemTool>
+      </item>
+    </conf>
+    <conf name="Release" type="1">
+      <toolsSet>
+        <compilerSet>GNU|GNU</compilerSet>
+        <platform>2</platform>
+      </toolsSet>
+      <compileType>
+        <cCompilerTool>
+          <developmentMode>5</developmentMode>
+        </cCompilerTool>
+        <ccCompilerTool>
+          <developmentMode>5</developmentMode>
+        </ccCompilerTool>
+        <fortranCompilerTool>
+          <developmentMode>5</developmentMode>
+        </fortranCompilerTool>
+        <linkerTool>
+          <linkerLibItems>
+          </linkerLibItems>
+        </linkerTool>
+      </compileType>
+      <item path="include/BsFitter.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="include/F.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="include/RooBsTimeAngle.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="include/TimeAngle.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="include/TransAngles.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/BsFitter.cc">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/F.cc">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/RooBsTimeAngle.cc">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/TimeAngle.cc">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/TransAngles.cc">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/fitter.cc">
+        <itemTool>1</itemTool>
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>
