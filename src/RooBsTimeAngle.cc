@@ -1,7 +1,5 @@
 
-#include <root/RooAbsRealLValue.h>
-
-#include <root/RooAbsRealLValue.h>
+#include <RooAbsRealLValue.h>
 
 #include "RooFit.h"
 

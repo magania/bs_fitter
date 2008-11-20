@@ -1,5 +1,5 @@
 
-#include <root/RooRealVar.h>
+#include <RooRealVar.h>
 
 #include "BsFitter.h"
 BsFitter::BsFitter() :
