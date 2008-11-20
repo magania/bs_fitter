@@ -6,11 +6,12 @@ int main(int argc, char *argv[]) {
     const char *parameters = "parameters.txt";
     const char *result = "result.txt";
     
+    bool plot = true;
     bool use_stdin = false;
     
     int c;
     opterr = 0;
-    while ((c = getopt(argc, argv, "d:v:p:r:")) != -1)
+    while ((c = getopt(argc, argv, "nd:v:p:r:")) != -1)
         switch (c) {
             case 'd':
                 if (*optarg == '-')
@@ -26,6 +27,9 @@ int main(int argc, char *argv[]) {
                 break;
             case 'r':
                 result = optarg;
+                break;
+            case 'n':
+                plot = false;
                 break;
             case '?':
                 if (optopt == 'd' || optopt == 'v' || optopt == 'p' || optopt == 'r')
@@ -51,9 +55,11 @@ int main(int argc, char *argv[]) {
         bs->setData(data);
     bs->fit();
     bs->writeResult(result);
-    bs->plotM();
-    bs->plotT();
-    bs->plotCpsi();
-    bs->plotCtheta();
-    bs->plotPhi();
+    if ( plot ) {
+        bs->plotM();
+        bs->plotT();
+        bs->plotCpsi();
+        bs->plotCtheta();
+        bs->plotPhi();
+    }
 }
