@@ -6,12 +6,17 @@ int main(int argc, char *argv[]) {
     const char *parameters = "parameters.txt";
     const char *result = "result.txt";
     
+    bool use_stdin = false;
+    
     int c;
     opterr = 0;
     while ((c = getopt(argc, argv, "d:v:p:r:")) != -1)
         switch (c) {
             case 'd':
-                data = optarg;
+                if (*optarg == '-')
+                    use_stdin = true;
+                else
+                    data = optarg;
                 break;
             case 'v':
                 variables = optarg;
@@ -40,7 +45,10 @@ int main(int argc, char *argv[]) {
 
     bs->setVariables(variables);
     bs->setParameters(parameters);
-    bs->setData(data);
+    if (use_stdin)
+        bs->setDataFromCin();
+    else
+        bs->setData(data);
     bs->fit();
     bs->writeResult(result);
     bs->plotM();

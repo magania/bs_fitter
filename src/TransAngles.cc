@@ -9,6 +9,11 @@ TransAngles::TransAngles(RooAbsReal* parent, RooRealVar& cpsi, RooRealVar& cthet
   _ctheta("_ctheta", "cos(#theta)", parent, ctheta),
   _phi("_phi", "#phi", parent, phi)
 {
+//    std::cout << "cpsi:" << (double)_cpsi << " ctheta:" << (double)_ctheta << " phi: " << (double)_phi
+//            << " cpsi_max:" << _cpsi.max() << " cpsi_min:" << _cpsi.min()
+//            << " ctheta_max:" << _ctheta.max() << " ctheta_min:" << _ctheta.min()
+//            << " phi_max:" << _phi.max() << " phi_min:" << _phi.min()
+//            << std::endl;
 }
 
 TransAngles::TransAngles(RooAbsReal* parent, const TransAngles& other, const char* name) :
@@ -270,12 +275,20 @@ Double_t TransAngles::integralF5(Int_t code,const char* range) const
 
  double is2p;
  if (integrate_cpsi(code)) {
-   double rc2p = cos(2.*_phi.max(range)) - cos(2.*_phi.min());
+   double rc2p = cos(2.*_phi.max(range)) - cos(2.*_phi.min(range));
    is2p = -rc2p/2;
  } else {
    is2p = sin(2*_phi);
  }
 
+// if ( p2 * ist2*is2p /sqrt(2.) !=0)
+//        std::cout << "IntegralF5: " << p2 * ist2 * is2p / sqrt(2.) << " code:" << code
+//            << "cpsi:" << (double) _cpsi << " ctheta:" << (double) _ctheta << " phi: " << (double) _phi
+//            << " cpsi_max:" << _cpsi.max(range) << " cpsi_min:" << _cpsi.min(range)
+//            << " ctheta_max:" << _ctheta.max(range) << " ctheta_min:" << _ctheta.min(range)
+//            << " phi_max:" << _phi.max(range) << " phi_min:" << _phi.min(range)
+//            << std::endl;
+ 
  return  + p2 * ist2*is2p /sqrt(2.);//opposite (minus) sign: BaBar convention
 
 };

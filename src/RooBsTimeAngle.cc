@@ -1,3 +1,8 @@
+
+#include <root/RooAbsRealLValue.h>
+
+#include <root/RooAbsRealLValue.h>
+
 #include "RooFit.h"
 
 #include "Riostream.h"
@@ -33,6 +38,7 @@ RooBsTimeAngle::RooBsTimeAngle(const char *name, const char *title, Bool_t isBs,
   _delta_2("delta_2", "#Delta_2", this, delta_2),
   _aleatorio(0)
 {
+//    std::cout << "RANGE: " << cpsi.getMax() << " " << cpsi.getMin() << std::endl;
   _usePhi = kFALSE;
   // Constructor
   _basisExpCosh = declareBasis("exp(-@0/@1)*cosh(@0*@2/2)", RooArgList(tau,DG)) ;
@@ -203,17 +209,15 @@ Double_t RooBsTimeAngle::coefAnalyticalIntegral(Int_t basisIndex, Int_t code, co
     for (int i=0; i<6 ; i++)
       f_integral[i] = _angles.integralF(i+1, code, range);
 
-    if (f_integral[5] !=0)
-      cout << "INTEGRAL: " 
-	 << f_integral[0] << ' '
-	 << f_integral[1] << ' '
-	 << f_integral[2] << ' '
-	 << f_integral[3] << ' '
-	 << f_integral[4] << ' '
-	 << f_integral[5] << endl;
+//    if (f_integral[5] !=0)
+//      cout << "INTEGRAL: " << code << ' ' 
+//	 << f_integral[0] << ' '
+//	 << f_integral[1] << ' '
+//	 << f_integral[2] << ' '
+//	 << f_integral[3] << ' '
+//	 << f_integral[4] << ' '
+//	 << f_integral[5] << endl;
   }
-
-
 
   Double_t val =0;
   for (int i=0; i<6; i++)

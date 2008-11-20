@@ -28,6 +28,7 @@ public:
   void setParameters(const char* params);
   void setData(const char* data_file);
   void setData(RooDataSet* data_set);
+  void setDataFromCin();
 
   RooDataSet* generate(Int_t num);
   Int_t fit(Bool_t hesse=kTRUE, Bool_t minos=kFALSE, Bool_t verbose=kFALSE, Int_t cpu=1);
@@ -50,15 +51,15 @@ private:
   RooAbsPdf* background_model();
   void plotVar(RooRealVar& x, const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
 
-  RooRealVar m;
-  RooRealVar t;
+  RooRealVar _m;
+  RooRealVar _t;
 #ifndef RES_TRUE
-  RooRealVar et;
+  RooRealVar _et;
 #endif
-  RooRealVar cpsi;
-  RooRealVar ctheta;
-  RooRealVar phi;
-  RooRealVar d;
+  RooRealVar _cpsi;
+  RooRealVar _ctheta;
+  RooRealVar _phi;
+  RooRealVar _d;
 
   RooArgSet* parameters;
   RooArgSet* variables;
