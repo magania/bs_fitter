@@ -1,6 +1,8 @@
 void plotOfVar(RooRealVar &var, RooRealVar &evar, RooDataSet &data){
-  TCanvas *canvas = new TCanvas();
-  canvas->Divide(3);
+  TString name = var.GetName();
+  name+= "_frame";
+  TCanvas *canvas = new TCanvas(name, name,1200,600);
+  canvas->Divide(2);
 
   canvas->cd(1);
   RooRealVar mean_var("mean_var","mean", var.getVal(), var.getVal()-1, var.getVal()+1);
@@ -11,7 +13,7 @@ void plotOfVar(RooRealVar &var, RooRealVar &evar, RooDataSet &data){
   RooPlot *frame = var.frame();
   data.plotOn(frame);
   gauss_var.plotOn(frame);  
-  gauss_var.paramOn(frame);
+  gauss_var.paramOn(frame, Layout(0.45,0.99,0.99));
   frame->Draw();
 
  
@@ -33,17 +35,18 @@ void plotOfVar(RooRealVar &var, RooRealVar &evar, RooDataSet &data){
   RooPlot *frame = pull.frame();
   pull_data.plotOn(frame);
   gauss.plotOn(frame); 
-  gauss.paramOn(frame); 
+  gauss.paramOn(frame, Layout(0.45,0.99,0.99)); 
   frame->Draw();
 
-  canvas->cd(3);
-  RooPlot *frame = evar.frame();
-  data.plotOn(frame);
-  frame->Draw();
+  //  canvas->cd(3);
+  //  RooPlot *frame = evar.frame();
+  //  data.plotOn(frame);
+  //  frame->Draw();
 
 }
 
 fit_toy_signal(){
+	gROOT->SetStyle("Plain");
 
   using namespace RooFit;
 
@@ -83,7 +86,7 @@ fit_toy_signal(){
 
   TTree tree("tree","tree");
   tree.ReadFile("data_set.txt","A02/D:eA02:All2:eAll2:DeltaGamma:eDeltaGamma:delta_1:edelta_1:delta_2:edelta_2:phi_s:ephi_s:tau:etau");
-  tree.Draw("ephi_s");
+  //  tree.Draw("ephi_s");
   RooArgSet set(A02,All2,DeltaGamma,delta_1,delta_2,phi_s,tau);
   set.add(eA02);
   set.add(eAll2);

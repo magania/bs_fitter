@@ -13,6 +13,8 @@ BsFitter::BsFitter() :
   _phi("_phi","#phi", 0),
   _d("_d", "dilution", 0)
 {
+  gROOT->SetStyle("Plain");
+
   resolution = 0;
   model = 0;
   data = 0;

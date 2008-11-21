@@ -2,7 +2,7 @@
 #define BS_FITTER
 
 #include "TCanvas.h"
-
+#include "TROOT.h"
 
 #include "RooFit.h"
 #include "RooRealVar.h"
