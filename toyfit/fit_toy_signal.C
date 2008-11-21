@@ -23,7 +23,7 @@ void plotOfVar(RooRealVar &var, RooRealVar &evar, RooDataSet &data){
   for (int i= 0; i < data.numEntries(); i++){
     RooArgSet* data_set = data.get(i);
     pull = (var.getVal() - data_set->getRealValue(var.GetName()))/data_set->getRealValue(evar.GetName());
-    pull_data.add(pull);
+    pull_data.add(pull); 
   }
 
   RooRealVar mean("mean","mean", 0, -1, +1);
@@ -42,7 +42,8 @@ void plotOfVar(RooRealVar &var, RooRealVar &evar, RooDataSet &data){
   //  RooPlot *frame = evar.frame();
   //  data.plotOn(frame);
   //  frame->Draw();
-
+  name += ".gif";
+  canvas->Print(name);
 }
 
 fit_toy_signal(){
