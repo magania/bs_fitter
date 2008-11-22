@@ -8,13 +8,17 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:../../bsfitter/lib
 SAMPLES=0
 while [ $SAMPLES -lt 1000 ]
 do 
-../../toy/dist/Debug/GNU-Linux-x86/toy -f- | tail -n+7 | ../bin/fitter -d- -r /tmp/result_1 -n > /dev/null&
+#../../toy/dist/Debug/GNU-Linux-x86/toy -f- | tail -n+7 | ../bin/fitter -d- -r /tmp/result_1 -n > /dev/null&
+../bin/fitter -r /tmp/result_1 -n > /dev/null&
 PID1=$!
-../../toy/dist/Debug/GNU-Linux-x86/toy -f- | tail -n+7 | ../bin/fitter -d- -r /tmp/result_2 -n > /dev/null&
+#../../toy/dist/Debug/GNU-Linux-x86/toy -f- | tail -n+7 | ../bin/fitter -d- -r /tmp/result_2 -n > /dev/null&
+../bin/fitter -r /tmp/result_2 -n > /dev/null&
 PID2=$!
-../../toy/dist/Debug/GNU-Linux-x86/toy -f- | tail -n+7 | ../bin/fitter -d- -r /tmp/result_3 -n > /dev/null&
+#../../toy/dist/Debug/GNU-Linux-x86/toy -f- | tail -n+7 | ../bin/fitter -d- -r /tmp/result_3 -n > /dev/null&
+../bin/fitter -r /tmp/result_3 -n > /dev/null&
 PID3=$!
-../../toy/dist/Debug/GNU-Linux-x86/toy -f- | tail -n+7 | ../bin/fitter -d- -r /tmp/result_4 -n > /dev/null&
+#../../toy/dist/Debug/GNU-Linux-x86/toy -f- | tail -n+7 | ../bin/fitter -d- -r /tmp/result_4 -n > /dev/null&
+../bin/fitter -r /tmp/result_4 -n > /dev/null&
 PID4=$!
 echo $PID1 $PID2 $PID3 $PID4
 wait $PID1 $PID2 $PID3 $PID4

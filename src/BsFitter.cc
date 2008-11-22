@@ -1,5 +1,5 @@
 
-#include <root/RooGlobalFunc.h>
+#include <RooGlobalFunc.h>
 
 
 #include <RooRealVar.h>
