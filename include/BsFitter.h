@@ -17,6 +17,7 @@
 #include "RooPlot.h"
 #include "RooGaussModel.h"
 #include "RooTruthModel.h"
+#include "RooLandau.h"
 
 #include "RooBsTimeAngle.h"
 
@@ -30,7 +31,7 @@ public:
   void setData(RooDataSet* data_set);
   void setDataFromCin();
 
-  RooDataSet* generate(Int_t num);
+  void generate(Int_t num);
   Int_t fit(Bool_t hesse=kTRUE, Bool_t minos=kFALSE, Bool_t verbose=kFALSE, Int_t cpu=1);
 
   void plotM(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);

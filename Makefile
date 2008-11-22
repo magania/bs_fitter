@@ -7,8 +7,8 @@ LIBS    = $(shell root-config --libs) -lRooFit -lRooFitCore
 MYLIBS = obj/TransAngles.o obj/RooBsTimeAngle.o obj/F.o obj/TimeAngle.o
 FITTERS = BsFitter
 
-DFLAGS = -DRES_TRUE
-#DFLAGS = -DRES_GAUSS
+#DFLAGS = -DRES_TRUE
+DFLAGS = -DRES_GAUSS
 
 all: bin/fitter
 

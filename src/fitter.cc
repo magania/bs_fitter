@@ -49,12 +49,13 @@ int main(int argc, char *argv[]) {
 
     bs->setVariables(variables);
     bs->setParameters(parameters);
-    if (use_stdin)
+/*    if (use_stdin)
         bs->setDataFromCin();
     else
-        bs->setData(data);
-    bs->fit();
-    bs->writeResult(result);
+        bs->setData(data); */
+    bs->generate(3000);
+    
+   bs->fit();   bs->writeResult(result);
     if ( plot ) {
         bs->plotM();
         bs->plotT();

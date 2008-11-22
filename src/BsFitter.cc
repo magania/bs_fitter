@@ -1,4 +1,7 @@
 
+#include <root/RooGlobalFunc.h>
+
+
 #include <RooRealVar.h>
 
 #include "BsFitter.h"
@@ -37,7 +40,7 @@ BsFitter::BsFitter() :
 #ifdef RES_GAUSS
   RooRealVar *S = new RooRealVar("S", "S", 0);
   parameters->add(*S);
-  resolution = new RooGaussModel("resolution", "gauss resolution", t, RooFit::RooConst(0), *S, et);  
+  resolution = new RooGaussModel("resolution", "gauss resolution", _t, RooFit::RooConst(0), *S, _et);  
 #endif
 
 #ifdef RES_TRUE
@@ -90,14 +93,18 @@ void BsFitter::setDataFromCin(){
 }
 
 
-RooDataSet* BsFitter::generate(Int_t num){
+void BsFitter::generate(Int_t num){
 #ifdef RES_TRUE
   return model->generate(RooArgSet(_m, _t, _cpsi, _ctheta, _phi, _d), num);
 #endif
-//     RooDataSet *data_p = p_model.generate(RooArgSet(p), num_events, kTRUE);
-//     RooDataSet *data_p_et = et_model.generate(RooArgSet(et), num_events, kTRUE);
-//     data_p_et->merge(data_p);
-//     RooDataSet *data = signal_model.generate(RooArgSet(phi,ctheta, cpsi, t), ProtoData(*data_p_et));
+//    RooRealVar et_mean("et_mean", "mean time error", 0.08);
+//    RooRealVar et_sigma("et_sigma", "sigma time error", 0.025);
+
+//    RooLandau *et_model = new RooLandau("et_model", "time error model", _et, et_mean, et_sigma);
+
+     RooDataSet *data_et = model->generate(RooArgSet(_et), num, kTRUE);
+//     RooProdPdf *gen_model = new RooProdPdf("gen_model","generation model",*model, *et_model);
+     data = model->generate(RooArgSet(_m,_t,_cpsi,_ctheta,_phi), *data_et);
 }
 
 Int_t BsFitter::fit(Bool_t hesse, Bool_t minos, Bool_t verbose, Int_t cpu)
@@ -168,11 +175,11 @@ void BsFitter::plotVar(RooRealVar& x, const char* plot_file, Int_t bins, Int_t p
 #endif
 #ifndef RES_TRUE
     if (proj_bins){
-      et.setBins(proj_bins);
-      RooDataHist projData("projData","projData",RooArgSet(et,d), *data);
-      model->plotOn(x_frame, RooFit::ProjWData(RooArgSet(et,d), projData));
+      _et.setBins(proj_bins);
+      RooDataHist projData("projData","projData",RooArgSet(_et,_d), *data);
+      model->plotOn(x_frame, RooFit::ProjWData(RooArgSet(_et,_d), projData));
     } else {
-      model->plotOn(x_frame, RooFit::ProjWData(RooArgSet(et,d), *data));
+      model->plotOn(x_frame, RooFit::ProjWData(RooArgSet(_et,_d), *data));
     }
 #endif
   } else {
@@ -219,6 +226,11 @@ RooAbsPdf* BsFitter::signal_model()
   parameters->add(*tau);
   parameters->add(*DeltaMs);
 
+  RooRealVar *et_mean = new RooRealVar("et_mean", "mean time error",0);
+  RooRealVar *et_sigma = new RooRealVar("et_sigma", "#sigma time error", 0);
+  parameters->add(*et_mean);
+  parameters->add(*et_sigma);
+
   RooGaussian *signal_mass = new RooGaussian("signal_mass", "signal_mass", _m, *M, *sigma);
 
 #ifdef EFFICIENCY
@@ -241,8 +253,10 @@ RooAbsPdf* BsFitter::signal_model()
 					      *time_angle_bs, *time_angle_bsbar, _d);
 #endif
 
-  RooProdPdf *signal =
-    new RooProdPdf("signal", "signal", RooArgSet(*signal_mass, *signal_time_angle));
+  RooLandau *et_model = new RooLandau("et_model", "time error model", _et, *et_mean, *et_sigma);
+  
+  RooProdPdf *signal = new RooProdPdf("signal", "signal",
+            RooArgSet(*signal_mass, /**signal_time_angle*/*time_angle_bs), RooFit::Conditional(*et_model, _et));
   
   return signal;
 }
