@@ -11,9 +11,9 @@ public:
   //  virtual TObject* clone(const char* newname) const { return new TransAngles(*this,newname) ; }
   //  virtual ~TransAngles();  
 
-  Double_t cpsi() {return (Double_t) _cpsi;}
-  Double_t ctheta() {return (Double_t) _ctheta;}
-  Double_t phi() {return (Double_t) _phi;}
+  Double_t cpsi() const {return (Double_t) _cpsi;}
+  Double_t ctheta() const {return (Double_t) _ctheta;}
+  Double_t phi() const {return (Double_t) _phi;}
 
   const RooRealProxy& cpsiProxy() const {return  _cpsi;}
   const RooRealProxy& cthetaProxy() const {return  _ctheta;}

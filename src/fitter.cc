@@ -1,3 +1,6 @@
+
+#include "BsFitter.h"
+
 # include "BsFitter.h"
 
 int main(int argc, char *argv[]) {
@@ -49,11 +52,12 @@ int main(int argc, char *argv[]) {
 
     bs->setVariables(variables);
     bs->setParameters(parameters);
-/*    if (use_stdin)
+    bs->setEfficiency("efficiency.txt");
+    if (use_stdin)
         bs->setDataFromCin();
     else
-        bs->setData(data); */
-    bs->generate(3000);
+        bs->setData(data); 
+    //bs->generate(10000);
     
    bs->fit();   bs->writeResult(result);
     if ( plot ) {

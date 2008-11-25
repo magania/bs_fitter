@@ -18,56 +18,64 @@
 #include "RooGaussModel.h"
 #include "RooTruthModel.h"
 #include "RooLandau.h"
+#include "RooProdPdf.h"
+#include "RooChebychev.h"
+#include "RooExponential.h"
+#include "RooDecay.h"
 
 #include "RooBsTimeAngle.h"
+#include "RooBkgAngle.h"
 
 class BsFitter {
 public:
-  BsFitter();
- 
-  void setVariables(const char* vars);
-  void setParameters(const char* params);
-  void setData(const char* data_file);
-  void setData(RooDataSet* data_set);
-  void setDataFromCin();
+    BsFitter();
 
-  void generate(Int_t num);
-  Int_t fit(Bool_t hesse=kTRUE, Bool_t minos=kFALSE, Bool_t verbose=kFALSE, Int_t cpu=1);
+    void setVariables(const char* vars);
+    void setParameters(const char* params);
+    void setEfficiency(const char* efficiency);
+    void setData(const char* data_file);
+    void setData(RooDataSet* data_set);
+    void setDataFromCin();
 
-  void plotM(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
-  void plotM();
-  void plotT(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
-  void plotT();
-  void plotCpsi(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
-  void plotCpsi();
-  void plotCtheta(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
-  void plotCtheta();
-  void plotPhi(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
-  void plotPhi();
+    void generate(Int_t num);
+    Int_t fit(Bool_t hesse = kTRUE, Bool_t minos = kFALSE, Bool_t verbose = kFALSE, Int_t cpu = 1);
 
-  void writeResult(const char* file_name);
+    void plotM(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
+    void plotM();
+    void plotT(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
+    void plotT();
+    void plotCpsi(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
+    void plotCpsi();
+    void plotCtheta(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
+    void plotCtheta();
+    void plotPhi(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
+    void plotPhi();
+
+    void writeResult(const char* file_name);
 
 private:
-  RooAbsPdf* signal_model();
-  RooAbsPdf* background_model();
-  void plotVar(RooRealVar& x, const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
+    RooAbsPdf* signal_model();
+    RooAbsPdf* background_model();
+    void plotVar(RooRealVar& x, const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
 
-  RooRealVar _m;
-  RooRealVar _t;
+    RooRealVar _m;
+    RooRealVar _t;
 #ifndef RES_TRUE
-  RooRealVar _et;
+    RooRealVar _et;
 #endif
-  RooRealVar _cpsi;
-  RooRealVar _ctheta;
-  RooRealVar _phi;
-  RooRealVar _d;
+    RooRealVar _cpsi;
+    RooRealVar _ctheta;
+    RooRealVar _phi;
+    RooRealVar _d;
 
-  RooArgSet* parameters;
-  RooArgSet* variables;
-  RooResolutionModel *resolution;
-  RooAbsPdf* model;
-  RooDataSet* data;
-  RooFitResult* fit_result;
+    RooArgSet* parameters;
+    RooArgSet* variables;
+    RooResolutionModel *resolution;
+    RooAbsPdf* model;
+    Efficiency* efficiency;
+
+    RooDataSet* data;
+    RooFitResult* fit_result;
 };
 
 #endif

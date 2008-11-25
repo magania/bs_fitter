@@ -4,11 +4,13 @@ CCFLAGS= -g -fPIC
 INCLUDE = $(shell root-config --cflags) -Iinclude
 LIBS    = $(shell root-config --libs) -lRooFit -lRooFitCore
 
-MYLIBS = obj/TransAngles.o obj/RooBsTimeAngle.o obj/F.o obj/TimeAngle.o
+MYLIBS = obj/TransAngles.o obj/RooBsTimeAngle.o obj/F.o obj/TimeAngle.o obj/Efficiency.o obj/RooBkgAngle.o
 FITTERS = BsFitter
 
 #DFLAGS = -DRES_TRUE
-DFLAGS = -DRES_GAUSS
+#DFLAGS = -DRES_GAUSS
+DFLAGS = -DRES_GAUSS -DEFFICIENCY
+
 
 all: bin/fitter
 
@@ -18,8 +20,10 @@ $(MYLIBS): obj/%.o : src/%.cc include/%.h
 	@echo $(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) -shared $@ -o $(@:obj/%.o=lib/lib%.so)
 	$(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) -shared $@ -o $(@:obj/%.o=lib/lib%.so)
 
-obj/BsFitter.o: src/BsFitter.cc include/BsFitter.h obj/$(LIBRARY)
-	rootcint -f Dict.cc  -c include/* 
+obj/BsFitter.o: src/BsFitter.cc include/BsFitter.h $(MYLIBS)
+	@echo rootcint -f Dict.cc  -c include/*
+	rootcint -f Dict.cc  -c include/*
+	@echo $(CXX) $(CCFLAGS) $(INCLUDE) -c Dict.cc -o obj/Dict.o
 	$(CXX) $(CCFLAGS) $(INCLUDE) -c Dict.cc -o obj/Dict.o
 	@echo $(CXX) $(CCFLAGS) $(INCLUDE) $(DFLAGS) -c $< -o obj/BsFitter.o
 	$(CXX) $(CCFLAGS) $(INCLUDE) $(DFLAGS) -c $< -o obj/BsFitter.o
@@ -28,6 +32,7 @@ obj/BsFitter.o: src/BsFitter.cc include/BsFitter.h obj/$(LIBRARY)
 #	$(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) -shared obj/Dict.o $(LIBRARY) obj/BsFitter_gauss.o -o lib/libBsFitter_gauss.so
 
 bin/fitter: src/fitter.cc $(MYLIBS) obj/BsFitter.o obj/Dict.o
+	@echo $(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) $^ -o bin/fitter
 	$(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) $^ -o bin/fitter
 
 piedritas: piedritas.cc
