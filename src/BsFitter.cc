@@ -1,4 +1,7 @@
 
+#include "RooBkgAngle.h"
+
+
 #include <root/TRandom3.h>
 
 
@@ -321,5 +324,66 @@ RooAbsPdf* BsFitter::signal_model() {
 }
 
 RooAbsPdf* BsFitter::background_model() {
-    return 0;
+//    return 0;
+    
+    RooRealVar *tm_p = new RooRealVar("tm_p", "tm_p", 0);
+    RooRealVar *B1_p = new RooRealVar("B1_p", "B1_p", 0);
+    RooRealVar *B2_p = new RooRealVar("B2_p", "B2_p", 0);
+    RooRealVar *B3_p = new RooRealVar("B3_p", "B3_p", 0);
+    RooRealVar *B4_p = new RooRealVar("B4_p", "B4_p", 0);
+    RooRealVar *B5_p = new RooRealVar("B5_p", "B5_p", 0);
+    RooRealVar *B6_p = new RooRealVar("B6_p", "B6_p", 0);
+    parameters->add(*tm_p);
+    parameters->add(*B1_p);
+    parameters->add(*B2_p);
+    parameters->add(*B3_p);
+    parameters->add(*B4_p);
+    parameters->add(*B5_p);
+    parameters->add(*B6_p);
+    
+    RooExponential *exp_mass_p = new RooExponential("exp_mass_p","exp mass prompt", _m, *tm_p);
+    RooBkgAngle *angle_p= new RooBkgAngle("angle_p","angle prompt",_cpsi, _ctheta, _phi,
+            *B1_p, *B2_p, *B3_p, *B4_p, *B5_p, *B6_p, efficiency);
+    RooProdPdf *prompt = new RooProdPdf("prompt","prompt bkg", RooArgSet(*exp_mass_p, *resolution, *angle_p));
+
+    RooRealVar *tm_np = new RooRealVar("tm_np", "tm_np",0);
+    RooRealVar *t_m = new RooRealVar("t_m","t_m",0);
+    RooRealVar *t_p = new RooRealVar("t_p", "t_p", 0);
+    RooRealVar *t_pp = new RooRealVar("t_pp", "t_pp", 0);
+    RooRealVar *fm = new RooRealVar("fm","fm",0);
+    RooRealVar *fp = new RooRealVar("fp","fp",0);
+    RooRealVar *B1_np = new RooRealVar("B1_np", "B1_np", 0);
+    RooRealVar *B2_np = new RooRealVar("B2_np", "B2_np", 0);
+    RooRealVar *B3_np = new RooRealVar("B3_np", "B3_np", 0);
+    RooRealVar *B4_np = new RooRealVar("B4_np", "B4_np", 0);
+    RooRealVar *B5_np = new RooRealVar("B5_np", "B5_np", 0);
+    RooRealVar *B6_np = new RooRealVar("B6_np", "B6_np", 0);
+    parameters->add(*tm_np);
+    parameters->add(*t_m);
+    parameters->add(*t_p);
+    parameters->add(*t_pp);
+    parameters->add(*fm);
+    parameters->add(*fp);
+    parameters->add(*B1_np);
+    parameters->add(*B2_np);
+    parameters->add(*B3_np);
+    parameters->add(*B4_np);
+    parameters->add(*B5_np);
+    parameters->add(*B6_np);
+    
+    RooExponential *exp_mass_np = new RooExponential("exp_mass_np", "exp mass noprompt", _m, *tm_np);
+    RooDecay *exp_minus = new RooDecay("exp_minus", "exp minus", _t , *t_m, *resolution, RooDecay::Flipped);
+    RooDecay *exp_plus = new RooDecay("exp_plus","exp plus", _t, *t_p, *resolution, RooDecay::SingleSided);
+    RooDecay *exp_plus_plus = new RooDecay("exp_plus_plus","exp plus plus", _t, *t_pp, *resolution, RooDecay::SingleSided);
+    RooAddPdf *time_np = new RooAddPdf("time_np", "time no propmt",
+            RooArgList(*exp_minus, *exp_plus, *exp_plus_plus), RooArgList(*fm, *fp));
+    RooBkgAngle *angle_np = new RooBkgAngle("angle_np", "angle noprompt", _cpsi, _ctheta, _phi,
+            *B1_np, *B2_np, *B3_np, *B4_np, *B5_np, *B6_np, efficiency);
+    RooProdPdf *noprompt = new RooProdPdf("noprompt", "noprompt bkg", RooArgSet(*exp_mass_np, *time_np, *angle_np));
+    
+    RooRealVar *xp = new RooRealVar("xp","xp",0);
+    parameters->add(*xp);
+    RooAddPdf *background = new RooAddPdf("background", "background", *prompt, *noprompt, *xp);
+            
+    return background;
 }

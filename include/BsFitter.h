@@ -20,6 +20,8 @@
 #include "RooLandau.h"
 #include "RooProdPdf.h"
 #include "RooChebychev.h"
+#include "RooExponential.h"
+#include "RooDecay.h"
 
 #include "RooBsTimeAngle.h"
 #include "RooBkgAngle.h"
