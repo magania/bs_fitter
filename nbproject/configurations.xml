@@ -6,7 +6,9 @@
                    projectFiles="true">
       <logicalFolder name="include" displayName="include" projectFiles="true">
         <itemPath>include/BsFitter.h</itemPath>
+        <itemPath>include/Efficiency.h</itemPath>
         <itemPath>include/F.h</itemPath>
+        <itemPath>include/RooBkgAngle.h</itemPath>
         <itemPath>include/RooBsTimeAngle.h</itemPath>
         <itemPath>include/TimeAngle.h</itemPath>
         <itemPath>include/TransAngles.h</itemPath>
@@ -21,8 +23,10 @@
                    projectFiles="true">
       <logicalFolder name="src" displayName="src" projectFiles="true">
         <itemPath>src/BsFitter.cc</itemPath>
+        <itemPath>efficiency.cc</itemPath>
         <itemPath>src/F.cc</itemPath>
         <itemPath>src/fitter.cc</itemPath>
+        <itemPath>src/RooBkgAngle.cc</itemPath>
         <itemPath>src/RooBsTimeAngle.cc</itemPath>
         <itemPath>src/TimeAngle.cc</itemPath>
         <itemPath>src/TransAngles.cc</itemPath>
@@ -62,10 +66,19 @@
           </includeDirectories>
         </ccCompilerTool>
       </folder>
+      <item path="efficiency.cc">
+        <itemTool>1</itemTool>
+      </item>
       <item path="include/BsFitter.h">
         <itemTool>3</itemTool>
       </item>
+      <item path="include/Efficiency.h">
+        <itemTool>3</itemTool>
+      </item>
       <item path="include/F.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="include/RooBkgAngle.h">
         <itemTool>3</itemTool>
       </item>
       <item path="include/RooBsTimeAngle.h">
@@ -81,6 +94,9 @@
         <itemTool>1</itemTool>
       </item>
       <item path="src/F.cc">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/RooBkgAngle.cc">
         <itemTool>1</itemTool>
       </item>
       <item path="src/RooBsTimeAngle.cc">
@@ -116,10 +132,19 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
+      <item path="efficiency.cc">
+        <itemTool>1</itemTool>
+      </item>
       <item path="include/BsFitter.h">
         <itemTool>3</itemTool>
       </item>
+      <item path="include/Efficiency.h">
+        <itemTool>3</itemTool>
+      </item>
       <item path="include/F.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="include/RooBkgAngle.h">
         <itemTool>3</itemTool>
       </item>
       <item path="include/RooBsTimeAngle.h">
@@ -135,6 +160,9 @@
         <itemTool>1</itemTool>
       </item>
       <item path="src/F.cc">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/RooBkgAngle.cc">
         <itemTool>1</itemTool>
       </item>
       <item path="src/RooBsTimeAngle.cc">

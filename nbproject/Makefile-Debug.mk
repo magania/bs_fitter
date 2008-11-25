@@ -27,10 +27,12 @@ OBJECTDIR=build/Debug/GNU-Linux-x86
 OBJECTFILES= \
 	${OBJECTDIR}/src/RooBsTimeAngle.o \
 	${OBJECTDIR}/src/fitter.o \
-	${OBJECTDIR}/src/BsFitter.o \
+	${OBJECTDIR}/src/RooBkgAngle.o \
 	${OBJECTDIR}/src/TimeAngle.o \
-	${OBJECTDIR}/src/TransAngles.o \
-	${OBJECTDIR}/src/F.o
+	${OBJECTDIR}/src/F.o \
+	${OBJECTDIR}/efficiency.o \
+	${OBJECTDIR}/src/BsFitter.o \
+	${OBJECTDIR}/src/TransAngles.o
 
 # C Compiler Flags
 CFLAGS=
@@ -60,21 +62,29 @@ ${OBJECTDIR}/src/fitter.o: src/fitter.cc
 	${MKDIR} -p ${OBJECTDIR}/src
 	$(COMPILE.cc) -g -I/usr/include/root -Iinclude -o ${OBJECTDIR}/src/fitter.o src/fitter.cc
 
-${OBJECTDIR}/src/BsFitter.o: src/BsFitter.cc 
+${OBJECTDIR}/src/RooBkgAngle.o: src/RooBkgAngle.cc 
 	${MKDIR} -p ${OBJECTDIR}/src
-	$(COMPILE.cc) -g -I/usr/include/root -Iinclude -o ${OBJECTDIR}/src/BsFitter.o src/BsFitter.cc
+	$(COMPILE.cc) -g -I/usr/include/root -Iinclude -o ${OBJECTDIR}/src/RooBkgAngle.o src/RooBkgAngle.cc
 
 ${OBJECTDIR}/src/TimeAngle.o: src/TimeAngle.cc 
 	${MKDIR} -p ${OBJECTDIR}/src
 	$(COMPILE.cc) -g -I/usr/include/root -Iinclude -o ${OBJECTDIR}/src/TimeAngle.o src/TimeAngle.cc
 
-${OBJECTDIR}/src/TransAngles.o: src/TransAngles.cc 
-	${MKDIR} -p ${OBJECTDIR}/src
-	$(COMPILE.cc) -g -I/usr/include/root -Iinclude -o ${OBJECTDIR}/src/TransAngles.o src/TransAngles.cc
-
 ${OBJECTDIR}/src/F.o: src/F.cc 
 	${MKDIR} -p ${OBJECTDIR}/src
 	$(COMPILE.cc) -g -I/usr/include/root -Iinclude -o ${OBJECTDIR}/src/F.o src/F.cc
+
+${OBJECTDIR}/efficiency.o: efficiency.cc 
+	${MKDIR} -p ${OBJECTDIR}
+	$(COMPILE.cc) -g -I/usr/include/root -Iinclude -o ${OBJECTDIR}/efficiency.o efficiency.cc
+
+${OBJECTDIR}/src/BsFitter.o: src/BsFitter.cc 
+	${MKDIR} -p ${OBJECTDIR}/src
+	$(COMPILE.cc) -g -I/usr/include/root -Iinclude -o ${OBJECTDIR}/src/BsFitter.o src/BsFitter.cc
+
+${OBJECTDIR}/src/TransAngles.o: src/TransAngles.cc 
+	${MKDIR} -p ${OBJECTDIR}/src
+	$(COMPILE.cc) -g -I/usr/include/root -Iinclude -o ${OBJECTDIR}/src/TransAngles.o src/TransAngles.cc
 
 # Subprojects
 .build-subprojects:
