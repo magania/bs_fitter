@@ -226,7 +226,8 @@ void BsFitter::plotVar(RooRealVar& x, const char* plot_file, Int_t bins, Int_t p
         if (proj_bins) {
             _et.setBins(proj_bins);
             RooDataHist projData("projData", "projData", RooArgSet(_et, _d), *data);
-//            model->plotOn(x_frame, RooFit::ProjWData(RooArgSet(_et, _d), projData));
+            if (x == _m || x == _t)
+            model->plotOn(x_frame, RooFit::ProjWData(RooArgSet(_et, _d), projData));
         } else {
             model->plotOn(x_frame, RooFit::ProjWData(RooArgSet(_et, _d), *data));
         }
@@ -234,8 +235,8 @@ void BsFitter::plotVar(RooRealVar& x, const char* plot_file, Int_t bins, Int_t p
     } else {
         model->plotOn(x_frame);
     }
-//    if (x == _ctheta || x== _cpsi || x==_phi )
-//        efficiency->plotOn(x_frame,RooFit::LineColor(kRed));
+//    if (x == _ctheta || x == _cpsi || x == _phi)
+        //        efficiency->plotOn(x_frame,RooFit::LineColor(kRed));
 
     TCanvas *canvas = new TCanvas("canvas", "canvas", 600, 600);
     x_frame->Draw();
@@ -318,14 +319,15 @@ RooAbsPdf* BsFitter::signal_model() {
     RooLandau *et_model = new RooLandau("et_model", "time error model", _et, *et_mean, *et_sigma);
 
     RooProdPdf *signal = new RooProdPdf("signal", "signal",
-            RooArgSet(*signal_mass, /**signal_time_angle*/*time_angle_bs), RooFit::Conditional(*et_model, _et));
+            RooArgSet(*signal_mass, *signal_time_angle/**time_angle_bs*/), RooFit::Conditional(*et_model, _et));
 
+//    return 0;
     return signal;
 }
 
 RooAbsPdf* BsFitter::background_model() {
 //    return 0;
-    
+    cout << "Bkg mode" << endl;
     RooRealVar *tm_p = new RooRealVar("tm_p", "tm_p", 0);
     RooRealVar *B1_p = new RooRealVar("B1_p", "B1_p", 0);
     RooRealVar *B2_p = new RooRealVar("B2_p", "B2_p", 0);
@@ -347,11 +349,11 @@ RooAbsPdf* BsFitter::background_model() {
     RooProdPdf *prompt = new RooProdPdf("prompt","prompt bkg", RooArgSet(*exp_mass_p, *resolution, *angle_p));
 
     RooRealVar *tm_np = new RooRealVar("tm_np", "tm_np",0);
-    RooRealVar *t_m = new RooRealVar("t_m","t_m",0);
+    RooRealVar *t_m = new RooRealVar("t_m", "t_m", 0);
     RooRealVar *t_p = new RooRealVar("t_p", "t_p", 0);
     RooRealVar *t_pp = new RooRealVar("t_pp", "t_pp", 0);
-    RooRealVar *fm = new RooRealVar("fm","fm",0);
-    RooRealVar *fp = new RooRealVar("fp","fp",0);
+    RooRealVar *fm = new RooRealVar("fm", "fm", 0);
+    RooRealVar *fp = new RooRealVar("fp", "fp", 0);
     RooRealVar *B1_np = new RooRealVar("B1_np", "B1_np", 0);
     RooRealVar *B2_np = new RooRealVar("B2_np", "B2_np", 0);
     RooRealVar *B3_np = new RooRealVar("B3_np", "B3_np", 0);
@@ -370,13 +372,13 @@ RooAbsPdf* BsFitter::background_model() {
     parameters->add(*B4_np);
     parameters->add(*B5_np);
     parameters->add(*B6_np);
-    
+
     RooExponential *exp_mass_np = new RooExponential("exp_mass_np", "exp mass noprompt", _m, *tm_np);
-    RooDecay *exp_minus = new RooDecay("exp_minus", "exp minus", _t , *t_m, *resolution, RooDecay::Flipped);
-    RooDecay *exp_plus = new RooDecay("exp_plus","exp plus", _t, *t_p, *resolution, RooDecay::SingleSided);
-    RooDecay *exp_plus_plus = new RooDecay("exp_plus_plus","exp plus plus", _t, *t_pp, *resolution, RooDecay::SingleSided);
+    RooDecay *exp_minus = new RooDecay("exp_minus", "exp minus", _t, *t_m, *resolution, RooDecay::Flipped);
+    RooDecay *exp_plus = new RooDecay("exp_plus", "exp plus", _t, *t_p, *resolution, RooDecay::SingleSided);
+    RooDecay *exp_plus_plus = new RooDecay("exp_plus_plus", "exp plus plus", _t, *t_pp, *resolution, RooDecay::SingleSided);
     RooAddPdf *time_np = new RooAddPdf("time_np", "time no propmt",
-            RooArgList(*exp_minus, *exp_plus, *exp_plus_plus), RooArgList(*fm, *fp));
+            RooArgSet(*exp_minus, *exp_plus, *exp_plus_plus), RooArgSet(*fm, *fp));
     RooBkgAngle *angle_np = new RooBkgAngle("angle_np", "angle noprompt", _cpsi, _ctheta, _phi,
             *B1_np, *B2_np, *B3_np, *B4_np, *B5_np, *B6_np, efficiency);
     RooProdPdf *noprompt = new RooProdPdf("noprompt", "noprompt bkg", RooArgSet(*exp_mass_np, *time_np, *angle_np));
