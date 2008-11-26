@@ -2,10 +2,8 @@
 #include "RooBkgAngle.h"
 
 
-#include <root/TRandom3.h>
-
-
-#include <root/RooDataSet.h>
+#include <TRandom3.h>
+#include <RooDataSet.h>
 
 #include <RooGlobalFunc.h>
 #include <RooRealVar.h>
@@ -324,7 +322,7 @@ RooAbsPdf* BsFitter::signal_model() {
 }
 
 RooAbsPdf* BsFitter::background_model() {
-//    return 0;
+    return 0;
     
     RooRealVar *tm_p = new RooRealVar("tm_p", "tm_p", 0);
     RooRealVar *B1_p = new RooRealVar("B1_p", "B1_p", 0);
