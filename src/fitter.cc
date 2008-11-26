@@ -1,6 +1,4 @@
-
 #include "BsFitter.h"
-
 # include "BsFitter.h"
 
 int main(int argc, char *argv[]) {
