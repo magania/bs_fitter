@@ -1,6 +1,6 @@
 void plotOfVar(RooRealVar &var, RooRealVar &evar, RooDataSet &data){
   TString name = var.GetName();
-  name+= "_frame";
+  name+= "_pull";
   TCanvas *canvas = new TCanvas(name, name,1200,600);
   canvas->Divide(2);
 
@@ -42,13 +42,30 @@ void plotOfVar(RooRealVar &var, RooRealVar &evar, RooDataSet &data){
   //  RooPlot *frame = evar.frame();
   //  data.plotOn(frame);
   //  frame->Draw();
+  
+  table += "^ ";
+  table += name;
+  table += " | ";
+  table += var.getVal();
+  table += " | ";
+  table += mean_var.getVal();
+  table += " | ";
+  table += sigma_var.getVal();
+  table += " | ";
+  table += mean.getVal();
+  table += " | ";
+  table += sigma.getVal() ;
+  table += "\n";
+
   name += ".gif";
   canvas->Print(name);
 }
 
+TString table;
+
 fit_toy_signal(){
 	gROOT->SetStyle("Plain");
-
+	table = "^ Parameters   ^ Generated   ^ mean   ^ sigma ^ mean_pull ^ sigma_pull \n";
   using namespace RooFit;
 
   RooRealVar A02("A02", "A02", 0);
@@ -109,5 +126,7 @@ fit_toy_signal(){
   plotOfVar(delta_2,edelta_2,data);
   plotOfVar(phi_s,ephi_s,data);
   plotOfVar(tau,etau,data);
+  
+  cout << table;
   return ;
 }

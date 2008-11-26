@@ -2,10 +2,8 @@
 #include "RooBkgAngle.h"
 
 
-#include <root/TRandom3.h>
-
-
-#include <root/RooDataSet.h>
+#include <TRandom3.h>
+#include <RooDataSet.h>
 
 #include <RooGlobalFunc.h>
 #include <RooRealVar.h>
