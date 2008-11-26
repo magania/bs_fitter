@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
         bs->setData(data); 
     //bs->generate(10000);
     
-   bs->fit();   bs->writeResult(result);
+   bs->fit(false, false, true, 4);   bs->writeResult(result);
     if ( plot ) {
         bs->plotM();
         bs->plotT();
