@@ -29,7 +29,7 @@
 
 class BsFitter {
 public:
-    BsFitter(Bool_t use_resolution, Bool_t signal_only, Bool_t use_efficiency, Bool_t use_phis);
+    BsFitter(Bool_t use_resolution, Bool_t signal_only, Bool_t sidebands, Bool_t use_efficiency, Bool_t use_phis);
 
     void setParameters(const char* params);
     void writeParameters(const char* params);
@@ -72,6 +72,7 @@ private:
 
     Bool_t _use_resolution;
     Bool_t _signal_only;
+    Bool_t _sidebands;
     Bool_t _use_efficiency;
     Bool_t _use_phis;
     
@@ -84,6 +85,8 @@ private:
 
     RooDataSet* _data;
     RooFitResult* _fit_result;
+
+    const char* _range;
 };
 
 #endif

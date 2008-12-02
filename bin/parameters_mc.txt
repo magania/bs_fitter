@@ -1,0 +1,13 @@
+M = 5.36849 C
+Sigma = 0.0358842 C 
+Tau =  1.4643464 C
+DeltaGamma =  0 C
+A02 =  0.3333333 C
+All2 =  0.66666667 C
+Delta_1 = 0 C
+Delta_2 =  0 C
+Phi_s = 0 C
+DeltaMs =  0 C
+S = 1  L(0 - 2) C
+et_mean = 0.08 C L(0.01 - 0.1)
+et_sigma = 0.025 C L(0.01 - 0.05)

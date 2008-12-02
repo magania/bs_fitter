@@ -113,6 +113,7 @@ Double_t RooBsTimeAngle<TA, TAI>::coefficient(Int_t basisIndex) const
       val -= coeficiente(basisIndex,i)*_angles.fe(i);
     else
       val += coeficiente(basisIndex,i)*_angles.fe(i);
+
     return val;
 }
 
