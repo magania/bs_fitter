@@ -1,6 +1,7 @@
 
-#include "RooBkgAngle.h"
+#include <root/RooDataSet.h>
 
+#include "RooBkgAngle.h"
 
 #include <TRandom3.h>
 #include <RooDataSet.h>
@@ -10,162 +11,161 @@
 
 #include "BsFitter.h"
 #include "Efficiency.h"
+#include "RooBsTimeAngle.cc"
+#include "RooBkgAngle.cc"
 
-BsFitter::BsFitter() :
-_m("_m", "m", 0),
-_t("_t", "t", 0),
-#ifndef RES_TRUE
-_et("_et", "et", 0),
-#endif
-_cpsi("_cpsi", "cos(#psi)", 0),
-_ctheta("_ctheta", "cos(#theta)", 0),
-_phi("_phi", "#phi", 0),
-_d("_d", "dilution", 0) {
+BsFitter::BsFitter(Bool_t use_resolution, Bool_t signal_only, Bool_t use_efficiency, Bool_t use_phis) :
+_m("_m", "m", 0, 5.1, 5.7),
+_t("_t", "t", 0, -2, 12),
+_et("_et", "et", 0, 0, 1),
+_cpsi("_cpsi", "cos(#psi)", 0, -1, 1),
+_ctheta("_ctheta", "cos(#theta)", 0, -1, 1),
+_phi("_phi", "#phi", 0, -TMath::Pi(), TMath::Pi()),
+_p("_p", "bs probability", 0, 0, 1) {
     gROOT->SetStyle("Plain");
 
-    resolution = 0;
-    model = 0;
-    data = 0;
-    fit_result = 0;
+    _use_resolution = use_resolution;
+    _signal_only = signal_only;
+    _use_efficiency = use_efficiency;
+    _use_phis = use_phis;
+    
+    _resolution = 0;
+    _model = 0;
+    _data = 0;
+    _fit_result = 0;
 
-    cout << "HERE" << endl;
-    variables = new RooArgSet();
-    parameters = new RooArgSet();
+    _variables = new RooArgSet();
+    _parameters = new RooArgSet();
 
-    variables->add(_m);
-    variables->add(_t);
-#ifndef RES_TRUE
-    variables->add(_et);
-#endif
-    variables->add(_cpsi);
-    variables->add(_ctheta);
-    variables->add(_phi);
-    variables->add(_d);
+    _variables->add(_m);
+    _variables->add(_t);
+    if (_use_resolution)
+        _variables->add(_et);
+    _variables->add(_cpsi);
+    _variables->add(_ctheta);
+    _variables->add(_phi);
+    _variables->add(_p);
 
-#ifdef RES_GAUSS
-    RooRealVar *S = new RooRealVar("S", "S", 0);
-    parameters->add(*S);
-    resolution = new RooGaussModel("resolution", "gauss resolution", _t, RooFit::RooConst(0), *S, _et);
-#endif
-
-#ifdef RES_TRUE
-    resolution = new RooTruthModel("resolution", "truth resolution", _t);
-#endif
+    if (_use_phis){
+        _phis = new Phis();
+    }  else {
+        if (_use_efficiency)
+            _efficiency = new Efficiency();
+    }
+    
+    if ( _use_resolution ) {
+        RooRealVar *S = new RooRealVar("S", "S", 0);
+        _parameters->add(*S);
+        _resolution = new RooGaussModel("_resolution", "gauss resolution", _t, RooFit::RooConst(0), *S, _et);
+    } else {
+        _resolution = new RooTruthModel("_resolution", "truth resolution", _t);
+    }
 
     RooAbsPdf* signal = signal_model();
-    RooAbsPdf* background = background_model();
+    RooAbsPdf *background = 0;
+    if (!_signal_only)
+        background = background_model();
 
     if (signal && background) {
         RooRealVar *xs = new RooRealVar("xs", "x_s", 0);
-        parameters->add(*xs);
-        model = new RooAddPdf("model", "Bs PDF", *signal, *background, *xs);
+        _parameters->add(*xs);
+        _model = new RooAddPdf("_model", "Bs PDF", *signal, *background, *xs);
     } else {
         if (signal)
-            model = signal;
+            _model = signal;
         else
-            model = background;
+            _model = background;
     }
 
-    if (!model)
+    if (!_model)
         cout << "EE: No Hay modelo de se~al o background" << endl;
-
 }
 
-void BsFitter::setVariables(const char* vars) {
-    variables->readFromFile(vars);
-    std::cout << "XRANGE: " << _cpsi.getMax() << " " << _cpsi.getMin() << std::endl;
-    _cpsi.setMax(1);
-    _cpsi.setMin(-1);
-    _ctheta.setMax(1);
-    _ctheta.setMin(-1);
-    _phi.setMax(3.1415);
-    _phi.setMin(-3.1416);
-}
+//void BsFitter::set_variables(const char* vars) {
+//    _variables->readFromFile(vars);
+//    std::cout << "XRANGE: " << _cpsi.getMax() << " " << _cpsi.getMin() << std::endl;
+//    _cpsi.setMax(1);
+//    _cpsi.setMin(-1);
+//    _ctheta.setMax(1);
+//    _ctheta.setMin(-1);
+//    _phi.setMax(3.1415);
+//    _phi.setMin(-3.1416);
+//}
 
 void BsFitter::setParameters(const char* params) {
-    parameters->readFromFile(params);
+    _parameters->readFromFile(params);
+}
+void BsFitter::writeParameters(const char* params) {
+    _parameters->writeToFile(params);
 }
 
 void BsFitter::setEfficiency(const char* eff) {
-    efficiency->setEfficiency(eff);
+    _efficiency->setEfficiency(eff);
+}
+
+void BsFitter::setPhis(const char* phis) {
+    _phis->setPhis(phis);
 }
 
 void BsFitter::setData(const char* data_file) {
-    data = RooDataSet::read(data_file, *variables);
+    _data = RooDataSet::read(data_file, *_variables);
 }
 
 void BsFitter::setData(RooDataSet* data_set) {
-    data = data_set;
+    _data = data_set;
 }
 
-void BsFitter::setDataFromCin() {
-    data = new RooDataSet("data", "data", *variables);
+//void BsFitter::setDataFromCin() {
+//    data = new RooDataSet("data", "data", *_variables);
+//
+//    Double_t m, t, cpsi, ctheta, phi, d;
+//    while (!cin.eof()) {
+//        cin >> m >> t >> cpsi >> ctheta >> phi >> d;
+//        cout << m << ' ' << t << ' ' << cpsi << ' ' << ctheta << ' ' << phi << ' ' << d << endl;
+//        _m = m;
+//        _t = t;
+//        _cpsi = cpsi;
+//        _ctheta = ctheta;
+//        _phi = phi;
+//        _d = d;
+//        data->add(*_variables);
+//    }
+//
+//}
 
-    Double_t m, t, cpsi, ctheta, phi, d;
-    while (!cin.eof()) {
-        cin >> m >> t >> cpsi >> ctheta >> phi >> d;
-        cout << m << ' ' << t << ' ' << cpsi << ' ' << ctheta << ' ' << phi << ' ' << d << endl;
-        _m = m;
-        _t = t;
-        _cpsi = cpsi;
-        _ctheta = ctheta;
-        _phi = phi;
-        _d = d;
-        data->add(*variables);
+void BsFitter::generate(Int_t num, const char* data) {
+    _variables->Print();
+    if (_use_resolution) {
+        RooPolynomial p_model("p_model", "p_model",_p, RooFit::RooConst(0));
+        RooDataSet *data_p = p_model.generate(RooArgSet(_p), num, kTRUE);
+        RooDataSet *data_et = _model->generate(RooArgSet(_et), num, kTRUE);
+        data_et->merge(data_p);
+        RooDataSet *data_m = _model->generate(RooArgSet(_m, _t, _cpsi, _ctheta, _phi), *data_et);
+        _data = new RooDataSet("_data", "data", data_m, *_variables);
+    } else {
+        _data = _model->generate(RooArgSet(_m, _t, _cpsi, _ctheta, _phi, _p), num);
     }
-
-}
-
-void BsFitter::generate(Int_t num) {
-#ifdef RES_TRUE
-    return model->generate(RooArgSet(_m, _t, _cpsi, _ctheta, _phi, _d), num);
-#endif
-
-    RooDataSet *data_et = model->generate(RooArgSet(_et), num, kTRUE);
-    data = model->generate(RooArgSet(_m, _t, _cpsi, _ctheta, _phi), *data_et);
-
-    /*
-#ifdef EFFICIENCY
-    Double_t min = 0.65;
-    RooDataSet *data_et = model->generate(RooArgSet(_et), num/min, kTRUE);
-    RooDataSet *data_noeff = model->generate(RooArgSet(_m, _t, _cpsi, _ctheta, _phi), *data_et);
-
-    data = new RooDataSet("data","data",*variables);
-    TRandom3 aleatorio(0);
-    for (int i=0; i<data_noeff->numEntries(); i++){
-        *variables = *data_noeff->get(i);
-        Double_t eff = efficiency->getVal();
-        Double_t y = aleatorio.Rndm();
-        if ((eff-min) <0 || (eff-min)>1){
-            cout << "EE: eff=" << eff << " min=" << min << endl;
-        }
-        if (y < eff-min)
-            data->add(*variables);
-    }
-#endif
-     */
-    cout << "Total Generated Entries: " << data->numEntries() << endl;
+    _data->write(data);
 }
 
 Int_t BsFitter::fit(Bool_t hesse, Bool_t minos, Bool_t verbose, Int_t cpu) {
-    if (!data) {
+    if (!_data) {
         cout << "EE: No Data" << endl;
         return kFALSE;
     }
 
-#ifdef RES_TRUE
-    fit_result = model->fitTo(*data, RooFit::ConditionalObservables(RooArgSet(_d)),
-            RooFit::Save(kTRUE), RooFit::Hesse(hesse),
-            RooFit::Minos(minos), RooFit::NumCPU(cpu),
-            RooFit::Verbose(verbose));
-#endif
-#ifndef RES_TRUE
-    fit_result = model->fitTo(*data, RooFit::ConditionalObservables(RooArgSet(_et, _d)),
-            RooFit::Save(kTRUE), RooFit::Hesse(hesse),
-            RooFit::Minos(minos), RooFit::NumCPU(cpu),
-            RooFit::Verbose(verbose));
-#endif
-    return fit_result->status();
+    if (_use_resolution) {
+        _fit_result = _model->fitTo(*_data, RooFit::ConditionalObservables(RooArgSet(_et,_p)),
+                RooFit::Save(kTRUE), RooFit::Hesse(hesse),
+                RooFit::Minos(minos), RooFit::NumCPU(cpu),
+                RooFit::Verbose(verbose));
+    } else {
+        _fit_result = _model->fitTo(*_data, RooFit::ConditionalObservables(RooArgSet(_p)),
+                RooFit::Save(kTRUE), RooFit::Hesse(hesse),
+                RooFit::Minos(minos), RooFit::NumCPU(cpu),
+                RooFit::Verbose(verbose));
+    }
+    return _fit_result->status();
 }
 
 void BsFitter::plotM(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log) {
@@ -178,6 +178,14 @@ void BsFitter::plotM() {
 
 void BsFitter::plotT(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log) {
     plotVar(_t, plot_file, bins, proj_bins, log);
+}
+
+void BsFitter::plotEt() {
+    plotVar(_et, "time_error.gif", 0, 100, kTRUE);
+}
+
+void BsFitter::plotEt(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log) {
+    plotVar(_et, plot_file, bins, proj_bins, log);
 }
 
 void BsFitter::plotT() {
@@ -210,28 +218,26 @@ void BsFitter::plotPhi() {
 
 void BsFitter::plotVar(RooRealVar& x, const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log) {
     RooPlot *x_frame = x.frame();
-    if (data)
+    if (_data)
         if (bins)
-            data->plotOn(x_frame, RooFit::Binning(bins));
+            _data->plotOn(x_frame, RooFit::Binning(bins));
         else
-            data->plotOn(x_frame);
+            _data->plotOn(x_frame);
 
-    if (data) {
-#ifdef RES_TRUE
-        model->plotOn(x_frame, RooFit::ProjWData(RooArgSet(_d), *data));
-#endif
-#ifndef RES_TRUE
-        if (proj_bins) {
-            _et.setBins(proj_bins);
-            RooDataHist projData("projData", "projData", RooArgSet(_et, _d), *data);
-            if (x == _m || x == _t)
-            model->plotOn(x_frame, RooFit::ProjWData(RooArgSet(_et, _d), projData));
+    if (_data) {
+        if (_use_resolution) {
+            if (proj_bins) {
+                _et.setBins(proj_bins);
+                RooDataHist projData("projData", "projData", RooArgSet(_et, _p), *_data);
+                _model->plotOn(x_frame, RooFit::ProjWData(RooArgSet(_et, _p), projData));
+            } else {
+                _model->plotOn(x_frame, RooFit::ProjWData(RooArgSet(_et, _p), *_data));
+            }
         } else {
-            model->plotOn(x_frame, RooFit::ProjWData(RooArgSet(_et, _d), *data));
+            _model->plotOn(x_frame, RooFit::ProjWData(RooArgSet(_p), *_data));
         }
-#endif
     } else {
-        model->plotOn(x_frame);
+        _model->plotOn(x_frame);
     }
 //    if (x == _ctheta || x == _cpsi || x == _phi)
         //        efficiency->plotOn(x_frame,RooFit::LineColor(kRed));
@@ -245,106 +251,115 @@ void BsFitter::plotVar(RooRealVar& x, const char* plot_file, Int_t bins, Int_t p
 
 void BsFitter::writeResult(const char* file_name) {
     ofstream out(file_name);
-    fit_result->printMultiline(out, 0, kTRUE);
+    _fit_result->printMultiline(out, 0, kTRUE);
     out.close();
 }
 
 RooAbsPdf* BsFitter::signal_model() {
     cout << "SIGNAL MODEL" << endl;
     RooRealVar *M = new RooRealVar("M", "M", 0);
-    RooRealVar *sigma = new RooRealVar("sigma", "#sigma", 0);
+    RooRealVar *Sigma = new RooRealVar("Sigma", "#sigma", 0);
 
     RooRealVar *A02 = new RooRealVar("A02", "A02", 0);
     RooRealVar *All2 = new RooRealVar("All2", "A_{#parallel}(0)", 0);
     RooRealVar *DeltaGamma = new RooRealVar("DeltaGamma", "#Delta#Gamma", 0);
-    RooRealVar *delta_1 = new RooRealVar("delta_1", "#delta_{1}", 0);
-    RooRealVar *delta_2 = new RooRealVar("delta_2", "#delta_{2}", 0);
-    RooRealVar *phi_s = new RooRealVar("phi_s", "#phi_{s}", 0);
-    RooRealVar *tau = new RooRealVar("tau", "#tau", 0);
+    RooRealVar *Delta_1 = new RooRealVar("Delta_1", "#delta_{1}", 0);
+    RooRealVar *Delta_2 = new RooRealVar("Delta_2", "#delta_{2}", 0);
+    RooRealVar *Phi_s = new RooRealVar("Phi_s", "#phi_{s}", 0);
+    RooRealVar *Tau = new RooRealVar("Tau", "#tau", 0);
     RooRealVar *DeltaMs = new RooRealVar("DeltaMs", "#Delta M_{s}", 0);
 
-    parameters->add(*M);
-    parameters->add(*sigma);
-    parameters->add(*A02);
-    parameters->add(*All2);
-    parameters->add(*DeltaGamma);
-    parameters->add(*delta_1);
-    parameters->add(*delta_2);
-    parameters->add(*phi_s);
-    parameters->add(*tau);
-    parameters->add(*DeltaMs);
+    _parameters->add(*M);
+    _parameters->add(*Sigma);
+    _parameters->add(*A02);
+    _parameters->add(*All2);
+    _parameters->add(*DeltaGamma);
+    _parameters->add(*Delta_1);
+    _parameters->add(*Delta_2);
+    _parameters->add(*Phi_s);
+    _parameters->add(*Tau);
+    _parameters->add(*DeltaMs);
 
     RooRealVar *et_mean = new RooRealVar("et_mean", "mean time error", 0);
     RooRealVar *et_sigma = new RooRealVar("et_sigma", "#sigma time error", 0);
-    parameters->add(*et_mean);
-    parameters->add(*et_sigma);
+    _parameters->add(*et_mean);
+    _parameters->add(*et_sigma);
 
-    RooGaussian *signal_mass = new RooGaussian("signal_mass", "signal_mass", _m, *M, *sigma);
+    RooGaussian *signal_mass = new RooGaussian("signal_mass", "signal_mass", _m, *M, *Sigma);
 
-#ifdef EFFICIENCY
-    efficiency = new Efficiency();
-    RooBsTimeAngle *time_angle_bs = new RooBsTimeAngle("time_angle_bs", "bs time angle pdf", kTRUE,
-            _t, _cpsi, _ctheta, _phi,
-            *A02, *All2, *DeltaGamma, *tau,
-            *DeltaMs, *phi_s, *delta_1, *delta_2,
-            *resolution,efficiency, kTRUE);
+    RooAddPdf *signal_time_angle;
+    if (_use_phis) {
+        RooBsTimeAngle<Phis,TransAnglesPhis>* time_angle_bs = new RooBsTimeAngle<Phis,TransAnglesPhis>("time_angle_bs", "bs time angle pdf", kTRUE,
+                _t, _cpsi, _ctheta, _phi,
+                *A02, *All2, *DeltaGamma, *Tau,
+                *DeltaMs, *Phi_s, *Delta_1, *Delta_2,
+                *_resolution, *_phis);
 
-    RooBsTimeAngle *time_angle_bsbar = new RooBsTimeAngle("time_angle_bsbar", "bs bar time angle pdf", kFALSE,
-            _t, _cpsi, _ctheta, _phi,
-            *A02, *All2, *DeltaGamma, *tau,
-            *DeltaMs, *phi_s, *delta_1, *delta_2,
-            *resolution, efficiency, kTRUE);
-    RooAddPdf *signal_time_angle = new RooAddPdf("signal_time_angle", "signal time-angular pdf",
-            *time_angle_bs, *time_angle_bsbar, _d);
-#endif
+        RooBsTimeAngle<Phis,TransAnglesPhis>* time_angle_bsbar = new RooBsTimeAngle<Phis,TransAnglesPhis>("time_angle_bsbar", "bs bar time angle pdf", kFALSE,
+                _t, _cpsi, _ctheta, _phi,
+                *A02, *All2, *DeltaGamma, *Tau,
+                *DeltaMs, *Phi_s, *Delta_1, *Delta_2,
+                *_resolution, *_phis);
+        signal_time_angle = new RooAddPdf("signal_time_angle", "signal time-angular pdf",
+                *time_angle_bs, *time_angle_bsbar, _p);
+    } else {
+        RooBsTimeAngle<Efficiency,TransAnglesEfficiency>* time_angle_bs = new RooBsTimeAngle<Efficiency,TransAnglesEfficiency>("time_angle_bs", "bs time angle pdf", kTRUE,
+                _t, _cpsi, _ctheta, _phi,
+                *A02, *All2, *DeltaGamma, *Tau,
+                *DeltaMs, *Phi_s, *Delta_1, *Delta_2,
+                *_resolution, *_efficiency);
 
-#ifndef EFFICIENCY
-    RooBsTimeAngle *time_angle_bs = new RooBsTimeAngle("time_angle_bs", "bs time angle pdf", kTRUE,
-            _t, _cpsi, _ctheta, _phi,
-            *A02, *All2, *DeltaGamma, *tau,
-            *DeltaMs, *phi_s, *delta_1, *delta_2,
-            *resolution);
+        RooBsTimeAngle<Efficiency,TransAnglesEfficiency>* time_angle_bsbar = new RooBsTimeAngle<Efficiency,TransAnglesEfficiency>("time_angle_bsbar", "bs bar time angle pdf", kFALSE,
+                _t, _cpsi, _ctheta, _phi,
+                *A02, *All2, *DeltaGamma, *Tau,
+                *DeltaMs, *Phi_s, *Delta_1, *Delta_2,
+                *_resolution, *_efficiency);
+        signal_time_angle = new RooAddPdf("signal_time_angle", "signal time-angular pdf",
+                *time_angle_bs, *time_angle_bsbar, _p);
+    }
 
-    RooBsTimeAngle *time_angle_bsbar = new RooBsTimeAngle("time_angle_bsbar", "bs bar time angle pdf", kFALSE,
-            _t, _cpsi, _ctheta, _phi,
-            *A02, *All2, *DeltaGamma, *tau,
-            *DeltaMs, *phi_s, *delta_1, *delta_2,
-            *resolution);
-    RooAddPdf *signal_time_angle = new RooAddPdf("signal_time_angle", "signal time-angular pdf",
-            *time_angle_bs, *time_angle_bsbar, _d);
-#endif
-
-    RooLandau *et_model = new RooLandau("et_model", "time error model", _et, *et_mean, *et_sigma);
-
-    RooProdPdf *signal = new RooProdPdf("signal", "signal",
-            RooArgSet(*signal_mass, *signal_time_angle/**time_angle_bs*/), RooFit::Conditional(*et_model, _et));
+    RooProdPdf * signal = 0;
+    if (_use_resolution) {
+//        RooPolynomial *p_model = new RooPolynomial("p_model", "p_model", _p, RooFit::RooConst(0));
+        RooLandau *et_model = new RooLandau("et_model", "time error model", _et, *et_mean, *et_sigma);
+        signal = new RooProdPdf("signal", "signal",
+                RooArgSet(*signal_mass, *signal_time_angle), RooFit::Conditional(*et_model, _et)/*, RooFit::Conditional(*p_model, _p)*/);
+    } else {
+        signal = new RooProdPdf("signal", "signal", RooArgSet(*signal_mass, *signal_time_angle));
+    }
 
 //    return 0;
     return signal;
 }
 
 RooAbsPdf* BsFitter::background_model() {
-//    return 0;
-    cout << "Bkg mode" << endl;
+    cout << "BACKGROUND MODEL" << endl;
     RooRealVar *tm_p = new RooRealVar("tm_p", "tm_p", 0);
-    RooRealVar *B1_p = new RooRealVar("B1_p", "B1_p", 0);
-    RooRealVar *B2_p = new RooRealVar("B2_p", "B2_p", 0);
-    RooRealVar *B3_p = new RooRealVar("B3_p", "B3_p", 0);
-    RooRealVar *B4_p = new RooRealVar("B4_p", "B4_p", 0);
-    RooRealVar *B5_p = new RooRealVar("B5_p", "B5_p", 0);
-    RooRealVar *B6_p = new RooRealVar("B6_p", "B6_p", 0);
-    parameters->add(*tm_p);
-    parameters->add(*B1_p);
-    parameters->add(*B2_p);
-    parameters->add(*B3_p);
-    parameters->add(*B4_p);
-    parameters->add(*B5_p);
-    parameters->add(*B6_p);
+    RooRealVar *y1 = new RooRealVar("y1", "y1", 0);
+    RooRealVar *y2 = new RooRealVar("y2", "y2", 0);
+    RooRealVar *y3 = new RooRealVar("y3", "y3", 0);
+    RooRealVar *y4 = new RooRealVar("y4", "y4", 0);
+    RooRealVar *y5 = new RooRealVar("y5", "y5", 0);
+    RooRealVar *y6 = new RooRealVar("y6", "y6", 0);
+    _parameters->add(*tm_p);
+    _parameters->add(*y1);
+    _parameters->add(*y2);
+    _parameters->add(*y3);
+    _parameters->add(*y4);
+    _parameters->add(*y5);
+    _parameters->add(*y6);
     
     RooExponential *exp_mass_p = new RooExponential("exp_mass_p","exp mass prompt", _m, *tm_p);
-    RooBkgAngle *angle_p= new RooBkgAngle("angle_p","angle prompt",_cpsi, _ctheta, _phi,
-            *B1_p, *B2_p, *B3_p, *B4_p, *B5_p, *B6_p, efficiency);
-    RooProdPdf *prompt = new RooProdPdf("prompt","prompt bkg", RooArgSet(*exp_mass_p, *resolution, *angle_p));
+    RooProdPdf * prompt;
+    if (_use_phis) {
+        RooBkgAngle<Phis,TransAnglesPhis> *angle_p = new RooBkgAngle<Phis,TransAnglesPhis>("angle_p", "angle prompt", _cpsi, _ctheta, _phi,
+                *y1, *y2, *y3, *y4, *y5, *y6, *_phis);
+        prompt = new RooProdPdf("prompt", "prompt bkg", RooArgSet(*exp_mass_p, *_resolution, *angle_p));
+    } else {
+        RooBkgAngle<Efficiency,TransAnglesEfficiency> *angle_p = new RooBkgAngle<Efficiency,TransAnglesEfficiency>("angle_p", "angle prompt", _cpsi, _ctheta, _phi,
+                *y1, *y2, *y3, *y4, *y5, *y6, *_efficiency);
+        prompt = new RooProdPdf("prompt", "prompt bkg", RooArgSet(*exp_mass_p, *_resolution, *angle_p));
+    }
 
     RooRealVar *tm_np = new RooRealVar("tm_np", "tm_np",0);
     RooRealVar *t_m = new RooRealVar("t_m", "t_m", 0);
@@ -352,38 +367,58 @@ RooAbsPdf* BsFitter::background_model() {
     RooRealVar *t_pp = new RooRealVar("t_pp", "t_pp", 0);
     RooRealVar *fm = new RooRealVar("fm", "fm", 0);
     RooRealVar *fp = new RooRealVar("fp", "fp", 0);
-    RooRealVar *B1_np = new RooRealVar("B1_np", "B1_np", 0);
-    RooRealVar *B2_np = new RooRealVar("B2_np", "B2_np", 0);
-    RooRealVar *B3_np = new RooRealVar("B3_np", "B3_np", 0);
-    RooRealVar *B4_np = new RooRealVar("B4_np", "B4_np", 0);
-    RooRealVar *B5_np = new RooRealVar("B5_np", "B5_np", 0);
-    RooRealVar *B6_np = new RooRealVar("B6_np", "B6_np", 0);
-    parameters->add(*tm_np);
-    parameters->add(*t_m);
-    parameters->add(*t_p);
-    parameters->add(*t_pp);
-    parameters->add(*fm);
-    parameters->add(*fp);
-    parameters->add(*B1_np);
-    parameters->add(*B2_np);
-    parameters->add(*B3_np);
-    parameters->add(*B4_np);
-    parameters->add(*B5_np);
-    parameters->add(*B6_np);
+    RooRealVar *z1 = new RooRealVar("z1", "z1", 0);
+    RooRealVar *z2 = new RooRealVar("z2", "z2", 0);
+    RooRealVar *z3 = new RooRealVar("z3", "z3", 0);
+    RooRealVar *z4 = new RooRealVar("z4", "z4", 0);
+    RooRealVar *z5 = new RooRealVar("z5", "z5", 0);
+    RooRealVar *z6 = new RooRealVar("z6", "z6", 0);
+    _parameters->add(*tm_np);
+    _parameters->add(*t_m);
+    _parameters->add(*t_p);
+    _parameters->add(*t_pp);
+    _parameters->add(*fm);
+    _parameters->add(*fp);
+    _parameters->add(*z1);
+    _parameters->add(*z2);
+    _parameters->add(*z3);
+    _parameters->add(*z4);
+    _parameters->add(*z5);
+    _parameters->add(*z6);
 
     RooExponential *exp_mass_np = new RooExponential("exp_mass_np", "exp mass noprompt", _m, *tm_np);
-    RooDecay *exp_minus = new RooDecay("exp_minus", "exp minus", _t, *t_m, *resolution, RooDecay::Flipped);
-    RooDecay *exp_plus = new RooDecay("exp_plus", "exp plus", _t, *t_p, *resolution, RooDecay::SingleSided);
-    RooDecay *exp_plus_plus = new RooDecay("exp_plus_plus", "exp plus plus", _t, *t_pp, *resolution, RooDecay::SingleSided);
+    RooDecay *exp_minus = new RooDecay("exp_minus", "exp minus", _t, *t_m, *_resolution, RooDecay::Flipped);
+    RooDecay *exp_plus = new RooDecay("exp_plus", "exp plus", _t, *t_p, *_resolution, RooDecay::SingleSided);
+    RooDecay *exp_plus_plus = new RooDecay("exp_plus_plus", "exp plus plus", _t, *t_pp, *_resolution, RooDecay::SingleSided);
     RooAddPdf *time_np = new RooAddPdf("time_np", "time no propmt",
             RooArgSet(*exp_minus, *exp_plus, *exp_plus_plus), RooArgSet(*fm, *fp));
-    RooBkgAngle *angle_np = new RooBkgAngle("angle_np", "angle noprompt", _cpsi, _ctheta, _phi,
-            *B1_np, *B2_np, *B3_np, *B4_np, *B5_np, *B6_np, efficiency);
-    RooProdPdf *noprompt = new RooProdPdf("noprompt", "noprompt bkg", RooArgSet(*exp_mass_np, *time_np, *angle_np));
-    
-    RooRealVar *xp = new RooRealVar("xp","xp",0);
-    parameters->add(*xp);
-    RooAddPdf *background = new RooAddPdf("background", "background", *prompt, *noprompt, *xp);
+
+    RooProdPdf * noprompt;
+    if (_use_phis) {
+        RooBkgAngle<Phis,TransAnglesPhis> *angle_np = new RooBkgAngle<Phis,TransAnglesPhis> ("angle_np", "angle noprompt", _cpsi, _ctheta, _phi,
+                *z1, *z2, *z3, *z4, *z5, *z6, *_phis);
+        noprompt = new RooProdPdf("noprompt", "noprompt bkg", RooArgSet(*exp_mass_np, *time_np, *angle_np));
+    } else {
+        RooBkgAngle<Efficiency,TransAnglesEfficiency> *angle_np = new RooBkgAngle<Efficiency,TransAnglesEfficiency> ("angle_np", "angle noprompt", _cpsi, _ctheta, _phi,
+                *z1, *z2, *z3, *z4, *z5, *z6, *_efficiency);
+        noprompt = new RooProdPdf("noprompt", "noprompt bkg", RooArgSet(*exp_mass_np, *time_np, *angle_np));
+    }
             
+    RooRealVar *xp = new RooRealVar("xp","xp",0);
+    _parameters->add(*xp);
+    
+    RooAddPdf *bkg = new RooAddPdf("bkg", "background", *prompt, *noprompt, *xp);
+//    RooProdPdf *bkg = noprompt;
+    
+
+    RooRealVar *et_mean_b = new RooRealVar("et_mean_b", "mean time error", 0);
+    RooRealVar *et_sigma_b = new RooRealVar("et_sigma_b", "#sigma time error", 0);
+    _parameters->add(*et_mean_b);
+    _parameters->add(*et_sigma_b);
+
+    RooLandau *et_model_b = new RooLandau("et_model_b", "time bkg error model", _et, *et_mean_b, *et_sigma_b);
+    
+    RooProdPdf *background = new RooProdPdf("background", "background x et_model_p", RooArgSet(*bkg), RooFit::Conditional(*et_model_b, _et));
+         
     return background;
 }

@@ -22,11 +22,14 @@
                    displayName="Source Files"
                    projectFiles="true">
       <logicalFolder name="src" displayName="src" projectFiles="true">
+        <itemPath>src/bs.cc</itemPath>
         <itemPath>src/BsFitter.cc</itemPath>
         <itemPath>efficiency.cc</itemPath>
         <itemPath>src/F.cc</itemPath>
         <itemPath>src/fitter.cc</itemPath>
+        <itemPath>src/Phis.cc</itemPath>
         <itemPath>src/RooBkgAngle.cc</itemPath>
+        <itemPath>include/RooBkgAngleLinkdef.h</itemPath>
         <itemPath>src/RooBsTimeAngle.cc</itemPath>
         <itemPath>src/TimeAngle.cc</itemPath>
         <itemPath>src/TransAngles.cc</itemPath>
@@ -37,6 +40,8 @@
                    projectFiles="false">
       <itemPath>Makefile</itemPath>
     </logicalFolder>
+    <itemPath>src/TransAnglesEfficiency.cc</itemPath>
+    <itemPath>src/TransAnglesPhis.cc</itemPath>
   </logicalFolder>
   <sourceEncoding>UTF-8</sourceEncoding>
   <projectmakefile>Makefile</projectmakefile>
@@ -54,7 +59,7 @@
           </includeDirectories>
         </ccCompilerTool>
         <linkerTool>
-          <output>bin/run.sh</output>
+          <output>bin/bs</output>
           <linkerLibItems>
           </linkerLibItems>
         </linkerTool>
@@ -81,6 +86,9 @@
       <item path="include/RooBkgAngle.h">
         <itemTool>3</itemTool>
       </item>
+      <item path="include/RooBkgAngleLinkdef.h">
+        <itemTool>3</itemTool>
+      </item>
       <item path="include/RooBsTimeAngle.h">
         <itemTool>3</itemTool>
       </item>
@@ -96,6 +104,9 @@
       <item path="src/F.cc">
         <itemTool>1</itemTool>
       </item>
+      <item path="src/Phis.cc">
+        <itemTool>1</itemTool>
+      </item>
       <item path="src/RooBkgAngle.cc">
         <itemTool>1</itemTool>
       </item>
@@ -106,6 +117,15 @@
         <itemTool>1</itemTool>
       </item>
       <item path="src/TransAngles.cc">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/TransAnglesEfficiency.cc">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/TransAnglesPhis.cc">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/bs.cc">
         <itemTool>1</itemTool>
       </item>
       <item path="src/fitter.cc">
@@ -147,6 +167,9 @@
       <item path="include/RooBkgAngle.h">
         <itemTool>3</itemTool>
       </item>
+      <item path="include/RooBkgAngleLinkdef.h">
+        <itemTool>3</itemTool>
+      </item>
       <item path="include/RooBsTimeAngle.h">
         <itemTool>3</itemTool>
       </item>
@@ -162,6 +185,9 @@
       <item path="src/F.cc">
         <itemTool>1</itemTool>
       </item>
+      <item path="src/Phis.cc">
+        <itemTool>1</itemTool>
+      </item>
       <item path="src/RooBkgAngle.cc">
         <itemTool>1</itemTool>
       </item>
@@ -172,6 +198,15 @@
         <itemTool>1</itemTool>
       </item>
       <item path="src/TransAngles.cc">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/TransAnglesEfficiency.cc">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/TransAnglesPhis.cc">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/bs.cc">
         <itemTool>1</itemTool>
       </item>
       <item path="src/fitter.cc">

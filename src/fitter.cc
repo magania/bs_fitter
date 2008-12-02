@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
     if (use_stdin)
         bs->setDataFromCin();
     else
-        bs->setData(data); 
+
     //bs->generate(10000);
     
    bs->fit(false, false, true, 4);   bs->writeResult(result);

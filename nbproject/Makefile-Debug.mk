@@ -27,8 +27,12 @@ OBJECTDIR=build/Debug/GNU-Linux-x86
 OBJECTFILES= \
 	${OBJECTDIR}/src/RooBsTimeAngle.o \
 	${OBJECTDIR}/src/fitter.o \
+	${OBJECTDIR}/src/Phis.o \
+	${OBJECTDIR}/src/bs.o \
 	${OBJECTDIR}/src/RooBkgAngle.o \
+	${OBJECTDIR}/src/TransAnglesPhis.o \
 	${OBJECTDIR}/src/TimeAngle.o \
+	${OBJECTDIR}/src/TransAnglesEfficiency.o \
 	${OBJECTDIR}/src/F.o \
 	${OBJECTDIR}/efficiency.o \
 	${OBJECTDIR}/src/BsFitter.o \
@@ -48,11 +52,11 @@ FFLAGS=
 LDLIBSOPTIONS=
 
 # Build Targets
-.build-conf: ${BUILD_SUBPROJECTS} bin/run.sh
+.build-conf: ${BUILD_SUBPROJECTS} bin/bs
 
-bin/run.sh: ${OBJECTFILES}
+bin/bs: ${OBJECTFILES}
 	${MKDIR} -p bin
-	${LINK.cc} -o bin/run.sh ${OBJECTFILES} ${LDLIBSOPTIONS} 
+	${LINK.cc} -o bin/bs ${OBJECTFILES} ${LDLIBSOPTIONS} 
 
 ${OBJECTDIR}/src/RooBsTimeAngle.o: src/RooBsTimeAngle.cc 
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -62,13 +66,29 @@ ${OBJECTDIR}/src/fitter.o: src/fitter.cc
 	${MKDIR} -p ${OBJECTDIR}/src
 	$(COMPILE.cc) -g -I/usr/include/root -Iinclude -o ${OBJECTDIR}/src/fitter.o src/fitter.cc
 
+${OBJECTDIR}/src/Phis.o: src/Phis.cc 
+	${MKDIR} -p ${OBJECTDIR}/src
+	$(COMPILE.cc) -g -I/usr/include/root -Iinclude -o ${OBJECTDIR}/src/Phis.o src/Phis.cc
+
+${OBJECTDIR}/src/bs.o: src/bs.cc 
+	${MKDIR} -p ${OBJECTDIR}/src
+	$(COMPILE.cc) -g -I/usr/include/root -Iinclude -o ${OBJECTDIR}/src/bs.o src/bs.cc
+
 ${OBJECTDIR}/src/RooBkgAngle.o: src/RooBkgAngle.cc 
 	${MKDIR} -p ${OBJECTDIR}/src
 	$(COMPILE.cc) -g -I/usr/include/root -Iinclude -o ${OBJECTDIR}/src/RooBkgAngle.o src/RooBkgAngle.cc
 
+${OBJECTDIR}/src/TransAnglesPhis.o: src/TransAnglesPhis.cc 
+	${MKDIR} -p ${OBJECTDIR}/src
+	$(COMPILE.cc) -g -I/usr/include/root -Iinclude -o ${OBJECTDIR}/src/TransAnglesPhis.o src/TransAnglesPhis.cc
+
 ${OBJECTDIR}/src/TimeAngle.o: src/TimeAngle.cc 
 	${MKDIR} -p ${OBJECTDIR}/src
 	$(COMPILE.cc) -g -I/usr/include/root -Iinclude -o ${OBJECTDIR}/src/TimeAngle.o src/TimeAngle.cc
+
+${OBJECTDIR}/src/TransAnglesEfficiency.o: src/TransAnglesEfficiency.cc 
+	${MKDIR} -p ${OBJECTDIR}/src
+	$(COMPILE.cc) -g -I/usr/include/root -Iinclude -o ${OBJECTDIR}/src/TransAnglesEfficiency.o src/TransAnglesEfficiency.cc
 
 ${OBJECTDIR}/src/F.o: src/F.cc 
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -92,7 +112,7 @@ ${OBJECTDIR}/src/TransAngles.o: src/TransAngles.cc
 # Clean Targets
 .clean-conf:
 	${RM} -r build/Debug
-	${RM} bin/run.sh
+	${RM} bin/bs
 
 # Subprojects
 .clean-subprojects:

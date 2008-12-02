@@ -1,6 +1,6 @@
 #include "TransAngles.h"
 #include "RooRealVar.h"
-//#include "iostream.h"
+
 //ClassImp(TransAngles) 
 //;
 
@@ -39,9 +39,9 @@ Int_t TransAngles::getIntegralCode(Bool_t _cpsi, Bool_t _ctheta, Bool_t _phi) co
   if (!_cpsi && _ctheta && _phi) return 2;
   if ( _cpsi &&!_ctheta && _phi) return 3;
   if ( _cpsi && _ctheta &&!_phi) return 4;
-  if ( _cpsi &&!_ctheta &&!_phi) return 5;
-  if (!_cpsi && _ctheta &&!_phi) return 6;
-  if (!_cpsi &&!_ctheta && _phi) return 7;
+  if ( _cpsi &&!_ctheta &&!_phi) return 0;//5;
+  if (!_cpsi && _ctheta &&!_phi) return 0;//6;
+  if (!_cpsi &&!_ctheta && _phi) return 0;//7;
   return 0;
 }
 
@@ -58,7 +58,7 @@ Double_t TransAngles::f(Int_t i) const
   }
 }
 
-Double_t TransAngles::integralF(Int_t i, Int_t code, const char* range) const
+Double_t TransAngles::int_f(Int_t i, Int_t code, const char* range) const
 {
   switch (i) {
   case 1: return integralF1(code, range);

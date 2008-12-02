@@ -4,25 +4,24 @@ CCFLAGS= -g -fPIC
 INCLUDE = $(shell root-config --cflags) -Iinclude
 LIBS    = $(shell root-config --libs) -lRooFit -lRooFitCore
 
-MYLIBS = obj/TransAngles.o obj/RooBsTimeAngle.o obj/F.o obj/TimeAngle.o obj/Efficiency.o obj/RooBkgAngle.o
-FITTERS = BsFitter
+MYLIBS =  obj/Efficiency.o obj/Phis.o obj/RooBkgAngle.o obj/RooBsTimeAngle.o obj/TransAngles.o obj/TransAnglesEfficiency.o obj/TransAnglesPhis.o
 
 #DFLAGS = -DRES_TRUE
 #DFLAGS = -DRES_GAUSS
-DFLAGS = -DRES_GAUSS -DEFFICIENCY
+#DFLAGS = -DRES_GAUSS -DEFFICIENCY
 
 
-all: bin/fitter
+all: bin/bs
 
 $(MYLIBS): obj/%.o : src/%.cc include/%.h
 	@echo $(CXX) $(CCFLAGS) $(INCLUDE)  -c $< -o $@
 	$(CXX) $(CCFLAGS) $(INCLUDE) -c $< -o $@
-	@echo $(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) -shared $@ -o $(@:obj/%.o=lib/lib%.so)
-	$(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) -shared $@ -o $(@:obj/%.o=lib/lib%.so)
+#	@echo $(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) -shared $@ -o $(@:obj/%.o=lib/lib%.so)
+#	$(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) -shared $@ -o $(@:obj/%.o=lib/lib%.so)
 
 obj/BsFitter.o: src/BsFitter.cc include/BsFitter.h $(MYLIBS)
 	@echo rootcint -f Dict.cc  -c include/*
-	rootcint -f Dict.cc  -c include/*
+	rootcint -f Dict.cc  -c include/BsFitter.h include/Efficiency.h include/Phis.h include/RooBkgAngle.h include/RooBsTimeAngle.h include/TransAngles.h include/TransAnglesEfficiency.h include/TransAnglesPhis.h include/RooBkgAngleLinkdef.h
 	@echo $(CXX) $(CCFLAGS) $(INCLUDE) -c Dict.cc -o obj/Dict.o
 	$(CXX) $(CCFLAGS) $(INCLUDE) -c Dict.cc -o obj/Dict.o
 	@echo $(CXX) $(CCFLAGS) $(INCLUDE) $(DFLAGS) -c $< -o obj/BsFitter.o
@@ -31,10 +30,14 @@ obj/BsFitter.o: src/BsFitter.cc include/BsFitter.h $(MYLIBS)
 #	$(CXX) $(CCFLAGS) $(INCLUDE) $(DGAUSS) -c $< -o obj/BsFitter_gauss.o
 #	$(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) -shared obj/Dict.o $(LIBRARY) obj/BsFitter_gauss.o -o lib/libBsFitter_gauss.so
 
+bin/bs: src/bs.cc $(MYLIBS) obj/BsFitter.o obj/Dict.o
+	@echo $(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) $^ -o bin/bs
+	$(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) $^ -o bin/bs
+
 bin/fitter: src/fitter.cc $(MYLIBS) obj/BsFitter.o obj/Dict.o
 	@echo $(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) $^ -o bin/fitter
 	$(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) $^ -o bin/fitter
-
+	
 piedritas: piedritas.cc
 	$(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) -Llib -lTimeAngle -lF  $< -o piedritas
 

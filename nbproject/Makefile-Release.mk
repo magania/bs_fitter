@@ -27,8 +27,12 @@ OBJECTDIR=build/Release/GNU-Linux-x86
 OBJECTFILES= \
 	${OBJECTDIR}/src/RooBsTimeAngle.o \
 	${OBJECTDIR}/src/fitter.o \
+	${OBJECTDIR}/src/Phis.o \
+	${OBJECTDIR}/src/bs.o \
 	${OBJECTDIR}/src/RooBkgAngle.o \
+	${OBJECTDIR}/src/TransAnglesPhis.o \
 	${OBJECTDIR}/src/TimeAngle.o \
+	${OBJECTDIR}/src/TransAnglesEfficiency.o \
 	${OBJECTDIR}/src/F.o \
 	${OBJECTDIR}/efficiency.o \
 	${OBJECTDIR}/src/BsFitter.o \
@@ -62,13 +66,29 @@ ${OBJECTDIR}/src/fitter.o: src/fitter.cc
 	${MKDIR} -p ${OBJECTDIR}/src
 	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/src/fitter.o src/fitter.cc
 
+${OBJECTDIR}/src/Phis.o: src/Phis.cc 
+	${MKDIR} -p ${OBJECTDIR}/src
+	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/src/Phis.o src/Phis.cc
+
+${OBJECTDIR}/src/bs.o: src/bs.cc 
+	${MKDIR} -p ${OBJECTDIR}/src
+	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/src/bs.o src/bs.cc
+
 ${OBJECTDIR}/src/RooBkgAngle.o: src/RooBkgAngle.cc 
 	${MKDIR} -p ${OBJECTDIR}/src
 	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/src/RooBkgAngle.o src/RooBkgAngle.cc
 
+${OBJECTDIR}/src/TransAnglesPhis.o: src/TransAnglesPhis.cc 
+	${MKDIR} -p ${OBJECTDIR}/src
+	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/src/TransAnglesPhis.o src/TransAnglesPhis.cc
+
 ${OBJECTDIR}/src/TimeAngle.o: src/TimeAngle.cc 
 	${MKDIR} -p ${OBJECTDIR}/src
 	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/src/TimeAngle.o src/TimeAngle.cc
+
+${OBJECTDIR}/src/TransAnglesEfficiency.o: src/TransAnglesEfficiency.cc 
+	${MKDIR} -p ${OBJECTDIR}/src
+	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/src/TransAnglesEfficiency.o src/TransAnglesEfficiency.cc
 
 ${OBJECTDIR}/src/F.o: src/F.cc 
 	${MKDIR} -p ${OBJECTDIR}/src

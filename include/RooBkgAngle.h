@@ -12,10 +12,16 @@
 #include "RooCategoryProxy.h"
 #include "RooAbsReal.h"
 #include "RooAbsCategory.h"
+#include "RooRandom.h"
+#include "TRandom3.h"
 
 #include "Efficiency.h"
 #include "TransAngles.h"
+#include "Phis.h"
+#include "TransAnglesEfficiency.h"
+#include "TransAnglesPhis.h"
 
+template<class TA, class TAI>
 class RooBkgAngle : public RooAbsPdf {
 public:
 
@@ -25,7 +31,12 @@ public:
             RooRealVar &cpsi, RooRealVar &ctheta, RooRealVar &phi,
             RooRealVar& B1, RooRealVar& _B2, RooRealVar& _B3,
             RooRealVar& B4, RooRealVar& _B5, RooRealVar& _B6,
-            Efficiency *efficiency = 0, Bool_t fit = kFALSE);
+            TA &ta);
+/*    RooBkgAngle(const char *name, const char *title,
+            RooRealVar &cpsi, RooRealVar &ctheta, RooRealVar &phi,
+            RooRealVar& B1, RooRealVar& _B2, RooRealVar& _B3,
+            RooRealVar& B4, RooRealVar& _B5, RooRealVar& _B6,
+            Phis phis);*/
     RooBkgAngle(const RooBkgAngle& other, const char* name = 0);
 
     virtual TObject* clone(const char* newname) const {
@@ -46,7 +57,7 @@ public:
 
 protected:
 
-    TransAngles _angles;
+    TAI _angles;
     RooRealProxy _B1;
     RooRealProxy _B2;
     RooRealProxy _B3;
@@ -54,14 +65,12 @@ protected:
     RooRealProxy _B5;
     RooRealProxy _B6;
 
+    TRandom3 _aleatorio;
+    
     Double_t evaluate() const;
 
-    Bool_t _fit;
-    Efficiency *_efficiency;
-
 private:
-
-    ClassDef(RooBkgAngle, 1) // Your description goes here...
+   ClassDef(RooBkgAngle, 1) // Your description goes here...
 };
 
 #endif

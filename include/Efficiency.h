@@ -10,70 +10,50 @@
 
 #include "RooRealVar.h"
 #include "RooArgSet.h"
-#include "RooChebychev.h"
-#include "RooProdPdf.h"
-#include "TransAngles.h"
-
+#include <fstream>
 
 class Efficiency {
 public:
     Efficiency();
-    void setEfficiency(const char* eff);
-    Double_t getPhi(Int_t i);
-    Double_t getPhi1();
-    Double_t getPhi2();
-    Double_t getPhi3();
-    Double_t getPhi4();
-    Double_t getPhi5();
-    Double_t getPhi6();
-
-    Double_t getVal(Double_t cpsi, Double_t ctheta, Double_t phi) ;
+    void setEfficiency(const char* efficiency);
+    void writeEfficiency(const char* file);
+    RooArgSet* getAs();
+    RooArgSet* getBs();
+    RooArgSet* getCs();
     
-private:
-    RooRealVar _cpsi;
-    RooRealVar _ctheta;
-    RooRealVar _phi;
-    
-    RooRealVar _cpsi_1;
-    RooRealVar _cpsi_2;
-    RooRealVar _cpsi_3;
-    RooRealVar _cpsi_4;
-    RooRealVar _cpsi_5;
-    RooRealVar _cpsi_6;
-    RooRealVar _cpsi_7;
+    RooRealVar a1;
+    RooRealVar a2;
+    RooRealVar a3;
+    RooRealVar a4;
+    RooRealVar a5;
+    RooRealVar a6;
+    RooRealVar a7;
+    RooRealVar a8;
+    RooRealVar a9;
 
-    RooRealVar _cth_1;
-    RooRealVar _cth_2;
-    RooRealVar _cth_3;
-    RooRealVar _cth_4;
-    RooRealVar _cth_5;
-    RooRealVar _cth_6;
+    RooRealVar b1;
+    RooRealVar b2;
+    RooRealVar b3;
+    RooRealVar b4;
+    RooRealVar b5;
+    RooRealVar b6;
+    RooRealVar b7;
+    RooRealVar b8;
+    RooRealVar b9;
 
-    RooRealVar _phi_1;
-    RooRealVar _phi_2;
-    RooRealVar _phi_3;
-    RooRealVar _phi_4;
-    RooRealVar _phi_5;
-    RooRealVar _phi_6;
+    RooRealVar c1;
+    RooRealVar c2;
+    RooRealVar c3;
+    RooRealVar c4;
+    RooRealVar c5;
+    RooRealVar c6;
+    RooRealVar c7;
+    RooRealVar c8;
+    RooRealVar c9;
 
-    RooChebychev _eff_cpsi;
-    RooChebychev _eff_ctheta;
-    RooChebychev _eff_phi;
-    
-    RooArgSet _coef_cpsi;
-    RooArgSet _coef_ctheta;
-    RooArgSet _coef_phi;
-    RooProdPdf _efficiency;
-
-    RooRealVar _Phi1;
-    RooRealVar _Phi2;
-    RooRealVar _Phi3;
-    RooRealVar _Phi4;
-    RooRealVar _Phi5;
-    RooRealVar _Phi6;
-    RooArgSet _Phis;
-    
-    
+    RooArgSet As;
+    RooArgSet Bs;
+    RooArgSet Cs;
 };
 
 

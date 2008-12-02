@@ -22,28 +22,32 @@
 #include "RooChebychev.h"
 #include "RooExponential.h"
 #include "RooDecay.h"
+#include "RooPolynomial.h"
 
-#include "RooBsTimeAngle.h"
-#include "RooBkgAngle.h"
+#include <RooBsTimeAngle.h>
+#include <RooBkgAngle.h>
 
 class BsFitter {
 public:
-    BsFitter();
+    BsFitter(Bool_t use_resolution, Bool_t signal_only, Bool_t use_efficiency, Bool_t use_phis);
 
-    void setVariables(const char* vars);
     void setParameters(const char* params);
+    void writeParameters(const char* params);
     void setEfficiency(const char* efficiency);
+    void setPhis(const char* phis);
     void setData(const char* data_file);
     void setData(RooDataSet* data_set);
-    void setDataFromCin();
+//    void setDataFromCin();
 
-    void generate(Int_t num);
+    void generate(Int_t num, const char* data);
     Int_t fit(Bool_t hesse = kTRUE, Bool_t minos = kFALSE, Bool_t verbose = kFALSE, Int_t cpu = 1);
 
     void plotM(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
     void plotM();
     void plotT(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
     void plotT();
+    void plotEt(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
+    void plotEt();
     void plotCpsi(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
     void plotCpsi();
     void plotCtheta(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
@@ -60,22 +64,26 @@ private:
 
     RooRealVar _m;
     RooRealVar _t;
-#ifndef RES_TRUE
     RooRealVar _et;
-#endif
     RooRealVar _cpsi;
     RooRealVar _ctheta;
     RooRealVar _phi;
-    RooRealVar _d;
+    RooRealVar _p;
 
-    RooArgSet* parameters;
-    RooArgSet* variables;
-    RooResolutionModel *resolution;
-    RooAbsPdf* model;
-    Efficiency* efficiency;
+    Bool_t _use_resolution;
+    Bool_t _signal_only;
+    Bool_t _use_efficiency;
+    Bool_t _use_phis;
+    
+    RooArgSet* _parameters;
+    RooArgSet* _variables;
+    RooResolutionModel *_resolution;
+    RooAbsPdf* _model;
+    Efficiency* _efficiency;
+    Phis* _phis;
 
-    RooDataSet* data;
-    RooFitResult* fit_result;
+    RooDataSet* _data;
+    RooFitResult* _fit_result;
 };
 
 #endif

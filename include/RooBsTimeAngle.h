@@ -7,15 +7,19 @@
 #include "RooRealProxy.h"
 #include "RooCategoryProxy.h"
 #include "TransAngles.h"
+#include "TransAnglesEfficiency.h"
+#include "TransAnglesPhis.h"
 #include "Efficiency.h"
+#include "Phis.h"
 
+template<class TA, class TAI>
 class RooBsTimeAngle : public RooAbsAnaConvPdf {
 public:
     RooBsTimeAngle(const char *name, const char *title, Bool_t isBs,
             RooRealVar& t, RooRealVar& cpsi, RooRealVar& ctheta, RooRealVar& phi,
             RooRealVar& A02, RooRealVar& All2, RooRealVar& DG, RooRealVar& tau,
             RooRealVar& Dm, RooRealVar& phi_s, RooRealVar& delta_1, RooRealVar& delta_2,
-            const RooResolutionModel& model, Efficiency *efficiency=0, Bool_t fit=kFALSE);
+            const RooResolutionModel& model, TA &ta);
 
     RooBsTimeAngle(const RooBsTimeAngle& other, const char* name = 0);
 
@@ -38,7 +42,7 @@ private:
 
 protected:
     RooRealProxy _t;
-    TransAngles _angles;
+    TAI _angles;
     RooRealProxy _A02;
     RooRealProxy _All2;
     RooRealProxy _DG;
@@ -48,9 +52,6 @@ protected:
     RooRealProxy _delta_1;
     RooRealProxy _delta_2;
 
-    Bool_t _fit;
-    Efficiency *_efficiency;
-    
     TRandom3 _aleatorio;
 
     Bool_t _isBs;
@@ -65,7 +66,7 @@ protected:
     Double_t _C_Cos;
     Double_t _C_Sin;
 
-    Double_t tmp;
+//    Double_t tmp;
 
     ClassDef(RooBsTimeAngle, 1) // B0s Time and Angular decay PDF
 };
