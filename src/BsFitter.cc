@@ -1,14 +1,7 @@
-
-#include <root/RooDataSet.h>
-
-
-#include <root/RooAbsRealLValue.h>
-
-
-#include <root/RooAbsRealLValue.h>
-
-
-#include <root/RooDataSet.h>
+#include <RooDataSet.h>
+#include <RooAbsRealLValue.h>
+#include <RooAbsRealLValue.h>
+#include <RooDataSet.h>
 
 #include "RooBkgAngle.h"
 
@@ -216,7 +209,7 @@ void BsFitter::plotM(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t 
 }
 
 void BsFitter::plotM() {
-    plotVar(_m, "mass.svg", 0, 100, kFALSE);
+    plotVar(_m, "mass.gif", 0, 100, kFALSE);
 }
 
 void BsFitter::plotT(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log) {
@@ -224,7 +217,7 @@ void BsFitter::plotT(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t 
 }
 
 void BsFitter::plotEt() {
-    plotVar(_et, "time_error.svg", 0, 100, kTRUE);
+    plotVar(_et, "time_error.gif", 0, 100, kTRUE);
 }
 
 void BsFitter::plotEt(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log) {
@@ -232,7 +225,7 @@ void BsFitter::plotEt(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t
 }
 
 void BsFitter::plotT() {
-    plotVar(_t, "time.svg", 0, 100, kTRUE);
+    plotVar(_t, "time.gif", 0, 100, kTRUE);
 }
 
 void BsFitter::plotCpsi(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log) {
@@ -240,7 +233,7 @@ void BsFitter::plotCpsi(const char* plot_file, Int_t bins, Int_t proj_bins, Bool
 }
 
 void BsFitter::plotCpsi() {
-    plotVar(_cpsi, "cpsi.svg", 0, 100, kFALSE);
+    plotVar(_cpsi, "cpsi.gif", 0, 100, kFALSE);
 }
 
 void BsFitter::plotCtheta(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log) {
@@ -248,7 +241,7 @@ void BsFitter::plotCtheta(const char* plot_file, Int_t bins, Int_t proj_bins, Bo
 }
 
 void BsFitter::plotCtheta() {
-    plotVar(_ctheta, "ctheta.svg", 0, 100, kFALSE);
+    plotVar(_ctheta, "ctheta.gif", 0, 100, kFALSE);
 }
 
 void BsFitter::plotPhi(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log) {
@@ -256,7 +249,7 @@ void BsFitter::plotPhi(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_
 }
 
 void BsFitter::plotPhi() {
-    plotVar(_phi, "phi.svg", 0, 100, kFALSE);
+    plotVar(_phi, "phi.gif", 0, 100, kFALSE);
 }
 
 void BsFitter::plotVar(RooRealVar& x, const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log) {
@@ -274,7 +267,8 @@ void BsFitter::plotVar(RooRealVar& x, const char* plot_file, Int_t bins, Int_t p
                 _et.setBins(proj_bins);
                 RooDataHist projData("projData", "projData", RooArgSet(_et, _p), *_data);
                 cout << "RANGE: " << _range << endl;
-                _model->plotOn(x_frame, RooFit::ProjWData(RooArgSet(_et, _p), projData), RooFit::Range(_range));
+                _model->plotOn(x_frame, RooFit::Components(*_prompt), RooFit::ProjWData(RooArgSet(_et, _p), projData), RooFit::LineColor(99));
+                _model->plotOn(x_frame, RooFit::ProjWData(RooArgSet(_et, _p), projData), RooFit::LineColor(54));
             } else {
                 _model->plotOn(x_frame, RooFit::ProjWData(RooArgSet(_et, _p), *_data), RooFit::Range(_range));
             }
@@ -394,16 +388,16 @@ RooAbsPdf* BsFitter::background_model() {
     _parameters->add(*y5);
     _parameters->add(*y6);
     
-    RooExponential *exp_mass_p = new RooExponential("exp_mass_p","exp mass prompt", _m, *tm_p);
-    RooProdPdf * prompt;
+    //RooExponential *exp_mass_p = new RooExponential("exp_mass_p","exp mass prompt", _m, *tm_p);
+    RooPolynomial *exp_mass_p = new RooPolynomial("exp_mass_p", "pol mass prompt", _m, RooArgSet(*tm_p));
     if (_use_phis) {
         RooBkgAngle<Phis,TransAnglesPhis> *angle_p = new RooBkgAngle<Phis,TransAnglesPhis>("angle_p", "angle prompt", _cpsi, _ctheta, _phi,
                 *y1, *y2, *y3, *y4, *y5, *y6, *_phis);
-        prompt = new RooProdPdf("prompt", "prompt bkg", RooArgSet(*exp_mass_p, *_resolution, *angle_p));
+        _prompt = new RooProdPdf("_prompt", "prompt bkg", RooArgSet(*exp_mass_p, *_resolution, *angle_p));
     } else {
         RooBkgAngle<Efficiency,TransAnglesEfficiency> *angle_p = new RooBkgAngle<Efficiency,TransAnglesEfficiency>("angle_p", "angle prompt", _cpsi, _ctheta, _phi,
                 *y1, *y2, *y3, *y4, *y5, *y6, *_efficiency);
-        prompt = new RooProdPdf("prompt", "prompt bkg", RooArgSet(*exp_mass_p, *_resolution, *angle_p));
+        _prompt = new RooProdPdf("_prompt", "prompt bkg", RooArgSet(*exp_mass_p, *_resolution, *angle_p));
     }
 
     RooRealVar *tm_np = new RooRealVar("tm_np", "tm_np",0);
@@ -438,22 +432,21 @@ RooAbsPdf* BsFitter::background_model() {
     RooAddPdf *time_np = new RooAddPdf("time_np", "time no propmt",
             RooArgSet(*exp_minus, *exp_plus, *exp_plus_plus), RooArgSet(*fm, *fp));
 
-    RooProdPdf * noprompt;
     if (_use_phis) {
         RooBkgAngle<Phis,TransAnglesPhis> *angle_np = new RooBkgAngle<Phis,TransAnglesPhis> ("angle_np", "angle noprompt", _cpsi, _ctheta, _phi,
                 *z1, *z2, *z3, *z4, *z5, *z6, *_phis);
-        noprompt = new RooProdPdf("noprompt", "noprompt bkg", RooArgSet(*exp_mass_np, *time_np, *angle_np));
+        _noprompt = new RooProdPdf("_noprompt", "noprompt bkg", RooArgSet(*exp_mass_np, *time_np, *angle_np));
     } else {
         RooBkgAngle<Efficiency,TransAnglesEfficiency> *angle_np = new RooBkgAngle<Efficiency,TransAnglesEfficiency> ("angle_np", "angle noprompt", _cpsi, _ctheta, _phi,
                 *z1, *z2, *z3, *z4, *z5, *z6, *_efficiency);
-        noprompt = new RooProdPdf("noprompt", "noprompt bkg", RooArgSet(*exp_mass_np, *time_np, *angle_np));
+        _noprompt = new RooProdPdf("_noprompt", "noprompt bkg", RooArgSet(*exp_mass_np, *time_np, *angle_np));
     }
             
     RooRealVar *xp = new RooRealVar("xp","xp",0);
     _parameters->add(*xp);
     
-    RooAddPdf *bkg = new RooAddPdf("bkg", "background", *prompt, *noprompt, *xp);
-//    RooProdPdf *bkg = noprompt;
+    RooAddPdf *background = new RooAddPdf("bkg", "background", *_prompt, *_noprompt, *xp);
+ //    RooProdPdf *background = _noprompt;
     
 
 /*    RooRealVar *et_mean_b = new RooRealVar("et_mean_b", "mean time error", 0);
@@ -463,7 +456,7 @@ RooAbsPdf* BsFitter::background_model() {
 
     RooLandau *et_model_b = new RooLandau("et_model_b", "time bkg error model", _et, *et_mean_b, *et_sigma_b);*/
     
-    RooProdPdf *background = new RooProdPdf("background", "background x et_model_p", RooArgSet(*bkg)/*, RooFit::Conditional(*et_model_b, _et)*/);
+//i    RooProdPdf *background = new RooProdPdf("background", "background x et_model_p", RooArgSet(*bkg)/*, RooFit::Conditional(*et_model_b, _et)*/);
          
     return background;
 }
