@@ -82,6 +82,8 @@ private:
     RooAbsPdf* _model;
     Efficiency* _efficiency;
     Phis* _phis;
+    RooProdPdf *_prompt;
+    RooProdPdf *_noprompt;
 
     RooDataSet* _data;
     RooFitResult* _fit_result;
