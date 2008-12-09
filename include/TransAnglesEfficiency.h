@@ -17,7 +17,7 @@
 
 class TransAnglesEfficiency : public TransAngles {
 public:
-    TransAnglesEfficiency(RooAbsReal* parent, RooRealVar& cpsi, RooRealVar& ctheta, RooRealVar& phi, Efficiency &e);
+    TransAnglesEfficiency(RooAbsReal* parent, RooRealVar& cpsi, RooRealVar& ctheta, RooRealVar& phi, Efficiency &e, Bool_t s_ok);
     TransAnglesEfficiency(RooAbsReal* parent, const TransAnglesEfficiency& other, const char* name = 0);
 
     Double_t fe(Int_t i) const;
@@ -28,7 +28,10 @@ private:
     Double_t ectheta() const;
     Double_t ephi() const;
     Double_t ChebyshevT(Int_t i, Double_t x) const;
-    
+
+    Double_t static_ok;
+    Double_t int_1,int_2,int_3,int_4,int_5,int_6;
+
     RooRealProxy _a1;
     RooRealProxy _a2;
     RooRealProxy _a3;

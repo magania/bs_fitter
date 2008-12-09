@@ -1,6 +1,6 @@
 #include "TransAnglesPhis.h"
 
-TransAnglesPhis::TransAnglesPhis(RooAbsReal* parent, RooRealVar& cpsi, RooRealVar& ctheta, RooRealVar& phi, Phis &phis) :
+TransAnglesPhis::TransAnglesPhis(RooAbsReal* parent, RooRealVar& cpsi, RooRealVar& ctheta, RooRealVar& phi, Phis &phis, Bool_t /*static_ok*/) :
 TransAngles(parent, cpsi, ctheta, phi),
 _Phi1("_Phi1", "#phi_1", parent, phis.Phi1),
 _Phi2("_Phi2", "#phi_2", parent, phis.Phi2),

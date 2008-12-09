@@ -25,7 +25,7 @@ RooBsTimeAngle<TA, TAI>::RooBsTimeAngle(const char *name, const char *title, Boo
   RooAbsAnaConvPdf(name,title,model,t), 
   _isBs(isBs),
   _t("_t", "time", this, t),
-  _angles(this, cpsi, ctheta, phi, ta),
+  _angles(this, cpsi, ctheta, phi, ta, true),
   _A02("A02", "|A_0(0)|^2", this, A02),
   _All2("All2", "|A_#parallell(0)|^2", this, All2),
   _DG("DG", "#Delta#Gamma", this, DG),

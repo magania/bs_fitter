@@ -13,7 +13,7 @@
 
 class TransAnglesPhis : public TransAngles {
 public:
-    TransAnglesPhis(RooAbsReal* parent, RooRealVar& cpsi, RooRealVar& ctheta, RooRealVar& phi, Phis &phis);
+    TransAnglesPhis(RooAbsReal* parent, RooRealVar& cpsi, RooRealVar& ctheta, RooRealVar& phi, Phis &phis, Bool_t /*static_ok*/);
     TransAnglesPhis(RooAbsReal* parent, const TransAnglesPhis& other, const char* name = 0);
 
     Double_t fe(Int_t i) const;

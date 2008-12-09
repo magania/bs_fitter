@@ -1,18 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="45">
+<configurationDescriptor version="51">
   <logicalFolder name="root" displayName="root" projectFiles="true">
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <logicalFolder name="include" displayName="include" projectFiles="true">
-        <itemPath>include/BsFitter.h</itemPath>
-        <itemPath>include/Efficiency.h</itemPath>
-        <itemPath>include/F.h</itemPath>
-        <itemPath>include/RooBkgAngle.h</itemPath>
-        <itemPath>include/RooBsTimeAngle.h</itemPath>
-        <itemPath>include/TimeAngle.h</itemPath>
-        <itemPath>include/TransAngles.h</itemPath>
-      </logicalFolder>
+      <itemPath>include/BsFitter.h</itemPath>
+      <itemPath>include/Efficiency.h</itemPath>
+      <itemPath>include/RooBkgAngleLinkdef.h</itemPath>
+      <itemPath>include/RooBsTimeAngle.h</itemPath>
+      <itemPath>include/TransAngles.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -21,33 +17,24 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <logicalFolder name="src" displayName="src" projectFiles="true">
-        <itemPath>src/bs.cc</itemPath>
-        <itemPath>src/BsFitter.cc</itemPath>
-        <itemPath>efficiency.cc</itemPath>
-        <itemPath>src/F.cc</itemPath>
-        <itemPath>src/fitter.cc</itemPath>
-        <itemPath>src/Phis.cc</itemPath>
-        <itemPath>src/RooBkgAngle.cc</itemPath>
-        <itemPath>include/RooBkgAngleLinkdef.h</itemPath>
-        <itemPath>src/RooBsTimeAngle.cc</itemPath>
-        <itemPath>src/TimeAngle.cc</itemPath>
-        <itemPath>src/TransAngles.cc</itemPath>
-      </logicalFolder>
+      <itemPath>src/bs.cc</itemPath>
+      <itemPath>src/BsFitter.cc</itemPath>
+      <itemPath>src/RooBsTimeAngle.cc</itemPath>
+      <itemPath>src/TransAngles.cc</itemPath>
+      <itemPath>src/TransAnglesEfficiency.cc</itemPath>
+      <itemPath>src/TransAnglesPhis.cc</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
                    projectFiles="false">
       <itemPath>Makefile</itemPath>
     </logicalFolder>
-    <itemPath>src/TransAnglesEfficiency.cc</itemPath>
-    <itemPath>src/TransAnglesPhis.cc</itemPath>
   </logicalFolder>
-  <sourceEncoding>UTF-8</sourceEncoding>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="Debug" type="1">
       <toolsSet>
+        <developmentServer>localhost</developmentServer>
         <compilerSet>GNU|GNU</compilerSet>
         <platform>2</platform>
       </toolsSet>
@@ -71,19 +58,10 @@
           </includeDirectories>
         </ccCompilerTool>
       </folder>
-      <item path="efficiency.cc">
-        <itemTool>1</itemTool>
-      </item>
       <item path="include/BsFitter.h">
         <itemTool>3</itemTool>
       </item>
       <item path="include/Efficiency.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="include/F.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="include/RooBkgAngle.h">
         <itemTool>3</itemTool>
       </item>
       <item path="include/RooBkgAngleLinkdef.h">
@@ -92,28 +70,13 @@
       <item path="include/RooBsTimeAngle.h">
         <itemTool>3</itemTool>
       </item>
-      <item path="include/TimeAngle.h">
-        <itemTool>3</itemTool>
-      </item>
       <item path="include/TransAngles.h">
         <itemTool>3</itemTool>
       </item>
       <item path="src/BsFitter.cc">
         <itemTool>1</itemTool>
       </item>
-      <item path="src/F.cc">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/Phis.cc">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/RooBkgAngle.cc">
-        <itemTool>1</itemTool>
-      </item>
       <item path="src/RooBsTimeAngle.cc">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/TimeAngle.cc">
         <itemTool>1</itemTool>
       </item>
       <item path="src/TransAngles.cc">
@@ -128,12 +91,10 @@
       <item path="src/bs.cc">
         <itemTool>1</itemTool>
       </item>
-      <item path="src/fitter.cc">
-        <itemTool>1</itemTool>
-      </item>
     </conf>
     <conf name="Release" type="1">
       <toolsSet>
+        <developmentServer>localhost</developmentServer>
         <compilerSet>GNU|GNU</compilerSet>
         <platform>2</platform>
       </toolsSet>
@@ -152,19 +113,10 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
-      <item path="efficiency.cc">
-        <itemTool>1</itemTool>
-      </item>
       <item path="include/BsFitter.h">
         <itemTool>3</itemTool>
       </item>
       <item path="include/Efficiency.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="include/F.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="include/RooBkgAngle.h">
         <itemTool>3</itemTool>
       </item>
       <item path="include/RooBkgAngleLinkdef.h">
@@ -173,28 +125,13 @@
       <item path="include/RooBsTimeAngle.h">
         <itemTool>3</itemTool>
       </item>
-      <item path="include/TimeAngle.h">
-        <itemTool>3</itemTool>
-      </item>
       <item path="include/TransAngles.h">
         <itemTool>3</itemTool>
       </item>
       <item path="src/BsFitter.cc">
         <itemTool>1</itemTool>
       </item>
-      <item path="src/F.cc">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/Phis.cc">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/RooBkgAngle.cc">
-        <itemTool>1</itemTool>
-      </item>
       <item path="src/RooBsTimeAngle.cc">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/TimeAngle.cc">
         <itemTool>1</itemTool>
       </item>
       <item path="src/TransAngles.cc">
@@ -207,9 +144,6 @@
         <itemTool>1</itemTool>
       </item>
       <item path="src/bs.cc">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/fitter.cc">
         <itemTool>1</itemTool>
       </item>
     </conf>

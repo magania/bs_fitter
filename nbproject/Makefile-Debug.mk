@@ -1,5 +1,5 @@
 #
-# Gererated Makefile - do not edit!
+# Generated Makefile - do not edit!
 #
 # Edit the Makefile in the project folder instead (../Makefile). Each target
 # has a -pre and a -post target defined where you can add customized code.
@@ -17,24 +17,21 @@ CCC=g++
 CXX=g++
 FC=gfortran
 
+# Macros
+PLATFORM=GNU-Linux-x86
+
 # Include project Makefile
 include Makefile
 
 # Object Directory
-OBJECTDIR=build/Debug/GNU-Linux-x86
+OBJECTDIR=build/Debug/${PLATFORM}
 
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/src/RooBsTimeAngle.o \
-	${OBJECTDIR}/src/fitter.o \
-	${OBJECTDIR}/src/Phis.o \
 	${OBJECTDIR}/src/bs.o \
-	${OBJECTDIR}/src/RooBkgAngle.o \
 	${OBJECTDIR}/src/TransAnglesPhis.o \
-	${OBJECTDIR}/src/TimeAngle.o \
 	${OBJECTDIR}/src/TransAnglesEfficiency.o \
-	${OBJECTDIR}/src/F.o \
-	${OBJECTDIR}/efficiency.o \
 	${OBJECTDIR}/src/BsFitter.o \
 	${OBJECTDIR}/src/TransAngles.o
 
@@ -52,7 +49,8 @@ FFLAGS=
 LDLIBSOPTIONS=
 
 # Build Targets
-.build-conf: ${BUILD_SUBPROJECTS} bin/bs
+.build-conf: ${BUILD_SUBPROJECTS}
+	${MAKE}  -f nbproject/Makefile-Debug.mk bin/bs
 
 bin/bs: ${OBJECTFILES}
 	${MKDIR} -p bin
@@ -62,41 +60,17 @@ ${OBJECTDIR}/src/RooBsTimeAngle.o: src/RooBsTimeAngle.cc
 	${MKDIR} -p ${OBJECTDIR}/src
 	$(COMPILE.cc) -g -I/usr/include/root -Iinclude -o ${OBJECTDIR}/src/RooBsTimeAngle.o src/RooBsTimeAngle.cc
 
-${OBJECTDIR}/src/fitter.o: src/fitter.cc 
-	${MKDIR} -p ${OBJECTDIR}/src
-	$(COMPILE.cc) -g -I/usr/include/root -Iinclude -o ${OBJECTDIR}/src/fitter.o src/fitter.cc
-
-${OBJECTDIR}/src/Phis.o: src/Phis.cc 
-	${MKDIR} -p ${OBJECTDIR}/src
-	$(COMPILE.cc) -g -I/usr/include/root -Iinclude -o ${OBJECTDIR}/src/Phis.o src/Phis.cc
-
 ${OBJECTDIR}/src/bs.o: src/bs.cc 
 	${MKDIR} -p ${OBJECTDIR}/src
 	$(COMPILE.cc) -g -I/usr/include/root -Iinclude -o ${OBJECTDIR}/src/bs.o src/bs.cc
-
-${OBJECTDIR}/src/RooBkgAngle.o: src/RooBkgAngle.cc 
-	${MKDIR} -p ${OBJECTDIR}/src
-	$(COMPILE.cc) -g -I/usr/include/root -Iinclude -o ${OBJECTDIR}/src/RooBkgAngle.o src/RooBkgAngle.cc
 
 ${OBJECTDIR}/src/TransAnglesPhis.o: src/TransAnglesPhis.cc 
 	${MKDIR} -p ${OBJECTDIR}/src
 	$(COMPILE.cc) -g -I/usr/include/root -Iinclude -o ${OBJECTDIR}/src/TransAnglesPhis.o src/TransAnglesPhis.cc
 
-${OBJECTDIR}/src/TimeAngle.o: src/TimeAngle.cc 
-	${MKDIR} -p ${OBJECTDIR}/src
-	$(COMPILE.cc) -g -I/usr/include/root -Iinclude -o ${OBJECTDIR}/src/TimeAngle.o src/TimeAngle.cc
-
 ${OBJECTDIR}/src/TransAnglesEfficiency.o: src/TransAnglesEfficiency.cc 
 	${MKDIR} -p ${OBJECTDIR}/src
 	$(COMPILE.cc) -g -I/usr/include/root -Iinclude -o ${OBJECTDIR}/src/TransAnglesEfficiency.o src/TransAnglesEfficiency.cc
-
-${OBJECTDIR}/src/F.o: src/F.cc 
-	${MKDIR} -p ${OBJECTDIR}/src
-	$(COMPILE.cc) -g -I/usr/include/root -Iinclude -o ${OBJECTDIR}/src/F.o src/F.cc
-
-${OBJECTDIR}/efficiency.o: efficiency.cc 
-	${MKDIR} -p ${OBJECTDIR}
-	$(COMPILE.cc) -g -I/usr/include/root -Iinclude -o ${OBJECTDIR}/efficiency.o efficiency.cc
 
 ${OBJECTDIR}/src/BsFitter.o: src/BsFitter.cc 
 	${MKDIR} -p ${OBJECTDIR}/src

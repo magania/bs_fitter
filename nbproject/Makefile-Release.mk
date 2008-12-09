@@ -1,5 +1,5 @@
 #
-# Gererated Makefile - do not edit!
+# Generated Makefile - do not edit!
 #
 # Edit the Makefile in the project folder instead (../Makefile). Each target
 # has a -pre and a -post target defined where you can add customized code.
@@ -17,24 +17,21 @@ CCC=g++
 CXX=g++
 FC=gfortran
 
+# Macros
+PLATFORM=GNU-Linux-x86
+
 # Include project Makefile
 include Makefile
 
 # Object Directory
-OBJECTDIR=build/Release/GNU-Linux-x86
+OBJECTDIR=build/Release/${PLATFORM}
 
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/src/RooBsTimeAngle.o \
-	${OBJECTDIR}/src/fitter.o \
-	${OBJECTDIR}/src/Phis.o \
 	${OBJECTDIR}/src/bs.o \
-	${OBJECTDIR}/src/RooBkgAngle.o \
 	${OBJECTDIR}/src/TransAnglesPhis.o \
-	${OBJECTDIR}/src/TimeAngle.o \
 	${OBJECTDIR}/src/TransAnglesEfficiency.o \
-	${OBJECTDIR}/src/F.o \
-	${OBJECTDIR}/efficiency.o \
 	${OBJECTDIR}/src/BsFitter.o \
 	${OBJECTDIR}/src/TransAngles.o
 
@@ -52,51 +49,28 @@ FFLAGS=
 LDLIBSOPTIONS=
 
 # Build Targets
-.build-conf: ${BUILD_SUBPROJECTS} dist/Release/GNU-Linux-x86/bsfitter
+.build-conf: ${BUILD_SUBPROJECTS}
+	${MAKE}  -f nbproject/Makefile-Release.mk dist/Release/${PLATFORM}/bsfitter
 
-dist/Release/GNU-Linux-x86/bsfitter: ${OBJECTFILES}
-	${MKDIR} -p dist/Release/GNU-Linux-x86
-	${LINK.cc} -o dist/Release/GNU-Linux-x86/bsfitter ${OBJECTFILES} ${LDLIBSOPTIONS} 
+dist/Release/${PLATFORM}/bsfitter: ${OBJECTFILES}
+	${MKDIR} -p dist/Release/${PLATFORM}
+	${LINK.cc} -o dist/Release/${PLATFORM}/bsfitter ${OBJECTFILES} ${LDLIBSOPTIONS} 
 
 ${OBJECTDIR}/src/RooBsTimeAngle.o: src/RooBsTimeAngle.cc 
 	${MKDIR} -p ${OBJECTDIR}/src
 	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/src/RooBsTimeAngle.o src/RooBsTimeAngle.cc
 
-${OBJECTDIR}/src/fitter.o: src/fitter.cc 
-	${MKDIR} -p ${OBJECTDIR}/src
-	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/src/fitter.o src/fitter.cc
-
-${OBJECTDIR}/src/Phis.o: src/Phis.cc 
-	${MKDIR} -p ${OBJECTDIR}/src
-	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/src/Phis.o src/Phis.cc
-
 ${OBJECTDIR}/src/bs.o: src/bs.cc 
 	${MKDIR} -p ${OBJECTDIR}/src
 	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/src/bs.o src/bs.cc
-
-${OBJECTDIR}/src/RooBkgAngle.o: src/RooBkgAngle.cc 
-	${MKDIR} -p ${OBJECTDIR}/src
-	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/src/RooBkgAngle.o src/RooBkgAngle.cc
 
 ${OBJECTDIR}/src/TransAnglesPhis.o: src/TransAnglesPhis.cc 
 	${MKDIR} -p ${OBJECTDIR}/src
 	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/src/TransAnglesPhis.o src/TransAnglesPhis.cc
 
-${OBJECTDIR}/src/TimeAngle.o: src/TimeAngle.cc 
-	${MKDIR} -p ${OBJECTDIR}/src
-	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/src/TimeAngle.o src/TimeAngle.cc
-
 ${OBJECTDIR}/src/TransAnglesEfficiency.o: src/TransAnglesEfficiency.cc 
 	${MKDIR} -p ${OBJECTDIR}/src
 	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/src/TransAnglesEfficiency.o src/TransAnglesEfficiency.cc
-
-${OBJECTDIR}/src/F.o: src/F.cc 
-	${MKDIR} -p ${OBJECTDIR}/src
-	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/src/F.o src/F.cc
-
-${OBJECTDIR}/efficiency.o: efficiency.cc 
-	${MKDIR} -p ${OBJECTDIR}
-	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/efficiency.o efficiency.cc
 
 ${OBJECTDIR}/src/BsFitter.o: src/BsFitter.cc 
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -112,7 +86,7 @@ ${OBJECTDIR}/src/TransAngles.o: src/TransAngles.cc
 # Clean Targets
 .clean-conf:
 	${RM} -r build/Release
-	${RM} dist/Release/GNU-Linux-x86/bsfitter
+	${RM} dist/Release/${PLATFORM}/bsfitter
 
 # Subprojects
 .clean-subprojects:
