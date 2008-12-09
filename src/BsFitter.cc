@@ -39,9 +39,9 @@ _p("_p", "bs probability", 0, 0, 1) {
     _data = 0;
     _fit_result = 0;
 
-    _t.setRange("np", -1,12);
-    const char *range_np = "np";
-    _range = range_np;
+//    _t.setRange("np", -1,12);
+//    const char *range_np = "np";
+//    _range = range_np;
 
     _variables = new RooArgSet();
     _parameters = new RooArgSet();
