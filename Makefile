@@ -21,7 +21,7 @@ $(MYLIBS): obj/%.o : src/%.cc include/%.h
 
 obj/BsFitter.o: src/BsFitter.cc include/BsFitter.h $(MYLIBS)
 	@echo rootcint -f Dict.cc  -c include/*
-	rootcint -f Dict.cc  -c include/BsFitter.h include/Efficiency.h include/Phis.h include/RooBkgAngle.h include/RooBsTimeAngle.h include/TransAngles.h include/TransAnglesEfficiency.h include/TransAnglesPhis.h include/RooBkgAngleLinkdef.h
+	rootcint -f Dict.cc  -c include/BsFitter.h include/Efficiency.h include/Phis.h include/RooBsTimeAngle.h include/TransAngles.h include/TransAnglesEfficiency.h include/TransAnglesPhis.h include/RooBkgAngleLinkdef.h
 	@echo $(CXX) $(CCFLAGS) $(INCLUDE) -c Dict.cc -o obj/Dict.o
 	$(CXX) $(CCFLAGS) $(INCLUDE) -c Dict.cc -o obj/Dict.o
 	@echo $(CXX) $(CCFLAGS) $(INCLUDE) $(DFLAGS) -c $< -o obj/BsFitter.o

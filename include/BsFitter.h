@@ -23,9 +23,10 @@
 #include "RooExponential.h"
 #include "RooDecay.h"
 #include "RooPolynomial.h"
+#include "RooGenericPdf.h"
 
 #include <RooBsTimeAngle.h>
-#include <RooBkgAngle.h>
+//#include <RooBkgAngle.h>
 
 class BsFitter {
 public:
@@ -84,6 +85,8 @@ private:
     Phis* _phis;
     RooProdPdf *_prompt;
     RooProdPdf *_noprompt;
+RooAbsPdf *_signal;	
+RooAbsPdf *_background;
 
     RooDataSet* _data;
     RooFitResult* _fit_result;

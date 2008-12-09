@@ -9,8 +9,8 @@
 //#define	_ROOBKGANGLELINKDEF_H
 
 #ifdef __CINT__
-#pragma link C++ class RooBkgAngle<Efficiency,TransAnglesEfficiency>;
-#pragma link C++ class RooBkgAngle<Phis,TransAnglesPhis>;
+//#pragma link C++ class RooBkgAngle<Efficiency,TransAnglesEfficiency>;
+//#pragma link C++ class RooBkgAngle<Phis,TransAnglesPhis>;
 #pragma link C++ class RooBsTimeAngle<Efficiency,TransAnglesEfficiency>;
 #pragma link C++ class RooBsTimeAngle<Phis,TransAnglesPhis>;
 #endif
