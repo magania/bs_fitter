@@ -69,6 +69,12 @@ _c6("_c6", parent, other._c6),
 _c7("_c7", parent, other._c7),
 _c8("_c8", parent, other._c8),
 _c9("_c9", parent, other._c9),
+int_1(other.int_1),
+int_2(other.int_2),
+int_3(other.int_3),
+int_4(other.int_4),
+int_5(other.int_5),
+int_6(other.int_6),
 static_ok(other.static_ok)
 {
 }
