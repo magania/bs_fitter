@@ -27,7 +27,17 @@ private:
     Double_t ecpsi() const;
     Double_t ectheta() const;
     Double_t ephi() const;
+
+    inline Double_t ec_cpsi() const;
+    inline Double_t ec_ctheta() const;
+    inline Double_t ec_phi() const;
+
     Double_t ChebyshevT(Int_t i, Double_t x) const;
+
+    Double_t eval_coef(Int_t i, Double_t a1, Double_t a2, Double_t a3, Double_t a4, Double_t a5,
+            Double_t a6, Double_t a7, Double_t a8, Double_t a9);
+    inline Double_t efficiency(const Double_t *coeff, Double_t *pow) const;
+    inline void power(Double_t x, Double_t *pow) const;
 
     Double_t static_ok;
     Double_t int_1,int_2,int_3,int_4,int_5,int_6;
@@ -61,6 +71,10 @@ private:
     RooRealProxy _c7;
     RooRealProxy _c8;
     RooRealProxy _c9;
+
+    Double_t _aa[10];
+    Double_t _bb[10];
+    Double_t _cc[10];
 };
 
 #endif	/* _TRANSANGLESEFFICIENCY_H */

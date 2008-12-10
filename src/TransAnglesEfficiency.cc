@@ -38,6 +38,12 @@ static_ok(s_ok)
     int_4 = 0.005696741357050134 * (693. * _a2 - 11. * (105. + 9. * _a4 + _a6) - 3. * _a8)*(_b1 - 1. * _b3)* (_c1 + 12.478417604357432 * _c3 + 247.87996017365685 * _c5 + 5690.997801077727 * _c7 + 143464.25816772878 * _c9);
     int_5 = 0.0020141022221180026 * (_a1 - 1. * _a3)*(693. * _b2 - 11. * (105. + 9. * _b4 + _b6) - 3. * _b8)*(_c1 + 30.478417604357432 * _c3 + 726.5850164351028 * _c5 + 18430.728116892853 * _c7 + 492529.4992742345 * _c9);
     int_6 = -10.962374249993156 * (_a1 - 1. * _a3)*(_b1 - 1. * _b3)* (_c2 + 26.956835208714864 * _c4 + 784.0751333340436 * _c6 + 23809.424715423258 * _c8);
+
+    for (int i=0; i<10; i++) {
+        _aa[i] = eval_coef(i, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9);
+        _bb[i] = eval_coef(i, _b1, _b2, _b3, _b4, _b5, _b6, _b7, _a8, _b9);
+        _cc[i] = eval_coef(i, _c1, _c2, _c3, _c4, _c5, _c6, _c7, _c8, _c9);
+    }
 }
 
 TransAnglesEfficiency::TransAnglesEfficiency(RooAbsReal* parent, const TransAnglesEfficiency& other, const char* name) :
@@ -75,8 +81,38 @@ int_3(other.int_3),
 int_4(other.int_4),
 int_5(other.int_5),
 int_6(other.int_6),
-static_ok(other.static_ok)
-{
+static_ok(other.static_ok) {
+    for (int i = 0; i < 10; i++) {
+        _aa[i] = eval_coef(i, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9);
+        _bb[i] = eval_coef(i, _b1, _b2, _b3, _b4, _b5, _b6, _b7, _a8, _b9);
+        _cc[i] = eval_coef(i, _c1, _c2, _c3, _c4, _c5, _c6, _c7, _c8, _c9);
+    }
+}
+
+Double_t TransAnglesEfficiency::eval_coef(Int_t i, Double_t a1, Double_t a2, Double_t a3, Double_t a4, Double_t a5,
+        Double_t a6, Double_t a7, Double_t a8, Double_t a9) {
+    switch (i) {
+        case 0:
+            return a4 - a2 - a6 + a8 + 1;
+        case 1:
+            return a1 - 3 * a3 + 5 * a5 - 7 * a7 + 9 * a9;
+        case 2:
+            return 2 * a2 - 8 * a4 + 18 * a6 - 32 * a8;
+        case 3:
+            return 4 * a3 - 20 * a5 + 56 * a7 - 120 * a9;
+        case 4:
+            return 8 * a4 - 48 * a6 + 160 * a8;
+        case 5:
+            return 16 * a5 - 112 * a7 + 432 * a9;
+        case 6:
+            return 32 * a6 - 256 * a8;
+        case 7:
+            return 64 * a7 - 576 * a9;
+        case 8:
+            return 128 * a8;
+        case 9:
+            return 256 * a9;
+    }
 }
 
 Double_t TransAnglesEfficiency::ChebyshevT(Int_t i, Double_t x) const {
@@ -106,7 +142,6 @@ Double_t TransAnglesEfficiency::ChebyshevT(Int_t i, Double_t x) const {
             return -1;
     }
 }
-
 /*Double_t f(Int_t i) const {
     switch (i) {
         case 1:
@@ -131,6 +166,31 @@ Double_t TransAnglesEfficiency::ChebyshevT(Int_t i, Double_t x) const {
     }
 }*/
 
+Double_t TransAnglesEfficiency::efficiency(const Double_t *coeff, Double_t *pow) const {
+    return coeff[0] + coeff[1] * pow[1] + coeff[2] * pow[2] + coeff[3] * pow[3]
+            + coeff[4] * pow[4] + coeff[5] * pow[5] + coeff[6] * pow[6]
+            + coeff[7] * pow[7] + coeff[8] * pow[8] + coeff[9] * pow[9];
+}
+
+void TransAnglesEfficiency::power(Double_t x, Double_t *pow) const {
+//    pow[0] = 1;
+    pow[1] = x;
+    pow[2] = pow[1]*x;
+    pow[3] = pow[2]*x;
+    pow[4] = pow[3]*x;
+    pow[5] = pow[4]*x;
+    pow[6] = pow[5]*x;
+    pow[7] = pow[6]*x;
+    pow[8] = pow[7]*x;
+    pow[9] = pow[8]*x;
+}
+
+Double_t TransAnglesEfficiency::ec_cpsi() const {
+    static Double_t cpsiE[10];
+    power(_cpsi, cpsiE);
+    return efficiency(_aa, cpsiE);
+}
+
 Double_t TransAnglesEfficiency::ecpsi() const {
     return (1 + _a1 * ChebyshevT(1, _cpsi) + _a2 * ChebyshevT(2, _cpsi) +
             _a3 * ChebyshevT(3, _cpsi) + _a4 * ChebyshevT(4, _cpsi) +
@@ -139,12 +199,24 @@ Double_t TransAnglesEfficiency::ecpsi() const {
             _a9 * ChebyshevT(9, _cpsi));
 }
 
+Double_t TransAnglesEfficiency::ec_ctheta() const {
+    static Double_t cthetaE[10];
+    power(_ctheta, cthetaE);
+    return efficiency(_bb, cthetaE);
+}
+
 Double_t TransAnglesEfficiency::ectheta() const {
     return (1 + _b1 * ChebyshevT(1, _ctheta) + _b2 * ChebyshevT(2, _ctheta) +
             _b3 * ChebyshevT(3, _ctheta) + _b4 * ChebyshevT(4, _ctheta) +
             _b5 * ChebyshevT(5, _ctheta) + _b6 * ChebyshevT(6, _ctheta) +
             _b7 * ChebyshevT(7, _ctheta) + _b8 * ChebyshevT(8, _ctheta) +
             _b9 * ChebyshevT(9, _ctheta));
+}
+
+ Double_t TransAnglesEfficiency::ec_phi() const {
+    static Double_t phiE[10];
+    power(_phi, phiE);
+    return efficiency(_cc, phiE);
 }
 
 Double_t TransAnglesEfficiency::ephi() const {
@@ -156,7 +228,10 @@ Double_t TransAnglesEfficiency::ephi() const {
 }
 
 Double_t TransAnglesEfficiency::fe(Int_t i) const {
-    return f(i) * ecpsi() * ectheta() * ephi();
+    if (static_ok)
+        return f(i) * ec_cpsi() * ec_ctheta() * ec_phi();
+    else
+        return f(i) * ecpsi() * ectheta() * ephi();
 }
 
 Double_t TransAnglesEfficiency::int_fe(Int_t i, Int_t code, const char* range) const {
@@ -164,7 +239,6 @@ Double_t TransAnglesEfficiency::int_fe(Int_t i, Int_t code, const char* range) c
 //    std::cout << _a1 << ' ' << _a2 << ' ' << _a3 << ' ' << _a4 << ' ' << _a5 << std::endl;
 //    std::cout << _b1 << ' ' << _b2 << ' ' << _b3 << ' ' << _b4 << ' ' << _b5 << std::endl;
 //    std::cout << _c1 << ' ' << _c2 << ' ' << _c3 << ' ' << _c4 << ' ' << _c5 << std::endl;
-
     switch (code) {
         case 1:
             switch (i) {
