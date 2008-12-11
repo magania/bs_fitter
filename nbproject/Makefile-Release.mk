@@ -28,11 +28,12 @@ OBJECTDIR=build/Release/${PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/fit_et.o \
 	${OBJECTDIR}/src/RooBsTimeAngle.o \
 	${OBJECTDIR}/src/bs.o \
+	${OBJECTDIR}/src/BsFitter.o \
 	${OBJECTDIR}/src/TransAnglesPhis.o \
 	${OBJECTDIR}/src/TransAnglesEfficiency.o \
-	${OBJECTDIR}/src/BsFitter.o \
 	${OBJECTDIR}/src/TransAngles.o
 
 # C Compiler Flags
@@ -56,6 +57,10 @@ dist/Release/${PLATFORM}/bsfitter: ${OBJECTFILES}
 	${MKDIR} -p dist/Release/${PLATFORM}
 	${LINK.cc} -o dist/Release/${PLATFORM}/bsfitter ${OBJECTFILES} ${LDLIBSOPTIONS} 
 
+${OBJECTDIR}/fit_et.o: fit_et.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/fit_et.o fit_et.cpp
+
 ${OBJECTDIR}/src/RooBsTimeAngle.o: src/RooBsTimeAngle.cc 
 	${MKDIR} -p ${OBJECTDIR}/src
 	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/src/RooBsTimeAngle.o src/RooBsTimeAngle.cc
@@ -64,6 +69,10 @@ ${OBJECTDIR}/src/bs.o: src/bs.cc
 	${MKDIR} -p ${OBJECTDIR}/src
 	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/src/bs.o src/bs.cc
 
+${OBJECTDIR}/src/BsFitter.o: src/BsFitter.cc 
+	${MKDIR} -p ${OBJECTDIR}/src
+	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/src/BsFitter.o src/BsFitter.cc
+
 ${OBJECTDIR}/src/TransAnglesPhis.o: src/TransAnglesPhis.cc 
 	${MKDIR} -p ${OBJECTDIR}/src
 	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/src/TransAnglesPhis.o src/TransAnglesPhis.cc
@@ -71,10 +80,6 @@ ${OBJECTDIR}/src/TransAnglesPhis.o: src/TransAnglesPhis.cc
 ${OBJECTDIR}/src/TransAnglesEfficiency.o: src/TransAnglesEfficiency.cc 
 	${MKDIR} -p ${OBJECTDIR}/src
 	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/src/TransAnglesEfficiency.o src/TransAnglesEfficiency.cc
-
-${OBJECTDIR}/src/BsFitter.o: src/BsFitter.cc 
-	${MKDIR} -p ${OBJECTDIR}/src
-	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/src/BsFitter.o src/BsFitter.cc
 
 ${OBJECTDIR}/src/TransAngles.o: src/TransAngles.cc 
 	${MKDIR} -p ${OBJECTDIR}/src

@@ -19,6 +19,7 @@
                    projectFiles="true">
       <itemPath>src/bs.cc</itemPath>
       <itemPath>src/BsFitter.cc</itemPath>
+      <itemPath>fit_et.cpp</itemPath>
       <itemPath>src/RooBsTimeAngle.cc</itemPath>
       <itemPath>src/TransAngles.cc</itemPath>
       <itemPath>src/TransAnglesEfficiency.cc</itemPath>
@@ -58,6 +59,9 @@
           </includeDirectories>
         </ccCompilerTool>
       </folder>
+      <item path="fit_et.cpp">
+        <itemTool>1</itemTool>
+      </item>
       <item path="include/BsFitter.h">
         <itemTool>3</itemTool>
       </item>
@@ -113,6 +117,9 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
+      <item path="fit_et.cpp">
+        <itemTool>1</itemTool>
+      </item>
       <item path="include/BsFitter.h">
         <itemTool>3</itemTool>
       </item>
