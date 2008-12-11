@@ -466,6 +466,6 @@ RooAbsPdf* BsFitter::background_model() {
     RooLandau *et_model_b = new RooLandau("et_model_b", "time bkg error model", _et, *et_mean_b, *et_sigma_b);*/
     
 //i    RooProdPdf *background = new RooProdPdf("background", "background x et_model_p", RooArgSet(*bkg)/*, RooFit::Conditional(*et_model_b, _et)*/);
-         
+    return _noprompt;     
     return background;
 }
