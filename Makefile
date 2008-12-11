@@ -1,5 +1,5 @@
 MAKEFLAGS = --no-print-directory -r -s
-CCFLAGS= -g -fPIC
+CCFLAGS= -O3 -g -fPIC
 
 INCLUDE = $(shell root-config --cflags) -Iinclude
 LIBS    = $(shell root-config --libs) -lRooFit -lRooFitCore
@@ -50,4 +50,4 @@ toymc: toymc.cc
 clean:
 	rm $(MYLIBS)
 	rm Dict.cc Dict.h
-	rm bin/fitter
+	rm bin/bs

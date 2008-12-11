@@ -1,3 +1,9 @@
+
+#include <root/RooGlobalFunc.h>
+
+
+#include <root/RooAddPdf.h>
+
 #include <RooDataSet.h>
 #include <RooAbsRealLValue.h>
 #include <RooAbsRealLValue.h>
@@ -17,7 +23,7 @@
 //#include "RooBkgAngle.cc"
 
 BsFitter::BsFitter(Bool_t use_resolution, Bool_t signal_only, Bool_t sidebands, Bool_t use_efficiency, Bool_t use_phis) :
-_m("_m", "m", 0, 5.1, 5.7),
+_m("_m", "m", 0, 5.28, 5.44/*5.1, 5.7*/),
 _t("_t", "t", 0, -2, 12),
 _et("_et", "et", 0, 0, 1),
 _cpsi("_cpsi", "cos(#psi)", 0, -1, 1),
@@ -38,8 +44,12 @@ _p("_p", "bs probability", 0, 0, 1) {
     _model = 0;
     _data = 0;
     _fit_result = 0;
+    _signal = 0;
+    _background = 0;
+    _prompt = 0;
+    _noprompt = 0;
 
-//    _t.setRange("np", -1,12);
+//    _t.setRange("np", 1,12);
 //    const char *range_np = "np";
 //    _range = range_np;
 
@@ -70,8 +80,6 @@ _p("_p", "bs probability", 0, 0, 1) {
         _resolution = new RooTruthModel("_resolution", "truth resolution", _t);
     }
 
- //   RooAbsPdf *signal = 0;
- //   RooAbsPdf *background = 0;
     if (!_sidebands)
         _signal = signal_model();
     if (!_signal_only)
@@ -264,6 +272,9 @@ void BsFitter::plotVar(RooRealVar& x, const char* plot_file, Int_t bins, Int_t p
             _data->plotOn(x_frame, RooFit::Binning(bins));
         else
             _data->plotOn(x_frame);
+    Double_t norm = 1;
+    if (x == _t)
+        norm = 2.6;
 
     if (_data) {
         if (_use_resolution) {
@@ -271,9 +282,14 @@ void BsFitter::plotVar(RooRealVar& x, const char* plot_file, Int_t bins, Int_t p
                 _et.setBins(proj_bins);
                 RooDataHist projData("projData", "projData", RooArgSet(_et, _p), *_data);
                 cout << "RANGE: " << _range << endl;
-                _model->plotOn(x_frame, RooFit::Components(*_signal), RooFit::ProjWData(RooArgSet(_et, _p), projData), RooFit::LineColor(kGreen));
-                _model->plotOn(x_frame, RooFit::Components(*_prompt), RooFit::ProjWData(RooArgSet(_et, _p), projData), RooFit::LineColor(99));
-                _model->plotOn(x_frame, RooFit::ProjWData(RooArgSet(_et, _p), projData), RooFit::LineColor(54));
+
+                if (_signal)
+                    _model->plotOn(x_frame, RooFit::Components(*_signal), RooFit::ProjWData(RooArgSet(_et, _p), projData), RooFit::LineColor(kGreen), RooFit::Normalization(norm));
+                if (_prompt)
+                    _model->plotOn(x_frame, RooFit::Components(*_prompt), RooFit::ProjWData(RooArgSet(_et, _p), projData), RooFit::LineColor(kRed), RooFit::Normalization(norm));
+                if (_noprompt)
+                    _model->plotOn(x_frame, RooFit::Components(*_noprompt), RooFit::ProjWData(RooArgSet(_et, _p), projData), RooFit::LineColor(kBlue), RooFit::Normalization(norm));
+                _model->plotOn(x_frame, RooFit::ProjWData(RooArgSet(_et, _p), projData), RooFit::LineColor(13), RooFit::Normalization(norm));
             } else {
                 _model->plotOn(x_frame, RooFit::ProjWData(RooArgSet(_et, _p), *_data), RooFit::Range(_range));
             }
@@ -453,8 +469,8 @@ RooAbsPdf* BsFitter::background_model() {
             
     RooRealVar *xp = new RooRealVar("xp","xp",0);
     _parameters->add(*xp);
-    
-       RooAddPdf *background = new RooAddPdf("bkg", "background", *_prompt, *_noprompt, *xp);
+
+    RooAddPdf *background = new RooAddPdf("bkg", "background", *_prompt, *_noprompt, *xp);
     //   RooProdPdf *background = _noprompt;
     
 
@@ -466,6 +482,7 @@ RooAbsPdf* BsFitter::background_model() {
     RooLandau *et_model_b = new RooLandau("et_model_b", "time bkg error model", _et, *et_mean_b, *et_sigma_b);*/
     
 //i    RooProdPdf *background = new RooProdPdf("background", "background x et_model_p", RooArgSet(*bkg)/*, RooFit::Conditional(*et_model_b, _et)*/);
-    return _noprompt;     
+    _prompt =0;
+    return _noprompt;
     return background;
 }
