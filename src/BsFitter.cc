@@ -1,13 +1,11 @@
-
-#include <root/RooGlobalFunc.h>
-
-
-#include <root/RooAddPdf.h>
+#include <RooGlobalFunc.h>
+#include <RooAddPdf.h>
 
 #include <RooDataSet.h>
 #include <RooAbsRealLValue.h>
 #include <RooAbsRealLValue.h>
 #include <RooDataSet.h>
+#include <RooAddModel.h>
 
 #include "RooBkgAngle.h"
 
@@ -23,7 +21,7 @@
 //#include "RooBkgAngle.cc"
 
 BsFitter::BsFitter(Bool_t use_resolution, Bool_t signal_only, Bool_t sidebands, Bool_t use_efficiency, Bool_t use_phis) :
-_m("_m", "m", 0, 5.28, 5.44/*5.1, 5.7*/),
+_m("_m", "m", 0, 5.12421105, 5.64236358),
 _t("_t", "t", 0, -2, 12),
 _et("_et", "et", 0, 0, 1),
 _cpsi("_cpsi", "cos(#psi)", 0, -1, 1),
@@ -73,9 +71,15 @@ _p("_p", "bs probability", 0, 0, 1) {
     }
     
     if ( _use_resolution ) {
-        RooRealVar *S = new RooRealVar("S", "S", 0);
-        _parameters->add(*S);
-        _resolution = new RooGaussModel("_resolution", "gauss resolution", _t, RooFit::RooConst(0), *S, _et);
+        RooRealVar *S1 = new RooRealVar("S1", "S1", 0);
+        RooRealVar *S2 = new RooRealVar("S2", "S2", 0);
+        RooRealVar *xr = new RooRealVar("xr", "xr", 0);
+        _parameters->add(*S1);
+        _parameters->add(*S2);
+        _parameters->add(*xr);
+        RooGaussModel *gauss_1 = new RooGaussModel("gauss_1", "gauss 1 resolution", _t, RooFit::RooConst(0), *S1, _et);
+        RooGaussModel *gauss_2 = new RooGaussModel("gauss_2", "gauss 2 resolution", _t, RooFit::RooConst(0), *S2, _et);
+        _resolution = new RooAddModel("_resolution", "gaussx2 resolution", RooArgList(*gauss_1, *gauss_2), RooArgList(*xr));
     } else {
         _resolution = new RooTruthModel("_resolution", "truth resolution", _t);
     }
@@ -203,7 +207,7 @@ Int_t BsFitter::fit(Bool_t hesse, Bool_t minos, Bool_t verbose, Int_t cpu) {
 
     cout << "RANGE: " << _range << endl;
     if (_use_resolution) {
-        _fit_result = _model->fitTo(*_data, RooFit::ConditionalObservables(RooArgSet(_et,_p)),
+        _fit_result = _model->fitTo(*_data, RooFit::ConditionalObservables(RooArgSet(/*_et,*/_p)),
                 RooFit::Save(kTRUE), RooFit::Hesse(hesse),
                 RooFit::Minos(minos), RooFit::NumCPU(cpu),
                 RooFit::Verbose(verbose)/*, RooFit::Range(_range)*/);
@@ -380,10 +384,25 @@ RooAbsPdf* BsFitter::signal_model() {
 
     RooProdPdf * signal = 0;
     if (_use_resolution) {
-//        RooPolynomial *p_model = new RooPolynomial("p_model", "p_model", _p, RooFit::RooConst(0));
-        RooLandau *et_model = new RooLandau("et_model", "time error model", _et, *et_mean, *et_sigma);
+        RooRealVar *et_sig_xl = new RooRealVar("et_sig_xl", "xl sig", 0.7, 0, 1);
+        RooRealVar *et_sig_mean = new RooRealVar("et_sig_mean", "mean sig", 0.06, 0, 1);
+        RooRealVar *et_sig_sigma = new RooRealVar("et_sig_sigma", "sigma sig", 0.01, 0, 0.1);
+        RooRealVar *et_sig_tau_short = new RooRealVar("et_sig_tau_short", "#tau short sig", 0.05, 0, 0.5);
+        RooRealVar *et_sig_tau_long = new RooRealVar("et_sig_tau_long", "#tau long sig", 0.05, 0, 0.1);
+        _parameters->add(*et_sig_xl);
+        _parameters->add(*et_sig_mean);
+        _parameters->add(*et_sig_sigma);
+        _parameters->add(*et_sig_tau_short);
+        _parameters->add(*et_sig_tau_long);
+
+        RooGaussModel *et_sig_gauss = new RooGaussModel("gauss", "gauss", _et, *et_sig_mean, *et_sig_sigma);
+        RooDecay *et_sig_short = new RooDecay("et_sig_short", "short sig", _et, *et_sig_tau_short, *et_sig_gauss, RooDecay::SingleSided);
+        RooDecay *et_sig_long = new RooDecay("et_sig_long", "long bgk", _et, *et_sig_tau_long, *et_sig_gauss, RooDecay::SingleSided);
+        RooAddPdf *et_sig_model = new RooAddPdf("et_sig_model", "et sig model", *et_sig_long, *et_sig_short, *et_sig_xl);
+
         signal = new RooProdPdf("signal", "signal",
-                RooArgSet(*signal_mass, *signal_time_angle)/*, RooFit::Conditional(*et_model, _et)/*, RooFit::Conditional(*p_model, _p)*/);
+                RooArgSet(*signal_mass, *signal_time_angle),
+                RooFit::Conditional(*et_sig_model, _et)/*, RooFit::Conditional(*p_model, _p)*/);
     } else {
         signal = new RooProdPdf("signal", "signal", RooArgSet(*signal_mass, *signal_time_angle));
     }
@@ -470,19 +489,26 @@ RooAbsPdf* BsFitter::background_model() {
     RooRealVar *xp = new RooRealVar("xp","xp",0);
     _parameters->add(*xp);
 
-    RooAddPdf *background = new RooAddPdf("bkg", "background", *_prompt, *_noprompt, *xp);
-    //   RooProdPdf *background = _noprompt;
-    
+    RooAddPdf *bkg = new RooAddPdf("bkg", "background", *_prompt, *_noprompt, *xp);
 
-/*    RooRealVar *et_mean_b = new RooRealVar("et_mean_b", "mean time error", 0);
-    RooRealVar *et_sigma_b = new RooRealVar("et_sigma_b", "#sigma time error", 0);
-    _parameters->add(*et_mean_b);
-    _parameters->add(*et_sigma_b);
+    RooRealVar *et_bkg_xl = new RooRealVar("et_bkg_xl", "xl bkg", 0);
+    RooRealVar *et_bkg_mean = new RooRealVar("et_bkg_mean", "mean bkg", 0);
+    RooRealVar *et_bkg_sigma = new RooRealVar("et_bkg_sigma", "sigma bkg", 0);
+    RooRealVar *et_bkg_tau_short = new RooRealVar("et_bkg_tau_short", "#tau short bkg", 0);
+    RooRealVar *et_bkg_tau_long = new RooRealVar("et_bkg_tau_long", "#tau long bkg", 0);
+    _parameters->add(*et_bkg_xl);
+    _parameters->add(*et_bkg_mean);
+    _parameters->add(*et_bkg_sigma);
+    _parameters->add(*et_bkg_tau_short);
+    _parameters->add(*et_bkg_tau_long);
 
-    RooLandau *et_model_b = new RooLandau("et_model_b", "time bkg error model", _et, *et_mean_b, *et_sigma_b);*/
-    
-//i    RooProdPdf *background = new RooProdPdf("background", "background x et_model_p", RooArgSet(*bkg)/*, RooFit::Conditional(*et_model_b, _et)*/);
-    _prompt =0;
-    return _noprompt;
+    RooGaussModel *et_bkg_gauss = new RooGaussModel("gauss", "gauss", _et, *et_bkg_mean, *et_bkg_sigma);
+    RooDecay *et_bkg_short = new RooDecay("et_bkg_short", "short bkg", _et, *et_bkg_tau_short, *et_bkg_gauss, RooDecay::SingleSided);
+    RooDecay *et_bkg_long = new RooDecay("et_bkg_long", "long bgk", _et, *et_bkg_tau_long, *et_bkg_gauss, RooDecay::SingleSided);
+    RooAddPdf *et_bkg_model = new RooAddPdf("et_bkg_model", "et bkg model", *et_bkg_long, *et_bkg_short, *et_bkg_xl);
+
+    RooProdPdf *background = new RooProdPdf("background", "background x et_model_p",
+            RooArgSet(*bkg), RooFit::Conditional(*et_bkg_model, _et));
+
     return background;
 }
