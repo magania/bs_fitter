@@ -80,7 +80,8 @@ _p("_p", "bs probability", 0, 0, 1) {
         RooGaussModel *gauss_1 = new RooGaussModel("gauss_1", "gauss 1 resolution", _t, RooFit::RooConst(0), *S1, _et);
         RooGaussModel *gauss_2 = new RooGaussModel("gauss_2", "gauss 2 resolution", _t, RooFit::RooConst(0), *S2, _et);
         _resolution = new RooAddModel("_resolution", "gaussx2 resolution", RooArgList(*gauss_1, *gauss_2), RooArgList(*xr));
-    } else {
+	//        _resolution = gauss_1;
+   } else {
         _resolution = new RooTruthModel("_resolution", "truth resolution", _t);
     }
 
@@ -207,7 +208,7 @@ Int_t BsFitter::fit(Bool_t hesse, Bool_t minos, Bool_t verbose, Int_t cpu) {
 
     cout << "RANGE: " << _range << endl;
     if (_use_resolution) {
-        _fit_result = _model->fitTo(*_data, RooFit::ConditionalObservables(RooArgSet(/*_et,*/_p)),
+        _fit_result = _model->fitTo(*_data, RooFit::ConditionalObservables(RooArgSet(_p)),
                 RooFit::Save(kTRUE), RooFit::Hesse(hesse),
                 RooFit::Minos(minos), RooFit::NumCPU(cpu),
                 RooFit::Verbose(verbose)/*, RooFit::Range(_range)*/);
@@ -344,10 +345,10 @@ RooAbsPdf* BsFitter::signal_model() {
     _parameters->add(*Tau);
     _parameters->add(*DeltaMs);
 
-    RooRealVar *et_mean = new RooRealVar("et_mean", "mean time error", 0);
-    RooRealVar *et_sigma = new RooRealVar("et_sigma", "#sigma time error", 0);
-    _parameters->add(*et_mean);
-    _parameters->add(*et_sigma);
+    //    RooRealVar *et_mean = new RooRealVar("et_mean", "mean time error", 0);
+    //    RooRealVar *et_sigma = new RooRealVar("et_sigma", "#sigma time error", 0);
+    //    _parameters->add(*et_mean);
+    //    _parameters->add(*et_sigma);
 
     RooGaussian *signal_mass = new RooGaussian("signal_mass", "signal_mass", _m, *M, *Sigma);
 
