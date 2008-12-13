@@ -16,16 +16,16 @@ templateClassImp(RooBsTimeAngle)
 
 //_____________________________________________________________________________
 template<class TA, class TAI>
-RooBsTimeAngle<TA, TAI>::RooBsTimeAngle(const char *name, const char *title, Bool_t isBs,
-            RooRealVar& t, RooRealVar& cpsi, RooRealVar& ctheta,
+RooBsTimeAngle<TA, TAI>::RooBsTimeAngle(const char *name, const char *title,
+            RooRealVar& t, RooRealVar& cpsi, RooRealVar& ctheta, RooRealVar& p,
             RooRealVar& phi, RooRealVar& A02, RooRealVar& All2,
             RooRealVar& DG, RooRealVar& tau, RooRealVar& Dm,
             RooRealVar& phi_s, RooRealVar& delta_1, RooRealVar& delta_2,
             const RooResolutionModel& model, TA &ta) :
   RooAbsAnaConvPdf(name,title,model,t), 
-  _isBs(isBs),
   _t("_t", "time", this, t),
   _angles(this, cpsi, ctheta, phi, ta, true),
+  _p("_p", "p", this, p),
   _A02("A02", "|A_0(0)|^2", this, A02),
   _All2("All2", "|A_#parallell(0)|^2", this, All2),
   _DG("DG", "#Delta#Gamma", this, DG),
@@ -51,8 +51,8 @@ RooBsTimeAngle<TA, TAI>::RooBsTimeAngle(const char *name, const char *title, Boo
         RooRealVar& phi_s, RooRealVar& delta_1, RooRealVar& delta_2,
         const RooResolutionModel& model, Phis phis) :
   RooAbsAnaConvPdf(name,title,model,t), 
-  _isBs(isBs),
   _t("_t", "time", this, t),
+ _p(...)
   _A02("A02", "|A_0(0)|^2", this, A02),
   _All2("All2", "|A_#parallell(0)|^2", this, All2),
   _DG("DG", "#Delta#Gamma", this, DG),
@@ -77,9 +77,9 @@ RooBsTimeAngle<TA, TAI>::RooBsTimeAngle(const char *name, const char *title, Boo
 template<class TA, class TAI>
 RooBsTimeAngle<TA, TAI>::RooBsTimeAngle(const RooBsTimeAngle& other, const char* name) : 
   RooAbsAnaConvPdf(other,name), 
-  _isBs(other._isBs),
   _t("_t", this, other._t),
   _angles(this, other._angles),
+  _p("_p",this, other._p),
   _A02("A02", this, other._A02),
   _All2("All2", this, other._All2),
   _DG("DG", this, other._DG),
@@ -105,14 +105,13 @@ RooBsTimeAngle<TA, TAI>::~RooBsTimeAngle()
 
 //_____________________________________________________________________________
 template<class TA, class TAI>
-Double_t RooBsTimeAngle<TA, TAI>::coefficient(Int_t basisIndex) const 
-{
-  Double_t val = 0;
-  for (int i=1; i<=6; i++)
-    if ( !_isBs && (basisIndex==_basisExpCos || basisIndex==_basisExpSin) )
-      val -= coeficiente(basisIndex,i)*_angles.fe(i);
-    else
-      val += coeficiente(basisIndex,i)*_angles.fe(i);
+Double_t RooBsTimeAngle<TA, TAI>::coefficient(Int_t basisIndex) const {
+    Double_t val = 0;
+    for (int i = 1; i <= 6; i++)
+        if (basisIndex == _basisExpCos || basisIndex == _basisExpSin)
+            val += (2 * _p - 1) * coeficiente(basisIndex, i) * _angles.fe(i);
+        else
+            val += coeficiente(basisIndex, i) * _angles.fe(i);
 
     return val;
 }
@@ -186,8 +185,8 @@ Double_t RooBsTimeAngle<TA, TAI>::coefAnalyticalIntegral(Int_t basisIndex, Int_t
 {
     Double_t val = 0;
     for (int i = 1; i <= 6; i++)
-        if (!_isBs && (basisIndex == _basisExpCos || basisIndex == _basisExpSin))
-            val -= coeficiente(basisIndex, i) * _angles.int_fe(i,code, range);
+        if (basisIndex == _basisExpCos || basisIndex == _basisExpSin)
+            val += (2 * _p - 1) * coeficiente(basisIndex, i) * _angles.int_fe(i, code, range);
         else
             val += coeficiente(basisIndex, i) * _angles.int_fe(i,code, range);
     return val;

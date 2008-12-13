@@ -352,35 +352,21 @@ RooAbsPdf* BsFitter::signal_model() {
 
     RooGaussian *signal_mass = new RooGaussian("signal_mass", "signal_mass", _m, *M, *Sigma);
 
-    RooAddPdf *signal_time_angle;
+    RooAbsPdf *signal_time_angle;
     if (_use_phis) {
-        RooBsTimeAngle<Phis,TransAnglesPhis>* time_angle_bs = new RooBsTimeAngle<Phis,TransAnglesPhis>("time_angle_bs", "bs time angle pdf", kTRUE,
-                _t, _cpsi, _ctheta, _phi,
+        RooBsTimeAngle<Phis, TransAnglesPhis>* time_angle = new RooBsTimeAngle<Phis, TransAnglesPhis > ("time_angle", "signal time angle pdf",
+                _t, _cpsi, _ctheta, _phi, _p,
                 *A02, *All2, *DeltaGamma, *Tau,
                 *DeltaMs, *Phi_s, *Delta_1, *Delta_2,
                 *_resolution, *_phis);
-
-        RooBsTimeAngle<Phis,TransAnglesPhis>* time_angle_bsbar = new RooBsTimeAngle<Phis,TransAnglesPhis>("time_angle_bsbar", "bs bar time angle pdf", kFALSE,
-                _t, _cpsi, _ctheta, _phi,
-                *A02, *All2, *DeltaGamma, *Tau,
-                *DeltaMs, *Phi_s, *Delta_1, *Delta_2,
-                *_resolution, *_phis);
-        signal_time_angle = new RooAddPdf("signal_time_angle", "signal time-angular pdf",
-                *time_angle_bs, *time_angle_bsbar, _p);
+        signal_time_angle = time_angle;
     } else {
-        RooBsTimeAngle<Efficiency,TransAnglesEfficiency>* time_angle_bs = new RooBsTimeAngle<Efficiency,TransAnglesEfficiency>("time_angle_bs", "bs time angle pdf", kTRUE,
-                _t, _cpsi, _ctheta, _phi,
+        RooBsTimeAngle<Efficiency, TransAnglesEfficiency>* time_angle = new RooBsTimeAngle<Efficiency, TransAnglesEfficiency > ("time_angle", "signal time angle pdf",
+                _t, _cpsi, _ctheta, _phi, _p,
                 *A02, *All2, *DeltaGamma, *Tau,
                 *DeltaMs, *Phi_s, *Delta_1, *Delta_2,
                 *_resolution, *_efficiency);
-
-        RooBsTimeAngle<Efficiency,TransAnglesEfficiency>* time_angle_bsbar = new RooBsTimeAngle<Efficiency,TransAnglesEfficiency>("time_angle_bsbar", "bs bar time angle pdf", kFALSE,
-                _t, _cpsi, _ctheta, _phi,
-                *A02, *All2, *DeltaGamma, *Tau,
-                *DeltaMs, *Phi_s, *Delta_1, *Delta_2,
-                *_resolution, *_efficiency);
-        signal_time_angle = new RooAddPdf("signal_time_angle", "signal time-angular pdf",
-                *time_angle_bs, *time_angle_bsbar, _p);
+        signal_time_angle = time_angle;
     }
 
     RooProdPdf * signal = 0;

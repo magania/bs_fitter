@@ -15,8 +15,8 @@
 template<class TA, class TAI>
 class RooBsTimeAngle : public RooAbsAnaConvPdf {
 public:
-    RooBsTimeAngle(const char *name, const char *title, Bool_t isBs,
-            RooRealVar& t, RooRealVar& cpsi, RooRealVar& ctheta, RooRealVar& phi,
+    RooBsTimeAngle(const char *name, const char *title,
+            RooRealVar& t, RooRealVar& cpsi, RooRealVar& ctheta, RooRealVar& phi, RooRealVar &p,
             RooRealVar& A02, RooRealVar& All2, RooRealVar& DG, RooRealVar& tau,
             RooRealVar& Dm, RooRealVar& phi_s, RooRealVar& delta_1, RooRealVar& delta_2,
             const RooResolutionModel& model, TA &ta);
@@ -43,6 +43,7 @@ private:
 protected:
     RooRealProxy _t;
     TAI _angles;
+    RooRealProxy _p;
     RooRealProxy _A02;
     RooRealProxy _All2;
     RooRealProxy _DG;
@@ -53,8 +54,6 @@ protected:
     RooRealProxy _delta_2;
 
     TRandom3 _aleatorio;
-
-    Bool_t _isBs;
 
     Int_t _basisExpCosh;
     Int_t _basisExpSinh;
