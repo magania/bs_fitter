@@ -187,7 +187,7 @@ Double_t RooBsTimeAngle<TA, TAI>::coefAnalyticalIntegral(Int_t basisIndex, Int_t
     for (int i = 1; i <= 6; i++)
         val += coeficiente(basisIndex, i) * _angles.int_fe(i, code, range);
 
-    cout << _p << ' ' << val << ' ' << (2*_p-1)*val<<endl;
+//    cout << _p << ' ' << val << ' ' << (2*_p-1)*val<<endl;
     if (basisIndex == _basisExpCos || basisIndex == _basisExpSin)
         return (2 * _p - 1) * val;
     else

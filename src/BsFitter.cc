@@ -288,13 +288,14 @@ void BsFitter::plotVar(RooRealVar& x, const char* plot_file, Int_t bins, Int_t p
                 RooDataHist projData("projData", "projData", RooArgSet(_et, _p), *_data);
                 cout << "RANGE: " << _range << endl;
 
-                if (_signal)
+    /*            if (_signal)
                     _model->plotOn(x_frame, RooFit::Components(*_signal), RooFit::ProjWData(RooArgSet(_et, _p), projData), RooFit::LineColor(kGreen), RooFit::Normalization(norm));
                 if (_prompt)
                     _model->plotOn(x_frame, RooFit::Components(*_prompt), RooFit::ProjWData(RooArgSet(_et, _p), projData), RooFit::LineColor(kRed), RooFit::Normalization(norm));
                 if (_noprompt)
                     _model->plotOn(x_frame, RooFit::Components(*_noprompt), RooFit::ProjWData(RooArgSet(_et, _p), projData), RooFit::LineColor(kBlue), RooFit::Normalization(norm));
-                _model->plotOn(x_frame, RooFit::ProjWData(RooArgSet(_et, _p), projData), RooFit::LineColor(13), RooFit::Normalization(norm));
+*/
+                _model->plotOn(x_frame, RooFit::ProjWData(RooArgSet(_et,_p), projData), RooFit::LineColor(13));
             } else {
                 _model->plotOn(x_frame, RooFit::ProjWData(RooArgSet(_et, _p), *_data), RooFit::Range(_range));
             }
