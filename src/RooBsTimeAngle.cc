@@ -108,12 +108,12 @@ template<class TA, class TAI>
 Double_t RooBsTimeAngle<TA, TAI>::coefficient(Int_t basisIndex) const {
     Double_t val = 0;
     for (int i = 1; i <= 6; i++)
-        if (basisIndex == _basisExpCos || basisIndex == _basisExpSin)
-            val += (2 * _p - 1) * coeficiente(basisIndex, i) * _angles.fe(i);
-        else
-            val += coeficiente(basisIndex, i) * _angles.fe(i);
+        val += coeficiente(basisIndex, i) * _angles.fe(i);
 
-    return val;
+    if (basisIndex == _basisExpCos || basisIndex == _basisExpSin)
+        return (2 * _p - 1) * val;
+    else
+        return val;
 }
 
 //_____________________________________________________________________________
@@ -181,15 +181,16 @@ Int_t RooBsTimeAngle<TA, TAI>::getCoefAnalyticalIntegral(Int_t /*code*/, RooArgS
 
 //_____________________________________________________________________________
 template<class TA, class TAI>
-Double_t RooBsTimeAngle<TA, TAI>::coefAnalyticalIntegral(Int_t basisIndex, Int_t code, const char* range) const 
+Double_t RooBsTimeAngle<TA, TAI>::coefAnalyticalIntegral(Int_t basisIndex, Int_t code, const char* range) const
 {
     Double_t val = 0;
     for (int i = 1; i <= 6; i++)
-        if (basisIndex == _basisExpCos || basisIndex == _basisExpSin)
-            val += (2 * _p - 1) * coeficiente(basisIndex, i) * _angles.int_fe(i, code, range);
-        else
-            val += coeficiente(basisIndex, i) * _angles.int_fe(i,code, range);
-    return val;
+        val += coeficiente(basisIndex, i) * _angles.int_fe(i, code, range);
+
+    if (basisIndex == _basisExpCos || basisIndex == _basisExpSin)
+        return (2 * _p - 1) * val;
+    else
+        return val;
 }
 
 
