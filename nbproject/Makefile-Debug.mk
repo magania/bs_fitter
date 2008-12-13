@@ -28,8 +28,8 @@ OBJECTDIR=build/Debug/${PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/fit_et.o \
 	${OBJECTDIR}/src/RooBsTimeAngle.o \
+	${OBJECTDIR}/fit_et.o \
 	${OBJECTDIR}/src/bs.o \
 	${OBJECTDIR}/src/BsFitter.o \
 	${OBJECTDIR}/src/TransAnglesPhis.o \
@@ -57,13 +57,13 @@ bin/bs: ${OBJECTFILES}
 	${MKDIR} -p bin
 	${LINK.cc} -o bin/bs ${OBJECTFILES} ${LDLIBSOPTIONS} 
 
-${OBJECTDIR}/fit_et.o: fit_et.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	$(COMPILE.cc) -g -I/usr/include/root -Iinclude -o ${OBJECTDIR}/fit_et.o fit_et.cpp
-
 ${OBJECTDIR}/src/RooBsTimeAngle.o: src/RooBsTimeAngle.cc 
 	${MKDIR} -p ${OBJECTDIR}/src
 	$(COMPILE.cc) -g -I/usr/include/root -Iinclude -o ${OBJECTDIR}/src/RooBsTimeAngle.o src/RooBsTimeAngle.cc
+
+${OBJECTDIR}/fit_et.o: fit_et.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	$(COMPILE.cc) -g -I/usr/include/root -Iinclude -o ${OBJECTDIR}/fit_et.o fit_et.cpp
 
 ${OBJECTDIR}/src/bs.o: src/bs.cc 
 	${MKDIR} -p ${OBJECTDIR}/src

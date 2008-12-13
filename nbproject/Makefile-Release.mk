@@ -28,8 +28,8 @@ OBJECTDIR=build/Release/${PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/fit_et.o \
 	${OBJECTDIR}/src/RooBsTimeAngle.o \
+	${OBJECTDIR}/fit_et.o \
 	${OBJECTDIR}/src/bs.o \
 	${OBJECTDIR}/src/BsFitter.o \
 	${OBJECTDIR}/src/TransAnglesPhis.o \
@@ -57,13 +57,13 @@ dist/Release/${PLATFORM}/bsfitter: ${OBJECTFILES}
 	${MKDIR} -p dist/Release/${PLATFORM}
 	${LINK.cc} -o dist/Release/${PLATFORM}/bsfitter ${OBJECTFILES} ${LDLIBSOPTIONS} 
 
-${OBJECTDIR}/fit_et.o: fit_et.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/fit_et.o fit_et.cpp
-
 ${OBJECTDIR}/src/RooBsTimeAngle.o: src/RooBsTimeAngle.cc 
 	${MKDIR} -p ${OBJECTDIR}/src
 	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/src/RooBsTimeAngle.o src/RooBsTimeAngle.cc
+
+${OBJECTDIR}/fit_et.o: fit_et.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/fit_et.o fit_et.cpp
 
 ${OBJECTDIR}/src/bs.o: src/bs.cc 
 	${MKDIR} -p ${OBJECTDIR}/src

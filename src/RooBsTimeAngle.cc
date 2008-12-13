@@ -17,8 +17,8 @@ templateClassImp(RooBsTimeAngle)
 //_____________________________________________________________________________
 template<class TA, class TAI>
 RooBsTimeAngle<TA, TAI>::RooBsTimeAngle(const char *name, const char *title,
-            RooRealVar& t, RooRealVar& cpsi, RooRealVar& ctheta, RooRealVar& p,
-            RooRealVar& phi, RooRealVar& A02, RooRealVar& All2,
+            RooRealVar& t, RooRealVar& cpsi, RooRealVar& ctheta, RooRealVar& phi, RooRealVar& p,
+            RooRealVar& A02, RooRealVar& All2,
             RooRealVar& DG, RooRealVar& tau, RooRealVar& Dm,
             RooRealVar& phi_s, RooRealVar& delta_1, RooRealVar& delta_2,
             const RooResolutionModel& model, TA &ta) :
@@ -187,6 +187,7 @@ Double_t RooBsTimeAngle<TA, TAI>::coefAnalyticalIntegral(Int_t basisIndex, Int_t
     for (int i = 1; i <= 6; i++)
         val += coeficiente(basisIndex, i) * _angles.int_fe(i, code, range);
 
+    cout << _p << ' ' << val << ' ' << (2*_p-1)*val<<endl;
     if (basisIndex == _basisExpCos || basisIndex == _basisExpSin)
         return (2 * _p - 1) * val;
     else
