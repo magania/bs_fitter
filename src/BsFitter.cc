@@ -402,8 +402,8 @@ RooAbsPdf* BsFitter::signal_model() {
         RooAddPdf *et_sig_model = new RooAddPdf("et_sig_model", "et sig model", *et_sig_long, *et_sig_short, *et_sig_xl);
 
         signal = new RooProdPdf("signal", "signal",
-                RooArgSet(*signal_mass, *signal_time_angle),
-                RooFit::Conditional(*et_sig_model, _et)/*, RooFit::Conditional(*p_model, _p)*/);
+                RooArgSet(*signal_mass, *et_sig_model),
+                RooFit::Conditional(*signal_time_angle, RooArgSet(_m,_t,_cpsi,_ctheta,_phi,_p))/*, RooFit::Conditional(*p_model, _p)*/);
     } else {
         signal = new RooProdPdf("signal", "signal", RooArgSet(*signal_mass, *signal_time_angle));
     }
@@ -428,7 +428,7 @@ RooAbsPdf* BsFitter::background_model() {
     _parameters->add(*y4);
     _parameters->add(*y5);
     _parameters->add(*y6);
-    
+
     //RooExponential *exp_mass_p = new RooExponential("exp_mass_p","exp mass prompt", _m, *tm_p);
     RooPolynomial *exp_mass_p = new RooPolynomial("exp_mass_p", "pol mass prompt", _m, RooArgSet(*tm_p));
     if (_use_phis) {
@@ -509,7 +509,7 @@ RooAbsPdf* BsFitter::background_model() {
     RooAddPdf *et_bkg_model = new RooAddPdf("et_bkg_model", "et bkg model", *et_bkg_long, *et_bkg_short, *et_bkg_xl);
 
     RooProdPdf *background = new RooProdPdf("background", "background x et_model_p",
-            RooArgSet(*bkg), RooFit::Conditional(*et_bkg_model, _et));
+            *et_bkg_model, RooFit::Conditional(*bkg, RooArgSet(_m,_t,_cpsi,_ctheta,_phi)));
 
     return background;
 }
