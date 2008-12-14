@@ -28,6 +28,7 @@ void usage(void) {
     printf("\t \033[1mefficiency\033[m\tFit efficiency coeficients.\n");
     printf("options:\n");
     printf("\t \033[1m-d\033[m data          \t Set data file.\n");
+    printf("\t \033[1m-v\033[m variables     \t Set variables file.\n");
     printf("\t \033[1m-p\033[m parameters    \t Set parameters file.\n");
     printf("\t \033[1m-e\033[m efficiency    \t Set efficiency file. (Phi's or coefficients)\n");
     printf("\t \033[1m-o\033[m out           \t Set file result file.\n\n");
@@ -50,6 +51,7 @@ int main(int argc, char** argv) {
     
     const char *data = "fit.dat";
     const char *parameters = "parameters.txt";
+    const char *variables = "variables.txt";
     const char *efficiency = "efficiency.txt";
     const char *out = "fit.txt";
 
@@ -67,7 +69,7 @@ int main(int argc, char** argv) {
         /* getopt_long stores the option index here. */
         int option_index = 0;
 
-        c = getopt_long(argc, argv, "d:p:e:o:",
+        c = getopt_long(argc, argv, "d:p:e:o:v:",
                 long_options, &option_index);
 
         /* Detect the end of the options. */
@@ -90,6 +92,9 @@ int main(int argc, char** argv) {
                 break;
             case 'o':
                 out = optarg;
+                break;
+            case 'v':
+                variables = optarg;
                 break;
             case '?':
                 usage();
@@ -161,6 +166,7 @@ int main(int argc, char** argv) {
     
     /* Do the real stuff */
     BsFitter bs(use_resolution, signal_only, sidebands, use_efficiency, use_phis);
+    bs.setVariables(variables);
     bs.setParameters(parameters);
     if (use_efficiency && !no_efficiency)
         bs.setEfficiency(efficiency);
