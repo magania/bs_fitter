@@ -285,17 +285,17 @@ void BsFitter::plotVar(RooRealVar& x, const char* plot_file, Int_t bins, Int_t p
         if (_use_resolution) {
             if (proj_bins) {
                 _et.setBins(proj_bins);
-                RooDataHist projData("projData", "projData", RooArgSet(_et, _p), *_data);
+                RooDataHist projData("projData", "projData", RooArgSet(_et), *_data);
                 cout << "RANGE: " << _range << endl;
 
-    /*            if (_signal)
-                    _model->plotOn(x_frame, RooFit::Components(*_signal), RooFit::ProjWData(RooArgSet(_et, _p), projData), RooFit::LineColor(kGreen), RooFit::Normalization(norm));
-                if (_prompt)
-                    _model->plotOn(x_frame, RooFit::Components(*_prompt), RooFit::ProjWData(RooArgSet(_et, _p), projData), RooFit::LineColor(kRed), RooFit::Normalization(norm));
-                if (_noprompt)
-                    _model->plotOn(x_frame, RooFit::Components(*_noprompt), RooFit::ProjWData(RooArgSet(_et, _p), projData), RooFit::LineColor(kBlue), RooFit::Normalization(norm));
-*/
-                _model->plotOn(x_frame, RooFit::ProjWData(RooArgSet(_et,_p), projData), RooFit::LineColor(13));
+                if (_signal)	
+                    _model->plotOn(x_frame, RooFit::Components(*_signal), RooFit::ProjWData(RooArgSet(_et, _p),projData),RooFit::LineColor(kGreen), RooFit::Normalization(0.052705));
+             //   if (_prompt)
+             //       _model->plotOn(x_frame, RooFit::Components(*_prompt), RooFit::ProjWData(RooArgSet(_et, _p), projData), RooFit::LineColor(kRed));
+             //   if (_noprompt)
+              //      _model->plotOn(x_frame, RooFit::Components(*_noprompt), RooFit::ProjWData(RooArgSet(_et, _p), projData), RooFit::LineColor(kBlue));
+
+                _model->plotOn(x_frame, RooFit::ProjWData(RooArgSet(_et,_p),projData), RooFit::LineColor(13));
             } else {
                 _model->plotOn(x_frame, RooFit::ProjWData(RooArgSet(_et, _p), *_data), RooFit::Range(_range));
             }

@@ -185,7 +185,7 @@ int main(int argc, char** argv) {
     if (plot) {
         bs.plotM();
         bs.plotT();
-        bs.plotEt();
+        //bs.plotEt();
         bs.plotCpsi();
         bs.plotCtheta();
         bs.plotPhi();
