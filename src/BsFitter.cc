@@ -53,6 +53,7 @@ _p("_p", "bs probability", 0) {
 
     _variables = new RooArgSet();
     _parameters = new RooArgSet();
+    _constraints = new RooArgSet();
 
     _variables->add(_m);
     _variables->add(_t);
@@ -210,10 +211,11 @@ Int_t BsFitter::fit(Bool_t hesse, Bool_t minos, Bool_t verbose, Int_t cpu) {
 
     cout << "RANGE: " << _range << endl;
     if (_use_resolution) {
-        _fit_result = _model->fitTo(*_data, RooFit::ConditionalObservables(RooArgSet(_p)),
-                RooFit::Save(kTRUE), RooFit::Hesse(hesse),
-                RooFit::Minos(minos), RooFit::NumCPU(cpu),
-                RooFit::Verbose(verbose)/*, RooFit::Range(_range)*/);
+      _fit_result = _model->fitTo(*_data, RooFit::ConditionalObservables(RooArgSet(_p)),
+				  RooFit::Save(kTRUE), RooFit::Hesse(hesse),
+				  RooFit::Minos(minos), RooFit::NumCPU(cpu),
+				  RooFit::Verbose(verbose),
+				  RooFit::ExternalConstraints(*_constraints));
     } else {
         _fit_result = _model->fitTo(*_data, RooFit::ConditionalObservables(RooArgSet(_p)),
                 RooFit::Save(kTRUE), RooFit::Hesse(hesse),
@@ -287,7 +289,7 @@ void BsFitter::plotVar(RooRealVar& x, const char* plot_file, Int_t bins, Int_t p
         if (_use_resolution) {
             if (proj_bins) {
                 _et.setBins(proj_bins);
-                RooDataHist projData("projData", "projData", RooArgSet(_et), *_data);
+                RooDataHist projData("projData", "projData", RooArgSet(_et,_p), *_data);
                 cout << "RANGE: " << _range << endl;
 
                 if (_signal)
@@ -349,10 +351,19 @@ RooAbsPdf* BsFitter::signal_model() {
     _parameters->add(*Tau);
     _parameters->add(*DeltaMs);
 
-    //    RooRealVar *et_mean = new RooRealVar("et_mean", "mean time error", 0);
-    //    RooRealVar *et_sigma = new RooRealVar("et_sigma", "#sigma time error", 0);
-    //    _parameters->add(*et_mean);
-    //    _parameters->add(*et_sigma);
+    RooRealVar *delta_1_mean = new RooRealVar("delta_1_mean", "#delta_1 mean", 0);
+    RooRealVar *delta_1_sigma = new RooRealVar("delta_1_sigma", "#delta_1 #sigma", 0);
+    RooRealVar *delta_2_mean = new RooRealVar("delta_2_mean", "#delta_2 mean", 0);
+    RooRealVar *delta_2_sigma = new RooRealVar("delta_2_sigma", "#delta_2 #sigma", 0);
+    _parameters->add(*delta_1_mean);
+    _parameters->add(*delta_1_sigma);
+    _parameters->add(*delta_2_mean);
+    _parameters->add(*delta_2_sigma);
+
+    RooGaussian *delta_1_constraint = new RooGaussian("delta_1_constraint", "#delta_1 Gaussian Constraint", *Delta_1, *delta_1_mean, *delta_1_sigma);
+    RooGaussian *delta_2_constraint = new RooGaussian("delta_2_constraint", "#delta_2 Gaussian Constraint", *Delta_2, *delta_2_mean, *delta_2_sigma);
+    _constraints->add(*delta_1_constraint);
+    _constraints->add(*delta_2_constraint);
 
     RooGaussian *signal_mass = new RooGaussian("signal_mass", "signal_mass", _m, *M, *Sigma);
 

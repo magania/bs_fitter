@@ -88,6 +88,7 @@ private:
     RooProdPdf *_noprompt;
     RooAbsPdf *_signal;
     RooAbsPdf *_background;
+    RooArgSet* _constraints;
 
     RooDataSet* _data;
     RooFitResult* _fit_result;

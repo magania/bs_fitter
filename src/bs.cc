@@ -183,7 +183,7 @@ int main(int argc, char** argv) {
     
     if (fit || fit_eff) {
         bs.writeParameters("parameters_out.txt");
-        bs.fit(false, false, true, 4);
+        bs.fit(true, true, true, 4);
         bs.writeResult(out);
         bs.writeParameters("parameters_out.txt");
     }
