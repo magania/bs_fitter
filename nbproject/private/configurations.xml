@@ -15,6 +15,10 @@
         <console-type>0</console-type>
         <terminal-type>0</terminal-type>
         <environment>
+          <variable name="PATH"
+                    value="/home/magania/local/root/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games"/>
+          <variable name="ROOTSYS" value="/home/magania/local/root"/>
+          <variable name="LD_LIBRARY_PATH" value="/home/magania/local/root/lib"/>
         </environment>
       </runprofile>
     </conf>

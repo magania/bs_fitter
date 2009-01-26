@@ -135,8 +135,8 @@ void BsFitter::setPhis(const char* phis) {
 }
 
 void BsFitter::setData(const char* data_file) {
-    if (_sidebands) {
-        RooDataSet *data = RooDataSet::read(data_file, *_variables);
+   // if (_sidebands) {
+   /*     RooDataSet *data = RooDataSet::read(data_file, *_variables);
         RooRealVar M("M", "M", 5.365081e+00, 5.28, 5.44);
         RooRealVar sigma("sigma", "sigma", 2.85725e-02, 0, 1);
         RooRealVar tau_bkg("tau_bkg", "tau_bkg", -6.11910e-01, -1.0, 0.0);
@@ -145,7 +145,7 @@ void BsFitter::setData(const char* data_file) {
         RooGaussian *signal_mass = new RooGaussian("signal_mass", "signal_mass", _m, M, sigma);
         RooExponential *bkg_mass = new RooExponential("bkg_mass", "bkg_mass", _m, tau_bkg);
         RooAddPdf *cut_model = new RooAddPdf("cut_model", "cut_model", *signal_mass, *bkg_mass, xs);
-        // cut_model->fitTo(*data);
+         cut_model->fitTo(*data);
 
         Double_t left = M.getVal() - 3 * sigma.getVal();
         Double_t right = M.getVal() + 3 * sigma.getVal();
@@ -161,9 +161,10 @@ void BsFitter::setData(const char* data_file) {
         _m.setRange("right", right, _m.getMax());
         const char* sideband_range = "left,right";
         _range = sideband_range;
-    } else {
+    */
+   // } else {
         _data = RooDataSet::read(data_file, *_variables);
-    }
+   // }
 }
 
 void BsFitter::setData(RooDataSet* data_set) {
@@ -210,12 +211,12 @@ Int_t BsFitter::fit(Bool_t hesse, Bool_t minos, Bool_t verbose, Int_t cpu) {
     }
 
     cout << "RANGE: " << _range << endl;
-    if (_use_resolution) {
-      _fit_result = _model->fitTo(*_data, RooFit::ConditionalObservables(RooArgSet(_p)),
-				  RooFit::Save(kTRUE), RooFit::Hesse(hesse),
-				  RooFit::Minos(minos), RooFit::NumCPU(cpu),
-				  RooFit::Verbose(verbose),
-				  RooFit::ExternalConstraints(*_constraints));
+    if (_use_resolution && !_sidebands) {
+        _fit_result = _model->fitTo(*_data, RooFit::ConditionalObservables(RooArgSet(_p)),
+                RooFit::Save(kTRUE), RooFit::Hesse(hesse),
+                RooFit::Minos(minos), RooFit::NumCPU(cpu),
+                RooFit::Verbose(verbose),
+                RooFit::ExternalConstraints(*_constraints));
     } else {
         _fit_result = _model->fitTo(*_data, RooFit::ConditionalObservables(RooArgSet(_p)),
                 RooFit::Save(kTRUE), RooFit::Hesse(hesse),
@@ -289,7 +290,7 @@ void BsFitter::plotVar(RooRealVar& x, const char* plot_file, Int_t bins, Int_t p
         if (_use_resolution) {
             if (proj_bins) {
                 _et.setBins(proj_bins);
-                RooDataHist projData("projData", "projData", RooArgSet(_et,_p), *_data);
+                RooDataHist projData("projData", "projData", RooArgSet(_et, _p), *_data);
                 cout << "RANGE: " << _range << endl;
 
                 if (_signal)

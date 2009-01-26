@@ -2,7 +2,7 @@ MAKEFLAGS = --no-print-directory -r -s
 CCFLAGS= -O3 -g -fPIC
 
 INCLUDE = $(shell root-config --cflags) -Iinclude
-LIBS    = $(shell root-config --libs) -lRooFit -lRooFitCore
+LIBS    = $(shell root-config --libs) -lMinuit -lRooFit -lRooFitCore
 
 MYLIBS =  obj/Efficiency.o obj/Phis.o obj/RooBkgAngle.o obj/RooBsTimeAngle.o obj/TransAngles.o obj/TransAnglesEfficiency.o obj/TransAnglesPhis.o
 
@@ -14,6 +14,7 @@ MYLIBS =  obj/Efficiency.o obj/Phis.o obj/RooBkgAngle.o obj/RooBsTimeAngle.o obj
 all: bin/bs
 
 $(MYLIBS): obj/%.o : src/%.cc include/%.h
+	bash /home/magania/local/root/bin/thisroot.sh
 	@echo $(CXX) $(CCFLAGS) $(INCLUDE)  -c $< -o $@
 	$(CXX) $(CCFLAGS) $(INCLUDE) -c $< -o $@
 #	@echo $(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) -shared $@ -o $(@:obj/%.o=lib/lib%.so)

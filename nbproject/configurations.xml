@@ -42,8 +42,8 @@
       <compileType>
         <ccCompilerTool>
           <includeDirectories>
-            <directoryPath>/usr/include/root</directoryPath>
             <directoryPath>include</directoryPath>
+            <directoryPath>/home/magania/local/root/include</directoryPath>
           </includeDirectories>
         </ccCompilerTool>
         <linkerTool>

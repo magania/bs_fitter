@@ -59,31 +59,38 @@ dist/Release/${PLATFORM}/bsfitter: ${OBJECTFILES}
 
 ${OBJECTDIR}/src/RooBsTimeAngle.o: src/RooBsTimeAngle.cc 
 	${MKDIR} -p ${OBJECTDIR}/src
-	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/src/RooBsTimeAngle.o src/RooBsTimeAngle.cc
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/RooBsTimeAngle.o src/RooBsTimeAngle.cc
 
 ${OBJECTDIR}/fit_et.o: fit_et.cpp 
 	${MKDIR} -p ${OBJECTDIR}
-	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/fit_et.o fit_et.cpp
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/fit_et.o fit_et.cpp
 
 ${OBJECTDIR}/src/bs.o: src/bs.cc 
 	${MKDIR} -p ${OBJECTDIR}/src
-	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/src/bs.o src/bs.cc
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/bs.o src/bs.cc
 
 ${OBJECTDIR}/src/BsFitter.o: src/BsFitter.cc 
 	${MKDIR} -p ${OBJECTDIR}/src
-	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/src/BsFitter.o src/BsFitter.cc
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/BsFitter.o src/BsFitter.cc
 
 ${OBJECTDIR}/src/TransAnglesPhis.o: src/TransAnglesPhis.cc 
 	${MKDIR} -p ${OBJECTDIR}/src
-	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/src/TransAnglesPhis.o src/TransAnglesPhis.cc
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/TransAnglesPhis.o src/TransAnglesPhis.cc
 
 ${OBJECTDIR}/src/TransAnglesEfficiency.o: src/TransAnglesEfficiency.cc 
 	${MKDIR} -p ${OBJECTDIR}/src
-	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/src/TransAnglesEfficiency.o src/TransAnglesEfficiency.cc
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/TransAnglesEfficiency.o src/TransAnglesEfficiency.cc
 
 ${OBJECTDIR}/src/TransAngles.o: src/TransAngles.cc 
 	${MKDIR} -p ${OBJECTDIR}/src
-	$(COMPILE.cc) -O2 -o ${OBJECTDIR}/src/TransAngles.o src/TransAngles.cc
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/TransAngles.o src/TransAngles.cc
 
 # Subprojects
 .build-subprojects:
@@ -95,3 +102,8 @@ ${OBJECTDIR}/src/TransAngles.o: src/TransAngles.cc
 
 # Subprojects
 .clean-subprojects:
+
+# Enable dependency checking
+.dep.inc: .depcheck-impl
+
+include .dep.inc
