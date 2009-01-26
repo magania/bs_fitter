@@ -18,7 +18,7 @@ echo '_t =  5.0000 L(-2.5 - 12)' >> variables.txt
 echo '_et = 0 L(0 - 1)' >> variables.txt
 
 awk '$8 > '$TMVA_CUT' && '$MASS_LEFT' < $1 && $1 < '$MASS_RIGHT' {print $1,$2,$3,$4,$5,$6,$7}' tofit.dat | awk -f d2p.awk > fit.dat
-awk '$2 > 2 && ( $1 < '$MASS_LLEFT' || '$MASS_RRIGHT' < $1 )' fit.dat > fit_noprompt.dat
-awk '$2 < 2 && ( $1 < '$MASS_LLEFT' || '$MASS_RRIGHT' < $1 )' fit.dat > fit_prompt.dat
+awk '( $1 < '$MASS_LLEFT' || '$MASS_RRIGHT' < $1 )' fit.dat > fit_bkg.dat
+#awk '$2 < 2 && ( $1 < '$MASS_LLEFT' || '$MASS_RRIGHT' < $1 )' fit.dat > fit_prompt.dat
 
 

@@ -37,6 +37,7 @@ void usage(void) {
     printf("\t \033[1m--sidebands\033[m      \t Use sidebans only.\n");
     printf("\t \033[1m--no-efficiency\033[m  \t Use efficiency = 1.\n");
     printf("\t \033[1m--use-phis\033[m       \t Use Phi constants no normalize.\n\n");
+    printf("\t \033[1m--verbose\033[m        \t Verbose fit.\n\n");
     printf("Report bugs to <magania@fnal.gov>.\n");
     exit(EXIT_FAILURE);
 }
@@ -48,7 +49,8 @@ int main(int argc, char** argv) {
     static int use_efficiency = true;
     static int use_phis = false;
     static int no_efficiency = false;
-    
+    static int verbose = false;
+
     const char *data = "fit.dat";
     const char *parameters = "parameters.txt";
     const char *variables = "variables.txt";
@@ -64,12 +66,13 @@ int main(int argc, char** argv) {
             {"sidebands"      , no_argument, &sidebands     , 1},
             {"no-efficiency"  , no_argument, &no_efficiency , 1},
             {"use-phis"       , no_argument, &use_phis      , 1},
+            {"verbose"        , no_argument, &verbose       , 1},
             {0, 0, 0, 0}
         };
         /* getopt_long stores the option index here. */
         int option_index = 0;
 
-        c = getopt_long(argc, argv, "d:p:e:o:v:",
+        c = getopt_long(argc, argv, "d:p:e:o:v:j:",
                 long_options, &option_index);
 
         /* Detect the end of the options. */
@@ -95,6 +98,9 @@ int main(int argc, char** argv) {
                 break;
             case 'v':
                 variables = optarg;
+                break;
+            case 'j':
+                jobs = optarg;
                 break;
             case '?':
                 usage();
@@ -183,7 +189,7 @@ int main(int argc, char** argv) {
     
     if (fit || fit_eff) {
         bs.writeParameters("parameters_out.txt");
-        bs.fit(true, true, true, 4);
+        bs.fit(true, true, verbose, 4);
         bs.writeResult(out);
         bs.writeParameters("parameters_out.txt");
     }
