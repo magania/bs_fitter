@@ -72,16 +72,16 @@ _p("_p", "bs probability", 0) {
     }
 
     if (_use_resolution) {
-        RooRealVar *S1 = new RooRealVar("S1", "S1", 0);
-        RooRealVar *S2 = new RooRealVar("S2", "S2", 0);
-        RooRealVar *xr = new RooRealVar("xr", "xr", 0);
-        _parameters->add(*S1);
-        _parameters->add(*S2);
-        _parameters->add(*xr);
-        RooGaussModel *gauss_1 = new RooGaussModel("gauss_1", "gauss 1 resolution", _t, RooFit::RooConst(0), *S1, _et);
-        RooGaussModel *gauss_2 = new RooGaussModel("gauss_2", "gauss 2 resolution", _t, RooFit::RooConst(0), *S2, _et);
-        _resolution = new RooAddModel("_resolution", "gaussx2 resolution", RooArgList(*gauss_1, *gauss_2), RooArgList(*xr));
-        //        _resolution = gauss_1;
+        RooRealVar *S = new RooRealVar("S", "S", 0);
+	//        RooRealVar *S2 = new RooRealVar("S2", "S2", 0);
+        //RooRealVar *xr = new RooRealVar("xr", "xr", 0);
+        _parameters->add(*S);
+        //_parameters->add(*S2);
+        //_parameters->add(*xr);
+        RooGaussModel *gauss_1 = new RooGaussModel("gauss_1", "gauss 1 resolution", _t, RooFit::RooConst(0), *S, _et);
+        //RooGaussModel *gauss_2 = new RooGaussModel("gauss_2", "gauss 2 resolution", _t, RooFit::RooConst(0), *S2, _et);
+	//_resolution = new RooAddModel("_resolution", "gaussx2 resolution", RooArgList(*gauss_1, *gauss_2), RooArgList(*xr));
+	_resolution = gauss_1;
     } else {
         _resolution = new RooTruthModel("_resolution", "truth resolution", _t);
     }
@@ -211,17 +211,24 @@ Int_t BsFitter::fit(Bool_t hesse, Bool_t minos, Bool_t verbose, Int_t cpu) {
     }
 
     cout << "RANGE: " << _range << endl;
-    if (_use_resolution && !_sidebands) {
-        _fit_result = _model->fitTo(*_data, RooFit::ConditionalObservables(RooArgSet(_p)),
-                RooFit::Save(kTRUE), RooFit::Hesse(hesse),
-                RooFit::Minos(minos), RooFit::NumCPU(cpu),
-                RooFit::Verbose(verbose),
-                RooFit::ExternalConstraints(*_constraints));
+    if (_signal_only) {
+      _fit_result = _model->fitTo(*_data, RooFit::ConditionalObservables(RooArgSet(_et,_p)),
+				  RooFit::Save(kTRUE), RooFit::Hesse(hesse),
+				  RooFit::Minos(minos), RooFit::NumCPU(cpu),
+				  RooFit::Verbose(verbose));
     } else {
+      if (_sidebands) {
+        _fit_result = _model->fitTo(*_data,
+				    RooFit::Save(kTRUE), RooFit::Hesse(hesse),
+				    RooFit::Minos(minos), RooFit::NumCPU(cpu),
+				    RooFit::Verbose(verbose));
+      } else {
         _fit_result = _model->fitTo(*_data, RooFit::ConditionalObservables(RooArgSet(_p)),
-                RooFit::Save(kTRUE), RooFit::Hesse(hesse),
-                RooFit::Minos(minos), RooFit::NumCPU(cpu),
-                RooFit::Verbose(verbose)/*, RooFit::Range(_range)*/);
+				    RooFit::Save(kTRUE), RooFit::Hesse(hesse),
+				    RooFit::Minos(minos), RooFit::NumCPU(cpu),
+				    RooFit::Verbose(verbose),
+				    RooFit::ExternalConstraints(*_constraints)/*, RooFit::Range(_range)*/);
+      }
     }
     return _fit_result->status();
 }
@@ -403,9 +410,13 @@ RooAbsPdf* BsFitter::signal_model() {
         RooDecay *et_sig_long = new RooDecay("et_sig_long", "long bgk", _et, *et_sig_tau_long, *et_sig_gauss, RooDecay::SingleSided);
         RooAddPdf *et_sig_model = new RooAddPdf("et_sig_model", "et sig model", *et_sig_long, *et_sig_short, *et_sig_xl);
 
-        signal = new RooProdPdf("signal", "signal",
-                RooArgSet(*signal_mass, *et_sig_model),
-                RooFit::Conditional(*signal_time_angle, RooArgSet(_m, _t, _cpsi, _ctheta, _phi)));
+	if (_signal_only)
+	  signal = new RooProdPdf("signal", "signal",
+				  RooArgSet(*signal_mass, *signal_time_angle));
+	else
+	  signal = new RooProdPdf("signal", "signal",
+				  RooArgSet(*signal_mass, *et_sig_model),
+				  RooFit::Conditional(*signal_time_angle, RooArgSet(_m, _t, _cpsi, _ctheta, _phi)));
     } else {
         signal = new RooProdPdf("signal", "signal", RooArgSet(*signal_mass, *signal_time_angle));
     }
