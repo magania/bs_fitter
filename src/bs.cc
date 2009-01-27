@@ -33,8 +33,9 @@ void usage(void) {
     printf("\t \033[1m-e\033[m efficiency    \t Set efficiency file. (Phi's or coefficients)\n");
     printf("\t \033[1m-o\033[m out           \t Set file result file.\n\n");
     printf("\t \033[1m--no-resolution\033[m  \t Set true resolution.\n");
-    printf("\t \033[1m--signal-only\033[m    \t Use signal model only.\n");
-    printf("\t \033[1m--sidebands\033[m      \t Use sidebans only.\n");
+    printf("\t \033[1m--signal-only\033[m    \t Fit signal model only.\n");
+    printf("\t \033[1m--prompt-only\033[m    \t Fit prompt model only.\n");
+    printf("\t \033[1m--noprompt-only\033[m  \t Fit no prompt model only.\n");
     printf("\t \033[1m--no-efficiency\033[m  \t Use efficiency = 1.\n");
     printf("\t \033[1m--use-phis\033[m       \t Use Phi constants no normalize.\n\n");
     printf("\t \033[1m--verbose\033[m        \t Verbose fit.\n\n");
@@ -45,12 +46,14 @@ void usage(void) {
 int main(int argc, char** argv) {
     static int use_resolution = true;
     static int signal_only = false;
-    static int sidebands = false;
+    static int prompt_only = false;
+    static int noprompt_only = false;
     static int use_efficiency = true;
     static int use_phis = false;
     static int no_efficiency = false;
     static int verbose = false;
 
+    int jobs =4;
     const char *data = "fit.dat";
     const char *parameters = "parameters.txt";
     const char *variables = "variables.txt";
@@ -63,7 +66,8 @@ int main(int argc, char** argv) {
             /* These options set a flag. */
             {"no-resolution"  , no_argument, &use_resolution, 0},
             {"signal-only"    , no_argument, &signal_only   , 1},
-            {"sidebands"      , no_argument, &sidebands     , 1},
+            {"prompt-only"    , no_argument, &prompt_only   , 1},
+            {"noprompt-only"  , no_argument, &noprompt_only , 1},
             {"no-efficiency"  , no_argument, &no_efficiency , 1},
             {"use-phis"       , no_argument, &use_phis      , 1},
             {"verbose"        , no_argument, &verbose       , 1},
@@ -100,7 +104,7 @@ int main(int argc, char** argv) {
                 variables = optarg;
                 break;
             case 'j':
-                jobs = optarg;
+                jobs = atoi(optarg);
                 break;
             case '?':
                 usage();
@@ -143,6 +147,10 @@ int main(int argc, char** argv) {
     }
 
     /* Exit on unposible flags */
+    //    if (prompt_only && noprompt_only) {
+    //   printf("Flags prompt-only and noprompt-only conflict.\n");
+    //   exit(EXIT_FAILURE);
+    // }
     if (generate && use_phis) {
         printf("Can't generate with Phi's.\n");
         exit(EXIT_FAILURE);
@@ -165,13 +173,13 @@ int main(int argc, char** argv) {
             exit(EXIT_FAILURE);
         }
     }
-    if(signal_only && sidebands) {
+    if(signal_only && !prompt_only && !noprompt_only) {
         printf("signal_only and sidebands options together is stupid.\n");
         exit(EXIT_FAILURE);
     }
     
     /* Do the real stuff */
-    BsFitter bs(use_resolution, signal_only, sidebands, use_efficiency, use_phis);
+    BsFitter bs(use_resolution, signal_only, prompt_only, noprompt_only, use_efficiency, use_phis);
     bs.setVariables(variables);
     bs.setParameters(parameters);
     if (use_efficiency && !no_efficiency)
