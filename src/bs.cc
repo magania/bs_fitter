@@ -56,6 +56,7 @@ int main(int argc, char** argv) {
     const char *variables = "variables.txt";
     const char *efficiency = "efficiency.txt";
     const char *out = "fit.txt";
+    static int jobs;
 
     int c;
     while (1) {
