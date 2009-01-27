@@ -35,7 +35,7 @@ fit_et() {
     Double_t m_left = (1 / tau_b) * log(exp(tau_b * left) - bkg_under_signal * tau_b);
 
     cout << bkg_under_signal << endl;
-    cout << "MASS: " << m_left << ' ' << left << ' ' << right << ' ' << m_right << endl;
+    cout << "XS: " << xs.getVal() << " MASS: " << m_left << ' ' << left << ' ' << right << ' ' << m_right << endl;
 
     _m.setMin(m_left);
     _m.setMax(m_right);

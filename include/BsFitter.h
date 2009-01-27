@@ -29,8 +29,8 @@
 //#include <RooBkgAngle.h>
 
 class BsFitter {
-public:
-    BsFitter(Bool_t use_resolution, Bool_t signal_only, Bool_t sidebands, Bool_t use_efficiency, Bool_t use_phis);
+ public:
+  BsFitter(Bool_t use_resolution, Bool_t signal_only, Bool_t prompt_only, Bool_t noprompt_only, Bool_t use_efficiency, Bool_t use_phis);
 
     void setVariables(const char* params);
     void setParameters(const char* params);
@@ -74,7 +74,8 @@ private:
 
     Bool_t _use_resolution;
     Bool_t _signal_only;
-    Bool_t _sidebands;
+    Bool_t _prompt_only;
+    Bool_t _noprompt_only;
     Bool_t _use_efficiency;
     Bool_t _use_phis;
     
