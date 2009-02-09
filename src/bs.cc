@@ -53,7 +53,7 @@ int main(int argc, char** argv) {
     static int no_efficiency = false;
     static int verbose = false;
 
-    int jobs =4;
+    int jobs =1;
     const char *data = "fit.dat";
     const char *parameters = "parameters.txt";
     const char *variables = "variables.txt";
@@ -173,8 +173,8 @@ int main(int argc, char** argv) {
             exit(EXIT_FAILURE);
         }
     }
-    if(signal_only && !prompt_only && !noprompt_only) {
-        printf("signal_only and sidebands options together is stupid.\n");
+    if(signal_only && prompt_only && noprompt_only) {
+        printf("signal_only && prompt_only && noprompt_only is wired .\n");
         exit(EXIT_FAILURE);
     }
     
@@ -197,7 +197,7 @@ int main(int argc, char** argv) {
     
     if (fit || fit_eff) {
         bs.writeParameters("parameters_out.txt");
-        bs.fit(true, true, verbose, 4);
+        bs.fit(true, true, verbose, jobs);
         bs.writeResult(out);
         bs.writeParameters("parameters_out.txt");
     }

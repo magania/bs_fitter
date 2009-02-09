@@ -213,10 +213,17 @@ Int_t BsFitter::fit(Bool_t hesse, Bool_t minos, Bool_t verbose, Int_t cpu) {
 
     cout << "RANGE: " << _range << endl;
     if (_signal_only) {
-        _fit_result = _model->fitTo(*_data, RooFit::ConditionalObservables(RooArgSet(_et, _p)),
+       if (_use_resolution){
+         _fit_result = _model->fitTo(*_data, RooFit::ConditionalObservables(RooArgSet(_et, _p)),
                 RooFit::Save(kTRUE), RooFit::Hesse(hesse),
                 RooFit::Minos(minos), RooFit::NumCPU(cpu),
-                RooFit::Verbose(verbose));
+                RooFit::Verbose(verbose)/*, RooFit::Strategy(2)*/);
+        } else {
+         _fit_result = _model->fitTo(*_data, RooFit::ConditionalObservables(RooArgSet(_p)),
+                RooFit::Save(kTRUE), RooFit::Hesse(hesse),
+                RooFit::Minos(minos), RooFit::NumCPU(cpu),
+                RooFit::Verbose(verbose)/*, RooFit::Strategy(2)*/);
+        }	
     } else {
         if (_prompt_only || _noprompt_only) {
             _fit_result = _model->fitTo(*_data, RooFit::ConditionalObservables(RooArgSet(_et)),
@@ -290,9 +297,12 @@ void BsFitter::plotVar(RooRealVar& x, const char* plot_file, Int_t bins, Int_t p
             _data->plotOn(x_frame, RooFit::Binning(bins));
         else
             _data->plotOn(x_frame);
-    Double_t norm = 1;
-    if (x == _t)
-        norm = 2.6;
+  //  Double_t norm = 1;
+  //  if (x == _t)
+  //      norm = 2.6;
+
+  double __xs = 0;//1.28021;
+  double __xp = 0.69990;
 
     if (_data) {
         if (_use_resolution) {
@@ -302,11 +312,11 @@ void BsFitter::plotVar(RooRealVar& x, const char* plot_file, Int_t bins, Int_t p
                 cout << "RANGE: " << _range << endl;
 
                 if (_signal)
-                    _model->plotOn(x_frame, RooFit::Components(*_signal), RooFit::ProjWData(RooArgSet(_et, _p), projData), RooFit::LineColor(kGreen), RooFit::Normalization(0.052705));
-                //   if (_prompt)
-                //       _model->plotOn(x_frame, RooFit::Components(*_prompt), RooFit::ProjWData(RooArgSet(_et, _p), projData), RooFit::LineColor(kRed));
-                //   if (_noprompt)
-                //      _model->plotOn(x_frame, RooFit::Components(*_noprompt), RooFit::ProjWData(RooArgSet(_et, _p), projData), RooFit::LineColor(kBlue));
+                    _signal->plotOn(x_frame, RooFit::ProjWData(RooArgSet(_et, _p), projData), RooFit::LineColor(kGreen), RooFit::Normalization(__xs));
+                if (_prompt)
+               	       _prompt->plotOn(x_frame, RooFit::ProjWData(RooArgSet(_et, _p), projData), RooFit::LineColor(kRed),RooFit::Normalization((1-__xs)*__xp));
+                if (_noprompt)
+                     _noprompt->plotOn(x_frame, RooFit::ProjWData(RooArgSet(_et, _p), projData), RooFit::LineColor(kBlue), RooFit::Normalization((1-__xs)*(1-__xp)));
 
                 _model->plotOn(x_frame, RooFit::ProjWData(RooArgSet(_et, _p), projData), RooFit::LineColor(13));
             } else {
@@ -360,20 +370,21 @@ RooAbsPdf* BsFitter::signal_model() {
     _parameters->add(*Tau);
     _parameters->add(*DeltaMs);
 
-    RooRealVar *delta_1_mean = new RooRealVar("delta_1_mean", "#delta_1 mean", 0);
-    RooRealVar *delta_1_sigma = new RooRealVar("delta_1_sigma", "#delta_1 #sigma", 0);
-    RooRealVar *delta_2_mean = new RooRealVar("delta_2_mean", "#delta_2 mean", 0);
-    RooRealVar *delta_2_sigma = new RooRealVar("delta_2_sigma", "#delta_2 #sigma", 0);
-    _parameters->add(*delta_1_mean);
-    _parameters->add(*delta_1_sigma);
-    _parameters->add(*delta_2_mean);
-    _parameters->add(*delta_2_sigma);
+    if (!_signal_only){
+      RooRealVar *delta_1_mean = new RooRealVar("delta_1_mean", "#delta_1 mean", 0);
+      RooRealVar *delta_1_sigma = new RooRealVar("delta_1_sigma", "#delta_1 #sigma", 0);
+      RooRealVar *delta_2_mean = new RooRealVar("delta_2_mean", "#delta_2 mean", 0);
+      RooRealVar *delta_2_sigma = new RooRealVar("delta_2_sigma", "#delta_2 #sigma", 0);
+      _parameters->add(*delta_1_mean);
+      _parameters->add(*delta_1_sigma);
+      _parameters->add(*delta_2_mean);
+      _parameters->add(*delta_2_sigma);
 
-    RooGaussian *delta_1_constraint = new RooGaussian("delta_1_constraint", "#delta_1 Gaussian Constraint", *Delta_1, *delta_1_mean, *delta_1_sigma);
-    RooGaussian *delta_2_constraint = new RooGaussian("delta_2_constraint", "#delta_2 Gaussian Constraint", *Delta_2, *delta_2_mean, *delta_2_sigma);
-    _constraints->add(*delta_1_constraint);
-    _constraints->add(*delta_2_constraint);
-
+      RooGaussian *delta_1_constraint = new RooGaussian("delta_1_constraint", "#delta_1 Gaussian Constraint", *Delta_1, *delta_1_mean, *delta_1_sigma);
+      RooGaussian *delta_2_constraint = new RooGaussian("delta_2_constraint", "#delta_2 Gaussian Constraint", *Delta_2, *delta_2_mean, *delta_2_sigma);
+      _constraints->add(*delta_1_constraint);
+      _constraints->add(*delta_2_constraint);
+    }
     RooGaussian *signal_mass = new RooGaussian("signal_mass", "signal_mass", _m, *M, *Sigma);
 
     RooAbsPdf *signal_time_angle;
@@ -394,7 +405,7 @@ RooAbsPdf* BsFitter::signal_model() {
     }
 
     RooProdPdf * signal = 0;
-    if (_use_resolution) {
+    if (_use_resolution && !_signal_only) {
         RooRealVar *et_sig_xl = new RooRealVar("et_sig_xl", "xl sig", 0.7, 0, 1);
         RooRealVar *et_sig_mean = new RooRealVar("et_sig_mean", "mean sig", 0.06, 0, 1);
         RooRealVar *et_sig_sigma = new RooRealVar("et_sig_sigma", "sigma sig", 0.01, 0, 0.1);
@@ -411,11 +422,7 @@ RooAbsPdf* BsFitter::signal_model() {
         RooDecay *et_sig_long = new RooDecay("et_sig_long", "long bgk", _et, *et_sig_tau_long, *et_sig_gauss, RooDecay::SingleSided);
         RooAddPdf *et_sig_model = new RooAddPdf("et_sig_model", "et sig model", *et_sig_long, *et_sig_short, *et_sig_xl);
 
-        if (_signal_only)
-            signal = new RooProdPdf("signal", "signal",
-                RooArgSet(*signal_mass, *signal_time_angle));
-        else
-            signal = new RooProdPdf("signal", "signal",
+        signal = new RooProdPdf("signal", "signal",
                 RooArgSet(*signal_mass, *et_sig_model),
                 RooFit::Conditional(*signal_time_angle, RooArgSet(_m, _t, _cpsi, _ctheta, _phi)));
     } else {
@@ -447,8 +454,8 @@ RooAbsPdf* BsFitter::background_model() {
         _parameters->add(*y6);
 
         //RooExponential *mass_p = new RooExponential("mass_p", "cuadratic mass prompt", _m, *m_p_a1);
-//        RooFormulaVar *m_trick = new RooFormulaVar("mtrick", "@0*(6*@1-1)/36", RooArgSet(*m_p_a2, *m_p_a1));
-        RooPolynomial *mass_p = new RooPolynomial("mass_p", "cuadratic mass prompt", _m, RooArgSet(*m_p_a1, *m_p_a2));
+     //   RooFormulaVar *m_trick = new RooFormulaVar("mtrick", "-@0*(5.7*@1+1)/32.49", RooArgList(*m_p_a2, *m_p_a1));
+        RooPolynomial *mass_p = new RooPolynomial("mass_p", "cuadratic mass prompt", _m, RooArgList(*m_p_a1));
         if (_use_phis) {
             //        RooBkgAngle<Phis,TransAnglesPhis> *angle_p = new RooBkgAngle<Phis,TransAnglesPhis>("angle_p", "angle prompt", _cpsi, _ctheta, _phi,
             //                *y1, *y2, *y3, *y4, *y5, *y6, *_phis);
@@ -489,7 +496,7 @@ RooAbsPdf* BsFitter::background_model() {
         //      _parameters->add(*z5);
         //      _parameters->add(*z6);
 
-  //      RooPolynomial *mass_np = new RooPolynomial("mass_np", "cuadratic mass noprompt", _m, RooArgSet(*m_np_a1, *m_np_a2));
+    //  RooPolynomial *mass_np = new RooPolynomial("mass_np", "cuadratic mass noprompt", _m, *m_np_a1);
         RooExponential *mass_np = new RooExponential("mass_np", "exp mass noprompt", _m, *m_np_a1);
         RooDecay *exp_minus = new RooDecay("exp_minus", "exp minus", _t, *t_m, *_resolution, RooDecay::Flipped);
         RooDecay *exp_plus = new RooDecay("exp_plus", "exp plus", _t, *t_p, *_resolution, RooDecay::SingleSided);

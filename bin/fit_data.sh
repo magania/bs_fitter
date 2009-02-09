@@ -1,11 +1,9 @@
 #!/bin/bash
 
-TMVA_CUT=0.45
-TMVA_CUT2=0.55
-T_CUT=1
+T_CUT=2
 
 echo "Fiting et model..." 
-awk '$8 > '$TMVA_CUT' && $9 > '$TMVA_CUT2' {print $1,$2,$3,$4,$5,$6,$7}' tofit.dat | awk -f d2p.awk > fit.dat
+awk -f d2p.awk tofit.dat > fit.dat
 MASS_CUT=`root -b -q fit_et.cpp | tee fit_et.out | grep MASS`
 #MASS_CUT=`echo MASS: 5.04951 5.2504 5.48037 5.74928`
 if [ ! -d plots_et ]; then
@@ -22,10 +20,11 @@ MASS_RIGHT=`echo $MASS_CUT | cut -d' ' -f 7`
 echo $XS $MASS_LEFT $MASS_LLEFT $MASS_RRIGHT $MASS_RIGHT
 
 echo '_m = 5.3 L('$MASS_LEFT' - '$MASS_RIGHT')' > variables.txt
-echo '_t =  5.0000 L(-1 - 12)' >> variables.txt
+echo '_t =  5.0000 L(-1 - 9)' >> variables.txt
 echo '_et = 0 L(0 - 1)' >> variables.txt
 
-awk '$8 > '$TMVA_CUT' && '$MASS_LEFT' < $1 && $1 < '$MASS_RIGHT' {print $1,$2,$3,$4,$5,$6,$7}' tofit.dat | awk -f d2p.awk > fit.dat
+awk $MASS_LEFT' < $1 && $1 < '$MASS_RIGHT' {print $1,$2,$3,$4,$5,$6,$7}' fit.dat | awk -f d2p.awk > fit.tmp
+mv fit.tmp fit.dat
 awk '$1 < '$MASS_LLEFT' || '$MASS_RRIGHT' < $1' fit.dat > fit_bkg.dat
 awk '$2 > '$T_CUT fit_bkg.dat > fit_noprompt.dat
 awk '$2 < '$T_CUT fit_bkg.dat > fit_prompt.dat
