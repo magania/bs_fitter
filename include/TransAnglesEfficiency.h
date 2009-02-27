@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   TransAnglesEfficiency.h
  * Author: magania
  *
@@ -22,7 +22,7 @@ public:
 
     Double_t fe(Int_t i) const;
     Double_t int_fe(Int_t i, Int_t code, const char* range) const;
-    
+
 private:
     Double_t ecpsi() const;
     Double_t ectheta() const;

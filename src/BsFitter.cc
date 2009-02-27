@@ -193,11 +193,12 @@ void BsFitter::setData(RooDataSet* data_set) {
 void BsFitter::generate(Int_t num, const char* data) {
     _variables->Print();
     if (_use_resolution) {
-        RooPolynomial p_model("p_model", "p_model", _p, RooFit::RooConst(0));
-        RooDataSet *data_p = p_model.generate(RooArgSet(_p), num, kTRUE);
-        RooDataSet *data_et = _model->generate(RooArgSet(_et), num, kTRUE);
-        data_et->merge(data_p);
-        RooDataSet *data_m = _model->generate(RooArgSet(_m, _t, _cpsi, _ctheta, _phi), *data_et);
+      //  RooPolynomial p_model("p_model", "p_model", _p, RooFit::RooConst(0));
+      //  RooDataSet *data_p = p_model.generate(RooArgSet(_p), num, kTRUE);
+    	_p =1;
+    	RooDataSet *data_et = _model->generate(RooArgSet(_et), num, kTRUE);
+      //  data_et->merge(data_p);
+        RooDataSet *data_m = _model->generate(RooArgSet(_m, _t, _et ,_cpsi, _ctheta, _phi), *data_et);
         _data = new RooDataSet("_data", "data", data_m, *_variables);
     } else {
         _data = _model->generate(RooArgSet(_m, _t, _cpsi, _ctheta, _phi, _p), num);
@@ -223,7 +224,7 @@ Int_t BsFitter::fit(Bool_t hesse, Bool_t minos, Bool_t verbose, Int_t cpu) {
                 RooFit::Save(kTRUE), RooFit::Hesse(hesse),
                 RooFit::Minos(minos), RooFit::NumCPU(cpu),
                 RooFit::Verbose(verbose)/*, RooFit::Strategy(2)*/);
-        }	
+        }
     } else {
         if (_prompt_only || _noprompt_only) {
             _fit_result = _model->fitTo(*_data, RooFit::ConditionalObservables(RooArgSet(_et)),
@@ -262,7 +263,7 @@ void BsFitter::plotEt(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t
 }
 
 void BsFitter::plotT() {
-    plotVar(_t, "time.gif", 0, 100, kTRUE);
+    plotVar(_t, "time.gif", 0, 100,kFALSE);// kTRUE);
 }
 
 void BsFitter::plotCpsi(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log) {
@@ -301,8 +302,8 @@ void BsFitter::plotVar(RooRealVar& x, const char* plot_file, Int_t bins, Int_t p
   //  if (x == _t)
   //      norm = 2.6;
 
-  double __xs = 0;//1.28021;
-  double __xp = 0.69990;
+  double __xs = 4.7754e-01;//1.28021;
+  double __xp = 6.5374e-01;
 
     if (_data) {
         if (_use_resolution) {
@@ -331,7 +332,7 @@ void BsFitter::plotVar(RooRealVar& x, const char* plot_file, Int_t bins, Int_t p
     //    if (x == _ctheta || x == _cpsi || x == _phi)
     //        efficiency->plotOn(x_frame,RooFit::LineColor(kRed));
 
-    TCanvas *canvas = new TCanvas("canvas", "canvas", 600, 600);
+    TCanvas *canvas = new TCanvas("canvas", "canvas", 800, 800);
     x_frame->Draw();
     if (log)
         gPad->SetLogy(1);
@@ -350,8 +351,8 @@ RooAbsPdf* BsFitter::signal_model() {
     RooRealVar *M = new RooRealVar("M", "M", 0);
     RooRealVar *Sigma = new RooRealVar("Sigma", "#sigma", 0);
 
-    RooRealVar *A02 = new RooRealVar("A02", "A02", 0);
-    RooRealVar *All2 = new RooRealVar("All2", "A_{#parallel}(0)", 0);
+    RooRealVar *A0 = new RooRealVar("A0", "A0", 0);
+    RooRealVar *A1 = new RooRealVar("A1", "A1", 0);
     RooRealVar *DeltaGamma = new RooRealVar("DeltaGamma", "#Delta#Gamma", 0);
     RooRealVar *Delta_1 = new RooRealVar("Delta_1", "#delta_{1}", 0);
     RooRealVar *Delta_2 = new RooRealVar("Delta_2", "#delta_{2}", 0);
@@ -359,10 +360,13 @@ RooAbsPdf* BsFitter::signal_model() {
     RooRealVar *Tau = new RooRealVar("Tau", "#tau", 0);
     RooRealVar *DeltaMs = new RooRealVar("DeltaMs", "#Delta M_{s}", 0);
 
+    RooFormulaVar *All2 = new RooFormulaVar("All2", "(1-@0)*@1",RooArgList(*A0,*A1));
+    RooFormulaVar *Ap2 = new RooFormulaVar("Ap2", "1-@0-@1",RooArgList(*A0,*All2));
+
     _parameters->add(*M);
     _parameters->add(*Sigma);
-    _parameters->add(*A02);
-    _parameters->add(*All2);
+    _parameters->add(*A0);
+    _parameters->add(*A1);
     _parameters->add(*DeltaGamma);
     _parameters->add(*Delta_1);
     _parameters->add(*Delta_2);
@@ -391,21 +395,21 @@ RooAbsPdf* BsFitter::signal_model() {
     if (_use_phis) {
         RooBsTimeAngle<Phis, TransAnglesPhis>* time_angle = new RooBsTimeAngle<Phis, TransAnglesPhis > ("time_angle", "signal time angle pdf",
                 _t, _cpsi, _ctheta, _phi, _p,
-                *A02, *All2, *DeltaGamma, *Tau,
+                *A0, *All2, *Ap2, *DeltaGamma, *Tau,
                 *DeltaMs, *Phi_s, *Delta_1, *Delta_2,
                 *_resolution, *_phis);
         signal_time_angle = time_angle;
     } else {
         RooBsTimeAngle<Efficiency, TransAnglesEfficiency>* time_angle = new RooBsTimeAngle<Efficiency, TransAnglesEfficiency > ("time_angle", "signal time angle pdf",
                 _t, _cpsi, _ctheta, _phi, _p,
-                *A02, *All2, *DeltaGamma, *Tau,
+                *A0, *All2, *Ap2, *DeltaGamma, *Tau,
                 *DeltaMs, *Phi_s, *Delta_1, *Delta_2,
                 *_resolution, *_efficiency);
         signal_time_angle = time_angle;
     }
 
     RooProdPdf * signal = 0;
-    if (_use_resolution && !_signal_only) {
+    if (_use_resolution /*&& !_signal_only*/) {
         RooRealVar *et_sig_xl = new RooRealVar("et_sig_xl", "xl sig", 0.7, 0, 1);
         RooRealVar *et_sig_mean = new RooRealVar("et_sig_mean", "mean sig", 0.06, 0, 1);
         RooRealVar *et_sig_sigma = new RooRealVar("et_sig_sigma", "sigma sig", 0.01, 0, 0.1);

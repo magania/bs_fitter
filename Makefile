@@ -17,8 +17,8 @@ $(MYLIBS): obj/%.o : src/%.cc include/%.h
 	bash /home/magania/local/root/bin/thisroot.sh
 	@echo $(CXX) $(CCFLAGS) $(INCLUDE)  -c $< -o $@
 	$(CXX) $(CCFLAGS) $(INCLUDE) -c $< -o $@
-#	@echo $(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) -shared $@ -o $(@:obj/%.o=lib/lib%.so)
-#	$(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) -shared $@ -o $(@:obj/%.o=lib/lib%.so)
+	@echo $(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) -shared $@ -o $(@:obj/%.o=lib/lib%.so)
+	$(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) -shared $@ -o $(@:obj/%.o=lib/lib%.so)
 
 obj/BsFitter.o: src/BsFitter.cc include/BsFitter.h $(MYLIBS)
 	@echo rootcint -f Dict.cc  -c include/*

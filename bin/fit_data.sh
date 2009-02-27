@@ -52,14 +52,14 @@ cat parameters_prompt.txt | sed 's/C//g' > parameters.txt
 grep -v S parameters_noprompt.txt | sed 's/C//g' >> parameters.txt
 echo "xp =  0.7 L(0 - 1)" >> parameters.txt 
 
-#echo "Fitting background ..."
-#./bs fit  -d fit_bkg.dat --prompt-only --noprompt-only > fit_bkg.out
+echo "Fitting background ..."
+./bs fit  -d fit_bkg.dat --prompt-only --noprompt-only > fit_bkg.out
 mv parameters.txt parameters_bkg.txt
-#./bs plot -d fit_bkg.dat --prompt-only --noprompt-only -p parameters_bkg.txt> /dev/null
-#if [ ! -d plots_bkg ]; then
-#mkdir plots_bkg
-#fi
-#mv *.gif fit_bkg.out plots_bkg/
+./bs plot -d fit_bkg.dat --prompt-only --noprompt-only -p parameters_bkg.txt> /dev/null
+if [ ! -d plots_bkg ]; then
+mkdir plots_bkg
+fi
+mv *.gif fit_bkg.out plots_bkg/
 
 head -n 18 initial_parameters.txt | tail -n 16 > parameters.txt
 cat parameters_bkg.txt >> parameters.txt

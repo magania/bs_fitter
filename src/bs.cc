@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   bs.cc
  * Author: magania
  *
@@ -13,7 +13,7 @@
 #include <iostream>
 
 /*
- * 
+ *
  */
 
 using namespace std;
@@ -112,7 +112,7 @@ int main(int argc, char** argv) {
                 usage();
         }
     }
-    
+
     if (use_phis)
         use_efficiency = false;
 
@@ -177,7 +177,7 @@ int main(int argc, char** argv) {
         printf("signal_only && prompt_only && noprompt_only is wired .\n");
         exit(EXIT_FAILURE);
     }
-    
+
     /* Do the real stuff */
     BsFitter bs(use_resolution, signal_only, prompt_only, noprompt_only, use_efficiency, use_phis);
     bs.setVariables(variables);
@@ -189,15 +189,15 @@ int main(int argc, char** argv) {
 
     if (fit || plot || fit_eff)
         bs.setData(data);
-    
+
     if (generate) {
         cout << "Generating .." << endl;
         bs.generate(3000, data);
     }
-    
+
     if (fit || fit_eff) {
         bs.writeParameters("parameters_out.txt");
-        bs.fit(true, true, verbose, jobs);
+        bs.fit(false, false, verbose, jobs);
         bs.writeResult(out);
         bs.writeParameters("parameters_out.txt");
     }
@@ -210,9 +210,9 @@ int main(int argc, char** argv) {
         bs.plotCtheta();
         bs.plotPhi();
     }
-    
+
     if ( fit_eff ) {
-        
+
     }
 
     return (EXIT_SUCCESS);
