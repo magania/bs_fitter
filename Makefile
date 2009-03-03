@@ -4,7 +4,7 @@ CCFLAGS= -O3 -g -fPIC
 INCLUDE = $(shell root-config --cflags) -Iinclude
 LIBS    = $(shell root-config --libs) -lMinuit -lRooFit -lRooFitCore
 
-MYLIBS =  obj/Efficiency.o obj/Phis.o obj/RooBkgAngle.o obj/RooBsTimeAngle.o obj/TransAngles.o obj/TransAnglesEfficiency.o obj/TransAnglesPhis.o
+MYLIBS =  obj/Efficiency.o obj/RooBsTimeAngle.o obj/TransAngles.o obj/TransAnglesEfficiency.o
 
 #DFLAGS = -DRES_TRUE
 #DFLAGS = -DRES_GAUSS
@@ -14,17 +14,18 @@ MYLIBS =  obj/Efficiency.o obj/Phis.o obj/RooBkgAngle.o obj/RooBsTimeAngle.o obj
 all: bin/bs
 
 $(MYLIBS): obj/%.o : src/%.cc include/%.h
-	bash /home/magania/local/root/bin/thisroot.sh
 	@echo $(CXX) $(CCFLAGS) $(INCLUDE)  -c $< -o $@
 	$(CXX) $(CCFLAGS) $(INCLUDE) -c $< -o $@
-	@echo $(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) -shared $@ -o $(@:obj/%.o=lib/lib%.so)
-	$(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) -shared $@ -o $(@:obj/%.o=lib/lib%.so)
+#	@echo $(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) -shared $@ -o $(@:obj/%.o=lib/lib%.so)
+#	$(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) -shared $@ -o $(@:obj/%.o=lib/lib%.so)
 
-obj/BsFitter.o: src/BsFitter.cc include/BsFitter.h $(MYLIBS)
+obj/Dict.o: $(MYLIBS)
 	@echo rootcint -f Dict.cc  -c include/*
-	rootcint -f Dict.cc  -c include/BsFitter.h include/Efficiency.h include/Phis.h include/RooBsTimeAngle.h include/TransAngles.h include/TransAnglesEfficiency.h include/TransAnglesPhis.h include/RooBkgAngleLinkdef.h
+	rootcint -f Dict.cc  -c include/BsFitter.h include/Efficiency.h include/RooBsTimeAngle.h include/TransAnglesEfficiency.h include/TransAngles.h
 	@echo $(CXX) $(CCFLAGS) $(INCLUDE) -c Dict.cc -o obj/Dict.o
 	$(CXX) $(CCFLAGS) $(INCLUDE) -c Dict.cc -o obj/Dict.o
+	
+obj/BsFitter.o: src/BsFitter.cc include/BsFitter.h $(MYLIBS) obj/Dict.o
 	@echo $(CXX) $(CCFLAGS) $(INCLUDE) $(DFLAGS) -c $< -o obj/BsFitter.o
 	$(CXX) $(CCFLAGS) $(INCLUDE) $(DFLAGS) -c $< -o obj/BsFitter.o
 #	$(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) -shared obj/Dict.o $(LIBRARY) obj/BsFitter_nores.o -o lib/libBsFitter_nores.so

@@ -32,25 +32,20 @@ void usage(void) {
     printf("\t \033[1m-p\033[m parameters    \t Set parameters file.\n");
     printf("\t \033[1m-e\033[m efficiency    \t Set efficiency file. (Phi's or coefficients)\n");
     printf("\t \033[1m-o\033[m out           \t Set file result file.\n\n");
-    printf("\t \033[1m--no-resolution\033[m  \t Set true resolution.\n");
-    printf("\t \033[1m--signal-only\033[m    \t Fit signal model only.\n");
-    printf("\t \033[1m--prompt-only\033[m    \t Fit prompt model only.\n");
-    printf("\t \033[1m--noprompt-only\033[m  \t Fit no prompt model only.\n");
-    printf("\t \033[1m--no-efficiency\033[m  \t Use efficiency = 1.\n");
-    printf("\t \033[1m--use-phis\033[m       \t Use Phi constants no normalize.\n\n");
+    printf("\t \033[1m--resolution\033[m     \t Use resolution.\n");
+    printf("\t \033[1m--signal\033[m         \t Include signal.\n");
+    printf("\t \033[1m--bkg\033[m            \t Include background.\n");
+    printf("\t \033[1m--efficiency\033[m     \t Use efficiency.\n");
     printf("\t \033[1m--verbose\033[m        \t Verbose fit.\n\n");
     printf("Report bugs to <magania@fnal.gov>.\n");
     exit(EXIT_FAILURE);
 }
 
 int main(int argc, char** argv) {
-    static int use_resolution = true;
-    static int signal_only = false;
-    static int prompt_only = false;
-    static int noprompt_only = false;
-    static int use_efficiency = true;
-    static int use_phis = false;
-    static int no_efficiency = false;
+    static int resolution = false;
+    static int signal = false;
+    static int background = false;
+    static int uefficiency = false;
     static int verbose = false;
 
     int jobs =1;
@@ -64,12 +59,10 @@ int main(int argc, char** argv) {
     while (1) {
         static struct option long_options[] ={
             /* These options set a flag. */
-            {"no-resolution"  , no_argument, &use_resolution, 0},
-            {"signal-only"    , no_argument, &signal_only   , 1},
-            {"prompt-only"    , no_argument, &prompt_only   , 1},
-            {"noprompt-only"  , no_argument, &noprompt_only , 1},
-            {"no-efficiency"  , no_argument, &no_efficiency , 1},
-            {"use-phis"       , no_argument, &use_phis      , 1},
+            {"resolution"  , no_argument, &resolution, 1},
+            {"signal"    , no_argument, &signal      , 1},
+            {"bkg"    , no_argument, &background     , 1},
+            {"efficiency"  , no_argument, &uefficiency, 1},
             {"verbose"        , no_argument, &verbose       , 1},
             {0, 0, 0, 0}
         };
@@ -113,9 +106,6 @@ int main(int argc, char** argv) {
         }
     }
 
-    if (use_phis)
-        use_efficiency = false;
-
     bool generate = false;
     bool fit = false;
     bool plot = false;
@@ -151,41 +141,23 @@ int main(int argc, char** argv) {
     //   printf("Flags prompt-only and noprompt-only conflict.\n");
     //   exit(EXIT_FAILURE);
     // }
-    if (generate && use_phis) {
-        printf("Can't generate with Phi's.\n");
-        exit(EXIT_FAILURE);
-    }
-    if (plot && use_phis) {
-        printf("Can't plot with Phi's.\n");
-        exit(EXIT_FAILURE);
-    }
     if (fit_eff) {
-        if (!signal_only) {
-            printf("Fit efficiency must be with signal-only.\n");
-            exit(EXIT_FAILURE);
-        }
-        if (!use_efficiency) {
-            printf("Fit efficiency requieres efficiency.\n");
-            exit(EXIT_FAILURE);
-        }
-        if (use_phis) {
-            printf("Fit efficiency can't be done with Phi's.\n");
+        if (background) {
+            printf("Fit efficiency must be with signal only.\n");
             exit(EXIT_FAILURE);
         }
     }
-    if(signal_only && prompt_only && noprompt_only) {
-        printf("signal_only && prompt_only && noprompt_only is wired .\n");
+    if(!(signal || background)) {
+        printf("Signal or background is needed .\n");
         exit(EXIT_FAILURE);
     }
 
     /* Do the real stuff */
-    BsFitter bs(use_resolution, signal_only, prompt_only, noprompt_only, use_efficiency, use_phis);
+    BsFitter bs(signal,background, resolution);
     bs.setVariables(variables);
     bs.setParameters(parameters);
-    if (use_efficiency && !no_efficiency)
+    if (uefficiency)
         bs.setEfficiency(efficiency);
-    if (use_phis)
-        bs.setPhis(efficiency);
 
     if (fit || plot || fit_eff)
         bs.setData(data);

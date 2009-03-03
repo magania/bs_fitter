@@ -30,13 +30,12 @@
 
 class BsFitter {
  public:
-  BsFitter(Bool_t use_resolution, Bool_t signal_only, Bool_t prompt_only, Bool_t noprompt_only, Bool_t use_efficiency, Bool_t use_phis);
+  BsFitter(Bool_t signal, Bool_t background, Bool_t resolution);
 
     void setVariables(const char* params);
     void setParameters(const char* params);
     void writeParameters(const char* params);
     void setEfficiency(const char* efficiency);
-    void setPhis(const char* phis);
     void setData(const char* data_file);
     void setData(RooDataSet* data_set);
 //    void setDataFromCin();
@@ -60,8 +59,8 @@ class BsFitter {
     void writeResult(const char* file_name);
 
 private:
-    RooAbsPdf* signal_model();
-    RooAbsPdf* background_model();
+    RooAbsPdf* signal_model(Bool_t background);
+    RooAbsPdf* background_model(Bool_t signal);
     void plotVar(RooRealVar& x, const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
 
     RooRealVar _m;
@@ -72,29 +71,21 @@ private:
     RooRealVar _phi;
     RooRealVar _p;
 
-    Bool_t _use_resolution;
-    Bool_t _signal_only;
-    Bool_t _prompt_only;
-    Bool_t _noprompt_only;
-    Bool_t _use_efficiency;
-    Bool_t _use_phis;
-    
     RooArgSet* _parameters;
     RooArgSet* _variables;
     RooResolutionModel *_resolution;
     RooAbsPdf* _model;
     Efficiency* _efficiency;
-    Phis* _phis;
-    RooProdPdf *_prompt;
-    RooProdPdf *_noprompt;
+    //RooProdPdf *_prompt;
+    //RooProdPdf *_noprompt;
     RooAbsPdf *_signal;
     RooAbsPdf *_background;
-    RooArgSet* _constraints;
+    //RooArgSet* _constraints;
 
     RooDataSet* _data;
     RooFitResult* _fit_result;
 
-    const char* _range;
+//    const char* _range;
 };
 
 #endif

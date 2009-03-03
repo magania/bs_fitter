@@ -10,21 +10,20 @@
 #include "RooBsTimeAngle.h"
 #include "Efficiency.h"
 
-templateClassImp(RooBsTimeAngle)
+ClassImp(RooBsTimeAngle)
 ;
 
 
 //_____________________________________________________________________________
-template<class TA, class TAI>
-RooBsTimeAngle<TA, TAI>::RooBsTimeAngle(const char *name, const char *title,
+RooBsTimeAngle::RooBsTimeAngle(const char *name, const char *title,
             RooRealVar& t, RooRealVar& cpsi, RooRealVar& ctheta, RooRealVar& phi, RooRealVar& p,
             RooAbsReal& A02, RooAbsReal& All2, RooAbsReal& Ap2,
             RooRealVar& DG, RooRealVar& tau, RooRealVar& Dm,
             RooRealVar& phi_s, RooRealVar& delta_1, RooRealVar& delta_2,
-            const RooResolutionModel& model, TA &ta) :
+            const RooResolutionModel& model, Efficiency &efficiency) :
   RooAbsAnaConvPdf(name,title,model,t),
   _t("_t", "time", this, t),
-  _angles(this, cpsi, ctheta, phi, ta, true),
+  _angles(this, cpsi, ctheta, phi, efficiency, true),
   _p("_p", "p", this, p),
   _A02("A02", "|A_0(0)|^2", this, A02),
   _All2("All2", "|A_#parallell(0)|^2", this, All2),
@@ -45,8 +44,7 @@ RooBsTimeAngle<TA, TAI>::RooBsTimeAngle(const char *name, const char *title,
 }
 
 //_____________________________________________________________________________
-template<class TA, class TAI>
-RooBsTimeAngle<TA, TAI>::RooBsTimeAngle(const RooBsTimeAngle& other, const char* name) :
+RooBsTimeAngle::RooBsTimeAngle(const RooBsTimeAngle& other, const char* name) :
   RooAbsAnaConvPdf(other,name),
   _t("_t", this, other._t),
   _angles(this, other._angles),
@@ -69,32 +67,25 @@ RooBsTimeAngle<TA, TAI>::RooBsTimeAngle(const RooBsTimeAngle& other, const char*
 }
 
 //_____________________________________________________________________________
-template<class TA, class TAI>
-RooBsTimeAngle<TA, TAI>::~RooBsTimeAngle()
+RooBsTimeAngle::~RooBsTimeAngle()
 {
   // Destructor
 }
 
 //_____________________________________________________________________________
-template<class TA, class TAI>
-Double_t RooBsTimeAngle<TA, TAI>::coefficient(Int_t basisIndex) const {
+Double_t RooBsTimeAngle::coefficient(Int_t basisIndex) const {
     Double_t val = 0;
-    for (int i = 1; i <= 6; i++){
-	double old_val = val;
+    for (int i = 1; i <= 6; i++)
         val += coeficiente(basisIndex, i) * _angles.fe(i);
-	if (val > 1000000)
-	cout << "Coeficiente " << basisIndex << ' ' << i << ' ' << coeficiente(basisIndex, i)  << ' ' << _angles.fe(i) << endl;
-    }
 
     if (basisIndex == _basisExpCos || basisIndex == _basisExpSin)
-        return (2 * _p - 1) * val;
+        return -val*_p;
     else
         return val;
 }
 
 //_____________________________________________________________________________
-template<class TA, class TAI>
-inline Double_t RooBsTimeAngle<TA, TAI>::coeficiente( Int_t basisIndex, Int_t fIndex) const
+inline Double_t RooBsTimeAngle::coeficiente( Int_t basisIndex, Int_t fIndex) const
 {
   switch (fIndex) {
   case 1:
@@ -138,8 +129,7 @@ inline Double_t RooBsTimeAngle<TA, TAI>::coeficiente( Int_t basisIndex, Int_t fI
 }
 
 //_____________________________________________________________________________
-template<class TA, class TAI>
-Int_t RooBsTimeAngle<TA, TAI>::getCoefAnalyticalIntegral(Int_t /*code*/, RooArgSet& allVars, RooArgSet& analVars, const char* /* rangeName*/) const
+Int_t RooBsTimeAngle::getCoefAnalyticalIntegral(Int_t /*code*/, RooArgSet& allVars, RooArgSet& analVars, const char* /* rangeName*/) const
 {
 //    cout << "Integrate .." << endl;
 //    allVars.Print();
@@ -156,26 +146,21 @@ Int_t RooBsTimeAngle<TA, TAI>::getCoefAnalyticalIntegral(Int_t /*code*/, RooArgS
 
 
 //_____________________________________________________________________________
-template<class TA, class TAI>
-Double_t RooBsTimeAngle<TA, TAI>::coefAnalyticalIntegral(Int_t basisIndex, Int_t code, const char* range) const
+Double_t RooBsTimeAngle::coefAnalyticalIntegral(Int_t basisIndex, Int_t code, const char* range) const
 {
     Double_t val = 0;
-    for (int i = 1; i <= 6; i++) {
+    for (int i = 1; i <= 6; i++)
         val += coeficiente(basisIndex, i) * _angles.int_fe(i, code, range);
-        if (val > 1000000)
-        cout << "Coeficiente " << basisIndex << ' ' << i << ' ' << coeficiente(basisIndex, i)  << ' ' << _angles.int_fe(i,code,range) << endl;
-}
-//    cout << _p << ' ' << val << ' ' << (2*_p-1)*val<<endl;
+
     if (basisIndex == _basisExpCos || basisIndex == _basisExpSin)
-        return (2 * _p - 1) * val;
+        return -val*_p;
     else
         return val;
 }
 
 
 //_____________________________________________________________________________
-template<class TA, class TAI>
-Int_t RooBsTimeAngle<TA, TAI>::getGenerator(const RooArgSet& directVars, RooArgSet &generateVars, Bool_t staticInitOK) const
+Int_t RooBsTimeAngle::getGenerator(const RooArgSet& directVars, RooArgSet &generateVars, Bool_t staticInitOK) const
 {
   if (matchArgs(directVars,generateVars,_t, _angles.phiProxy(), _angles.cthetaProxy(), _angles.cpsiProxy())) return 1;
   if (staticInitOK)
@@ -185,8 +170,7 @@ Int_t RooBsTimeAngle<TA, TAI>::getGenerator(const RooArgSet& directVars, RooArgS
 
 
 //_____________________________________________________________________________
-template<class TA, class TAI>
-void RooBsTimeAngle<TA, TAI>::initGenerator(Int_t code)
+void RooBsTimeAngle::initGenerator(Int_t code)
 {
   if ( code == 2 ) {
     _C_Cosh =  coefficient(_basisExpCosh);
@@ -197,8 +181,7 @@ void RooBsTimeAngle<TA, TAI>::initGenerator(Int_t code)
 }
 
 //_____________________________________________________________________________
-template<class TA, class TAI>
-void RooBsTimeAngle<TA, TAI>::generateEvent(Int_t code) {
+void RooBsTimeAngle::generateEvent(Int_t code) {
     Double_t max = 2.1;
     Double_t DG = TMath::Abs(_DG);
     Double_t tau_H = _tau / (1 - 0.5 * _tau * DG);

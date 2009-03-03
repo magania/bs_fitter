@@ -8,18 +8,15 @@
 #include "RooCategoryProxy.h"
 #include "TransAngles.h"
 #include "TransAnglesEfficiency.h"
-#include "TransAnglesPhis.h"
 #include "Efficiency.h"
-#include "Phis.h"
 
-template<class TA, class TAI>
 class RooBsTimeAngle : public RooAbsAnaConvPdf {
 public:
     RooBsTimeAngle(const char *name, const char *title,
             RooRealVar& t, RooRealVar& cpsi, RooRealVar& ctheta, RooRealVar& phi, RooRealVar &p,
             RooAbsReal& A02, RooAbsReal& All2, RooAbsReal& Ap2, RooRealVar& DG, RooRealVar& tau,
             RooRealVar& Dm, RooRealVar& phi_s, RooRealVar& delta_1, RooRealVar& delta_2,
-            const RooResolutionModel& model, TA &ta);
+            const RooResolutionModel& model, Efficiency &efficiency);
 
     RooBsTimeAngle(const RooBsTimeAngle& other, const char* name = 0);
 
@@ -42,7 +39,7 @@ private:
 
 protected:
     RooRealProxy _t;
-    TAI _angles;
+    TransAnglesEfficiency _angles;
     RooRealProxy _p;
     RooRealProxy _A02;
     RooRealProxy _All2;
