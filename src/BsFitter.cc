@@ -44,6 +44,7 @@ BsFitter::BsFitter(Bool_t signal, Bool_t background, Bool_t resolution) :
 	_variables->add(_p);
 
 	_efficiency = new Efficiency();
+        _efficiency->setEfficiency("efficiency.txt");
 
 	if (resolution) {
 		RooRealVar *S = new RooRealVar("S", "S", 0);
