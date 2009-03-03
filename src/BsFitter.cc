@@ -63,7 +63,7 @@ BsFitter::BsFitter(Bool_t signal, Bool_t background, Bool_t resolution) :
 	if (_signal && _background) {
 		RooRealVar *xs = new RooRealVar("xs", "x_s", 0);
 		_parameters->add(*xs);
-		_model = new RooAddPdf("_model", "Bs PDF", *_signal, *_background, *xs);
+		_model = new RooAddPdf("model", "model", *_signal, *_background, *xs);
 	} else {
 		if (_signal)
 			_model = _signal;
@@ -515,8 +515,9 @@ RooAbsPdf* BsFitter::background_model(Bool_t signal) {
 		RooProdPdf *background = new RooProdPdf("background", "background",
 				RooArgSet(*mass_bkg, *angle_bkg, *et_bkg_model),
 				RooFit::Conditional(*time_bkg, RooArgSet(_m, _t, _cpsi, _ctheta, _phi)));
+		return background;
 	} else {
-		RooProdPdf *background = new RooProdPdf("_prompt", "prompt bkg",
+		RooProdPdf *background = new RooProdPdf("background", "background",
 				RooArgSet(*mass_bkg, *time_bkg, *angle_bkg));
 		return background;
 	}
