@@ -16,7 +16,9 @@
 #include "BsFitter.h"
 #include "Efficiency.h"
 
-BsFitter::BsFitter(Bool_t signal, Bool_t background, Bool_t resolution) :
+BsFitter::BsFitter(Bool_t signal, Bool_t background,
+		Bool_t resolution, Bool_t error_model, Bool_t tag_model,
+		const char* efficiency_file) :
 	_m("_m", "m", 0), _t("_t", "t", 0), _et("_et", "et", 0), _cpsi("_cpsi",
 			"cos(#psi)", 0), _ctheta("_ctheta", "cos(#theta)", 0), _phi("_phi",
 			"#phi", 0), _p("_p", "bs probability", 0) {
@@ -29,6 +31,8 @@ BsFitter::BsFitter(Bool_t signal, Bool_t background, Bool_t resolution) :
 	_model = 0;
 	_signal = 0;
 	_background = 0;
+	_error_signal = 0;
+	_error_background = 0;
 
 	_variables = new RooArgSet();
 	_parameters = new RooArgSet();
@@ -44,7 +48,8 @@ BsFitter::BsFitter(Bool_t signal, Bool_t background, Bool_t resolution) :
 	_variables->add(_p);
 
 	_efficiency = new Efficiency();
-        _efficiency->setEfficiency("efficiency.txt");
+	if (efficiency_file)
+		_efficiency->setEfficiency(efficiency_file);
 
 	if (resolution) {
 		RooRealVar *S = new RooRealVar("S", "S", 0);
@@ -57,9 +62,9 @@ BsFitter::BsFitter(Bool_t signal, Bool_t background, Bool_t resolution) :
 	}
 
 	if (signal)
-		_signal = signal_model(background);
+		_signal = signal_model(error_model, tag_model);
 	if (background)
-		_background = background_model(signal);
+		_background = background_model(error_model, tag_model);
 
 	if (_signal && _background) {
 		RooRealVar *xs = new RooRealVar("xs", "x_s", 0);
@@ -104,36 +109,34 @@ void BsFitter::setEfficiency(const char* eff) {
 
 
 void BsFitter::setData(const char* data_file) {
-	// if (_sidebands) {
-	/*     RooDataSet *data = RooDataSet::read(data_file, *_variables);
-	 RooRealVar M("M", "M", 5.365081e+00, 5.28, 5.44);
-	 RooRealVar sigma("sigma", "sigma", 2.85725e-02, 0, 1);
-	 RooRealVar tau_bkg("tau_bkg", "tau_bkg", -6.11910e-01, -1.0, 0.0);
-	 RooRealVar xs("xs", "xs", 3.85194e-02, 0, 1);
+	if (!_signal && _background) {
+		RooRealVar mean("mean", "mean", 5.37, 5.28, 5.44);
+		RooRealVar sigma("sigma", "sigma", 0.038, 0.01, 0.1);
+		RooRealVar m("m", "m", 0, -1/6, 1);
+		RooRealVar xs("xs", "xs", 0.2, 0.01, 1);
 
-	 RooGaussian *signal_mass = new RooGaussian("signal_mass", "signal_mass", _m, M, sigma);
-	 RooExponential *bkg_mass = new RooExponential("bkg_mass", "bkg_mass", _m, tau_bkg);
-	 RooAddPdf *cut_model = new RooAddPdf("cut_model", "cut_model", *signal_mass, *bkg_mass, xs);
-	 cut_model->fitTo(*data);
+		RooDataSet *data = RooDataSet::read(data_file, *_variables);
 
-	 Double_t left = M.getVal() - 3 * sigma.getVal();
-	 Double_t right = M.getVal() + 3 * sigma.getVal();
+		RooGaussian gauss("gauss", "gauss", _m, mean, sigma);
+		RooPolynomial line("line", "line", _m, m);
+		RooAddPdf model("model", "model", gauss, line, xs);
+		model.fitTo(*data,
+				RooFit::Hesse(false),
+				RooFit::Minos(false));
 
-	 TString cut = "_m < ";
-	 cut += left;
-	 cut += " || _m > ";
-	 cut += right;
-	 cout << "Cut: " << cut << endl;
-	 _data = new RooDataSet("_data", "data", data, *_variables, cut);
-	 delete data;
-	 _m.setRange("left", _m.getMin(), left);
-	 _m.setRange("right", right, _m.getMax());
-	 const char* sideband_range = "left,right";
-	 _range = sideband_range;
-	 */
-	// } else {
-	_data = RooDataSet::read(data_file, *_variables);
-	// }
+		Double_t left = mean.getVal() - 3 * sigma.getVal();
+		Double_t right = mean.getVal() + 3 * sigma.getVal();
+
+		TString cut = "_m < ";
+		cut += left;
+		cut += " || _m > ";
+		cut += right;
+		cout << "Bkg Cut: " << cut << endl;
+		_data = new RooDataSet("_data", "data", data, *_variables, cut);
+		delete data;
+	} else {
+		_data = RooDataSet::read(data_file, *_variables);
+	}
 }
 
 void BsFitter::setData(RooDataSet* data_set) {
@@ -183,7 +186,7 @@ Int_t BsFitter::fit(Bool_t hesse, Bool_t minos, Bool_t verbose, Int_t cpu) {
 	}
 
 	if (_resolution) {
-		if (_signal && _background){
+		if (_error_signal || _error_background){
 			_fit_result = _model->fitTo(*_data,
 					RooFit::ConditionalObservables(RooArgSet(_p)),
 					RooFit::Save(kTRUE),
@@ -236,7 +239,7 @@ void BsFitter::plotEt(const char* plot_file, Int_t bins, Int_t proj_bins,
 }
 
 void BsFitter::plotT() {
-	plotVar(_t, "time.gif", 0, 100, kFALSE);// kTRUE);
+	plotVar(_t, "time.gif", 0, 100, kTRUE);
 }
 
 void BsFitter::plotCpsi(const char* plot_file, Int_t bins, Int_t proj_bins,
@@ -333,7 +336,7 @@ void BsFitter::writeResult(const char* file_name) {
 	out.close();
 }
 
-RooAbsPdf* BsFitter::signal_model(Bool_t background) {
+RooAbsPdf* BsFitter::signal_model(Bool_t error_model, Bool_t tag_model) {
 	cout << "SIGNAL MODEL" << endl;
 	RooRealVar *M = new RooRealVar("M", "M", 0);
 	RooRealVar *Sigma = new RooRealVar("Sigma", "#sigma", 0);
@@ -381,12 +384,44 @@ RooAbsPdf* BsFitter::signal_model(Bool_t background) {
 
 	RooGaussian *signal_mass = new RooGaussian("signal_mass", "signal_mass",
 			_m, *M, *Sigma);
-	RooBsTimeAngle* signal_time_angle = new RooBsTimeAngle("time_angle",
-			"signal time angle pdf", _t, _cpsi, _ctheta, _phi, _p, *A0, *All2,
-			*Ap2, *DeltaGamma, *Tau, *DeltaMs, *Phi_s, *Delta_1, *Delta_2,
-			*_resolution, *_efficiency);
 
-	if (_resolution && background) {
+	RooAbsPdf* signal_time_angle = 0;
+	if (tag_model){
+		RooRealVar *d_mean_bs = new RooRealVar("d_mean_bs", "d_mean_bs", 0);
+		RooRealVar *d_sigma_bs = new RooRealVar("d_sigma_bs", "d_sigma_bs", 0);
+		RooRealVar *d_mean_bsbar = new RooRealVar("d_mean_bsbar", "d_mean_bsbar", 0);
+		RooRealVar *d_sigma_bsbar = new RooRealVar("d_sigma_bsbar", "d_sigma_bsbar", 0);
+		_parameters->add(*d_mean_bs);
+		_parameters->add(*d_sigma_bs);
+		_parameters->add(*d_mean_bsbar);
+		_parameters->add(*d_sigma_bsbar);
+		RooGaussian *d_gauss_bs = new RooGaussian("d_gauss_bs", "d_gauss_bs", _p, *d_mean_bs, *d_sigma_bs);
+		RooGaussian *d_gauss_bsbar = new RooGaussian("d_gauss_bsbar", "d_gauss_bsbar", _p, *d_mean_bsbar, *d_sigma_bsbar);
+		RooRealVar *var_plus_one = new RooRealVar("var_plus_one", "var plus one", 1);
+		RooRealVar *var_minus_one = new RooRealVar("var_minus_one", "var minus one", -1);
+		RooBsTimeAngle* time_angle_bs = new RooBsTimeAngle("time_angle_bs",
+				"time angle bs", _t, _cpsi, _ctheta, _phi, *var_plus_one, *A0, *All2,
+				*Ap2, *DeltaGamma, *Tau, *DeltaMs, *Phi_s, *Delta_1, *Delta_2,
+				*_resolution, *_efficiency);
+		RooBsTimeAngle* time_angle_bsbar = new RooBsTimeAngle("time_angle_bsbar",
+				"time angle bsbar", _t, _cpsi, _ctheta, _phi, *var_minus_one, *A0, *All2,
+				*Ap2, *DeltaGamma, *Tau, *DeltaMs, *Phi_s, *Delta_1, *Delta_2,
+				*_resolution, *_efficiency);
+		RooProdPdf *d_time_angle_bs = new RooProdPdf("d_time_angle_bs", "d_time_angle_bs",
+				RooArgSet(*time_angle_bs, *d_gauss_bs));
+		RooProdPdf *d_time_angle_bsbar = new RooProdPdf("d_time_angle_bsbar", "d_time_angle_bsbar",
+				RooArgSet(*time_angle_bsbar, *d_gauss_bsbar));
+
+		signal_time_angle = new RooAddPdf("signal_time_angle", "signal time angle",
+				*d_time_angle_bs, *d_time_angle_bsbar, RooFit::RooConst(0.5));
+	} else {
+		signal_time_angle = new RooBsTimeAngle("signal_time_angle",
+				"signal time angle pdf", _t, _cpsi, _ctheta, _phi, _p, *A0, *All2,
+				*Ap2, *DeltaGamma, *Tau, *DeltaMs, *Phi_s, *Delta_1, *Delta_2,
+				*_resolution, *_efficiency);
+	}
+
+	if (_resolution && error_model) {
 		RooRealVar *et_sig_xl =
 				new RooRealVar("et_sig_xl", "xl sig", 0.7, 0, 1);
 		RooRealVar *et_sig_mean = new RooRealVar("et_sig_mean", "mean sig",
@@ -412,6 +447,8 @@ RooAbsPdf* BsFitter::signal_model(Bool_t background) {
 		RooAddPdf *et_sig_model = new RooAddPdf("et_sig_model", "et sig model",
 				*et_sig_long, *et_sig_short, *et_sig_xl);
 
+		_error_signal = et_sig_model;
+
 		RooProdPdf *signal = new RooProdPdf("signal", "signal",
 				RooArgSet(*signal_mass, *et_sig_model),
 				RooFit::Conditional(*signal_time_angle, RooArgSet(_m, _t, _cpsi, _ctheta, _phi)));
@@ -423,7 +460,7 @@ RooAbsPdf* BsFitter::signal_model(Bool_t background) {
 	}
 }
 
-RooAbsPdf* BsFitter::background_model(Bool_t signal) {
+RooAbsPdf* BsFitter::background_model(Bool_t error_model, Bool_t tag_model) {
 	cout << "BACKGROUND MODEL" << endl;
 	RooRealVar *m_a1 = new RooRealVar("m_a1", "m_a1", 0);
 //	RooRealVar *m_a2 = new RooRealVar("m_a2", "m_p_a2", 0);
@@ -486,7 +523,17 @@ RooAbsPdf* BsFitter::background_model(Bool_t signal) {
 	RooProdPdf *angle_bkg = new RooProdPdf("angle_bkg", "angle_bkg",
 			RooArgSet(*cpsi_bkg, *ctheta_bkg, *phi_bkg));
 
-	if (_resolution && signal){
+	RooArgSet *background_set = new RooArgSet(*mass_bkg, *angle_bkg);
+	if (tag_model) {
+		RooRealVar *d_mean_bkg = new RooRealVar("d_mean_bkg", "d_mean_bkg", 0);
+		RooRealVar *d_sigma_bkg = new RooRealVar("d_sigma_bkg", "d_sigma_bkg", 0);
+		_parameters->add(*d_mean_bkg);
+		_parameters->add(*d_sigma_bkg);
+		RooGaussian *d_gauss_bkg = new RooGaussian("d_gauss_bkg", "d_gauss_bkg", _p, *d_mean_bkg, *d_sigma_bkg);
+		background_set->add(*d_gauss_bkg);
+	}
+
+	if (_resolution && error_model){
 		RooRealVar *et_bkg_xl = new RooRealVar("et_bkg_xl", "xl bkg", 0);
 		RooRealVar *et_bkg_mean = new RooRealVar("et_bkg_mean", "mean bkg", 0);
 		RooRealVar *et_bkg_sigma = new RooRealVar("et_bkg_sigma", "sigma bkg", 0);
@@ -513,13 +560,17 @@ RooAbsPdf* BsFitter::background_model(Bool_t signal) {
 			new RooAddPdf("et_bkg_model", "et bkg model",
 				*et_bkg_long, *et_bkg_short, *et_bkg_xl);
 
+		_error_background = et_bkg_model;
+		background_set->add(*et_bkg_model);
+
 		RooProdPdf *background = new RooProdPdf("background", "background",
-				RooArgSet(*mass_bkg, *angle_bkg, *et_bkg_model),
+				*background_set,
 				RooFit::Conditional(*time_bkg, RooArgSet(_m, _t, _cpsi, _ctheta, _phi)));
 		return background;
 	} else {
+		background_set->add(*time_bkg);
 		RooProdPdf *background = new RooProdPdf("background", "background",
-				RooArgSet(*mass_bkg, *time_bkg, *angle_bkg));
-		return background;
+				*background_set);
+		return background;;
 	}
 }

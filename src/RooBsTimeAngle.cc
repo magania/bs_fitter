@@ -13,7 +13,6 @@
 ClassImp(RooBsTimeAngle)
 ;
 
-
 //_____________________________________________________________________________
 RooBsTimeAngle::RooBsTimeAngle(const char *name, const char *title,
             RooRealVar& t, RooRealVar& cpsi, RooRealVar& ctheta, RooRealVar& phi, RooRealVar& p,
@@ -71,6 +70,10 @@ RooBsTimeAngle::~RooBsTimeAngle()
 {
   // Destructor
 }
+
+TObject* RooBsTimeAngle::clone(const char* newname) const {
+        return new RooBsTimeAngle(*this, newname);
+    }
 
 //_____________________________________________________________________________
 Double_t RooBsTimeAngle::coefficient(Int_t basisIndex) const {

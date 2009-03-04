@@ -30,7 +30,9 @@
 
 class BsFitter {
  public:
-  BsFitter(Bool_t signal, Bool_t background, Bool_t resolution);
+  BsFitter(Bool_t signal, Bool_t background,
+		  Bool_t resolution, Bool_t error_model, Bool_t tag_model,
+		  const char* efficiency_file = 0);
 
     void setVariables(const char* params);
     void setParameters(const char* params);
@@ -59,8 +61,8 @@ class BsFitter {
     void writeResult(const char* file_name);
 
 private:
-    RooAbsPdf* signal_model(Bool_t background);
-    RooAbsPdf* background_model(Bool_t signal);
+    RooAbsPdf* signal_model(Bool_t error_model, Bool_t tag_model);
+    RooAbsPdf* background_model(Bool_t error_model, Bool_t tag_model);
     void plotVar(RooRealVar& x, const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
 
     RooRealVar _m;
@@ -80,6 +82,8 @@ private:
     //RooProdPdf *_noprompt;
     RooAbsPdf *_signal;
     RooAbsPdf *_background;
+    RooAbsPdf *_error_signal;
+    RooAbsPdf *_error_background;
     //RooArgSet* _constraints;
 
     RooDataSet* _data;

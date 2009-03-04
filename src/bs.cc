@@ -36,6 +36,7 @@ void usage(void) {
     printf("\t \033[1m--signal\033[m         \t Include signal.\n");
     printf("\t \033[1m--bkg\033[m            \t Include background.\n");
     printf("\t \033[1m--efficiency\033[m     \t Use efficiency.\n");
+    printf("\t \033[1m--error\033[m          \t Use error model.\n");
     printf("\t \033[1m--verbose\033[m        \t Verbose fit.\n\n");
     printf("Report bugs to <magania@fnal.gov>.\n");
     exit(EXIT_FAILURE);
@@ -47,6 +48,8 @@ int main(int argc, char** argv) {
     static int background = false;
     static int uefficiency = false;
     static int verbose = false;
+    static int error_model = false;
+    static int tag_model = false;
 
     int jobs =1;
     const char *data = "fit.dat";
@@ -63,6 +66,8 @@ int main(int argc, char** argv) {
             {"signal"    , no_argument, &signal      , 1},
             {"bkg"    , no_argument, &background     , 1},
             {"efficiency"  , no_argument, &uefficiency, 1},
+            {"error"  , no_argument, &error_model, 1},
+            {"tag"  , no_argument, &tag_model, 1},
             {"verbose"        , no_argument, &verbose       , 1},
             {0, 0, 0, 0}
         };
@@ -153,11 +158,12 @@ int main(int argc, char** argv) {
     }
 
     /* Do the real stuff */
-    BsFitter bs(signal,background, resolution);
+    if (!uefficiency)
+        efficiency = 0;
+    BsFitter bs(signal, background,
+    		resolution, error_model, tag_model, efficiency);
     bs.setVariables(variables);
     bs.setParameters(parameters);
-    if (uefficiency)
-        bs.setEfficiency(efficiency);
 
     if (fit || plot || fit_eff)
         bs.setData(data);

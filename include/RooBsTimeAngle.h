@@ -20,9 +20,7 @@ public:
 
     RooBsTimeAngle(const RooBsTimeAngle& other, const char* name = 0);
 
-    virtual TObject* clone(const char* newname) const {
-        return new RooBsTimeAngle(*this, newname);
-    }
+    virtual TObject* clone(const char* newname) const ;
     virtual ~RooBsTimeAngle();
 
     virtual Double_t coefficient(Int_t basisIndex) const;
