@@ -19,9 +19,13 @@
 BsFitter::BsFitter(Bool_t signal, Bool_t background,
 		Bool_t resolution, Bool_t error_model, Bool_t tag_model,
 		const char* efficiency_file) :
-	_m("_m", "m", 0), _t("_t", "t", 0), _et("_et", "et", 0), _cpsi("_cpsi",
-			"cos(#psi)", 0), _ctheta("_ctheta", "cos(#theta)", 0), _phi("_phi",
-			"#phi", 0), _p("_p", "bs probability", 0) {
+	_m("_m", "m", 0),
+	_t("_t", "t", 0),
+	_et("_et", "et", 0),
+	_cpsi("_cpsi", "cos(#psi)", 0),
+	_ctheta("_ctheta", "cos(#theta)", 0),
+	_phi("_phi", "#phi", 0),
+	_p("_p", "bs probability", 0) {
 	gROOT->SetStyle("Plain");
 
 	//    const char *range = "full";
