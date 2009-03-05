@@ -24,6 +24,7 @@
 #include "RooDecay.h"
 #include "RooPolynomial.h"
 #include "RooGenericPdf.h"
+#include "RooHistPdf.h"
 
 #include <RooBsTimeAngle.h>
 //#include <RooBkgAngle.h>
