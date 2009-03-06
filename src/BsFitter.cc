@@ -19,9 +19,9 @@
 BsFitter::BsFitter(Bool_t signal, Bool_t background,
 		Bool_t resolution, Bool_t error_model, Bool_t tag_model,
 		const char* efficiency_file) :
-	_m("_m", "m", 0),
-	_t("_t", "t", 0),
-	_et("_et", "et", 0),
+	_m("_m", "m", 0,5,5.8),
+	_t("_t", "t", 0,-2, 15),
+	_et("_et", "et", 0, 0, 2),
 	_cpsi("_cpsi", "cos(#psi)", 0),
 	_ctheta("_ctheta", "cos(#theta)", 0),
 	_phi("_phi", "#phi", 0),
@@ -118,7 +118,7 @@ void BsFitter::setData(const char* data_file) {
 	if (!_signal && _background) {
 		RooRealVar mean("mean", "mean", 5.37, 5.28, 5.44);
 		RooRealVar sigma("sigma", "sigma", 0.038, 0.01, 0.1);
-		RooRealVar m("m", "m", 0, -1/6, 1);
+		RooRealVar m("m", "m", 0, -1, 1);
 		RooRealVar xs("xs", "xs", 0.2, 0.01, 1);
 
 		RooDataSet *data = RooDataSet::read(data_file, *_variables);
@@ -434,11 +434,11 @@ RooAbsPdf* BsFitter::signal_model(Bool_t error_model, Bool_t tag_model) {
 		RooRealVar *var_minus_one = new RooRealVar("var_minus_one", "var minus one", -1);
 
 		RooBsTimeAngle* time_angle_bs = new RooBsTimeAngle("time_angle_bs",
-				"time angle bs", _t, _cpsi, _ctheta, _phi, *var_plus_one, *A0, *All2,
+				"time angle bs", _t, _cpsi, _ctheta, _phi, *var_minus_one, *A0, *All2,
 				*Ap2, *DeltaGamma, *Tau, *DeltaMs, *Phi_s, *Delta_1, *Delta_2,
 				*_resolution, *_efficiency);
 		RooBsTimeAngle* time_angle_bsbar = new RooBsTimeAngle("time_angle_bsbar",
-				"time angle bsbar", _t, _cpsi, _ctheta, _phi, *var_minus_one, *A0, *All2,
+				"time angle bsbar", _t, _cpsi, _ctheta, _phi, *var_plus_one, *A0, *All2,
 				*Ap2, *DeltaGamma, *Tau, *DeltaMs, *Phi_s, *Delta_1, *Delta_2,
 				*_resolution, *_efficiency);
 		RooProdPdf *d_time_angle_bs = new RooProdPdf("d_time_angle_bs", "d_time_angle_bs",
@@ -565,7 +565,7 @@ RooAbsPdf* BsFitter::background_model(Bool_t error_model, Bool_t tag_model) {
 
 		RooRealVar mean("mean", "mean", 5.37, 5.28, 5.44);
 		RooRealVar sigma("sigma", "sigma", 0.038, 0.01, 0.1);
-		RooRealVar m("m", "m", 0, -1/6, 1);
+		RooRealVar m("m", "m", 0, -1, 1);
 		RooRealVar xs("xs", "xs", 0.2, 0.01, 1);
 
 		RooDataSet *data = RooDataSet::read(data_file, *_variables);
