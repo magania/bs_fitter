@@ -38,6 +38,8 @@ BsFitter::BsFitter(Bool_t signal, Bool_t background,
 	_error_signal = 0;
 	_error_background = 0;
 
+	_using_tag = tag_model;
+
 	_variables = new RooArgSet();
 	_parameters = new RooArgSet();
 	//    _constraints = new RooArgSet();
@@ -291,37 +293,61 @@ void BsFitter::plotVar(RooRealVar& x, const char* plot_file, Int_t bins,
 	//double __xp = 6.5374e-01;
 
 	if (_data) {
-		if (_resolution) {
-			if (proj_bins) {
-				_et.setBins(proj_bins);
-				RooDataHist projData("projData", "projData",
-						RooArgSet(_et, _p), *_data);
-/*
-				if (_signal)
-					_model->plotOn(x_frame,
-							RooFit::Components(*_signal),
-//							RooFit::ProjWData(RooArgSet(_et), projData),
-							RooFit::LineColor(kGreen));
-							//RooFit::Normalization(__xs));
-				if (_background)
-					_model->plotOn(x_frame,
-							RooFit::Components(*_background),
-//							RooFit::ProjWData(RooArgSet(_et), projData),
-							RooFit::LineColor(kRed));
-							//RooFit::Normalization((1 - __xs) * __xp));
-*/
-				_model->plotOn(x_frame,
-//						RooFit::ProjWData(RooArgSet(_et),projData),
-						RooFit::LineColor(13));
-			} else {
-				_model->plotOn(x_frame,
-						RooFit::ProjWData(RooArgSet(_et, _p),*_data));
-						//RooFit::Range(_range));
-			}
+		RooAbsData *projData;
+		if (proj_bins) {
+			_et.setBins(proj_bins);
+			projData = new RooDataHist("projData", "projData",RooArgSet(_et, _p), *_data);
 		} else {
-			_model->plotOn(x_frame,
-					RooFit::ProjWData(RooArgSet(_p), *_data));
+			projData = _data;
 		}
+		if (!_resolution && !_using_tag){
+			_model->plotOn(x_frame,
+					RooFit::ProjWData(RooArgSet(_p), *projData),
+					RooFit::LineColor(13));
+		}
+		if (!_resolution && _using_tag){
+			_model->plotOn(x_frame,
+					RooFit::LineColor(13));
+		}
+		if (_resolution && _error_signal && _using_tag){
+			/*
+							if (_signal)
+								_model->plotOn(x_frame,
+										RooFit::Components(*_signal),
+			//							RooFit::ProjWData(RooArgSet(_et), projData),
+										RooFit::LineColor(kGreen));
+										//RooFit::Normalization(__xs));
+							if (_background)
+								_model->plotOn(x_frame,
+										RooFit::Components(*_background),
+			//							RooFit::ProjWData(RooArgSet(_et), projData),
+										RooFit::LineColor(kRed));
+										//RooFit::Normalization((1 - __xs) * __xp));
+			*/
+			_model->plotOn(x_frame,
+//					RooFit::ProjWData(RooArgSet(_et),projData),
+					RooFit::LineColor(13));
+		}
+		if (_resolution && !_error_signal && _using_tag){
+			/*
+							if (_signal)
+								_model->plotOn(x_frame,
+										RooFit::Components(*_signal),
+			//							RooFit::ProjWData(RooArgSet(_et), projData),
+										RooFit::LineColor(kGreen));
+										//RooFit::Normalization(__xs));
+							if (_background)
+								_model->plotOn(x_frame,
+										RooFit::Components(*_background),
+			//							RooFit::ProjWData(RooArgSet(_et), projData),
+										RooFit::LineColor(kRed));
+										//RooFit::Normalization((1 - __xs) * __xp));
+			*/
+			_model->plotOn(x_frame,
+					RooFit::ProjWData(RooArgSet(_et), *projData),
+					RooFit::LineColor(13));
+		}
+
 	} else {
 		_model->plotOn(x_frame);
 	}
@@ -420,8 +446,10 @@ RooAbsPdf* BsFitter::signal_model(Bool_t error_model, Bool_t tag_model) {
 		RooProdPdf *d_time_angle_bsbar = new RooProdPdf("d_time_angle_bsbar", "d_time_angle_bsbar",
 				RooArgSet(*time_angle_bsbar, *d_pdf_bsbar));
 
+		RooRealVar *xbs = new RooRealVar("xbs", "xbs", 0);
+		_parameters->add(*xbs);
 		signal_time_angle = new RooAddPdf("signal_time_angle", "signal time angle",
-				*d_time_angle_bs, *d_time_angle_bsbar, RooFit::RooConst(0.5));
+				*d_time_angle_bs, *d_time_angle_bsbar, *xbs);
 	} else {
 		signal_time_angle = new RooBsTimeAngle("signal_time_angle",
 				"signal time angle pdf", _t, _cpsi, _ctheta, _phi, _p, *A0, *All2,

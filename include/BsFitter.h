@@ -85,7 +85,8 @@ private:
     RooAbsPdf *_background;
     RooAbsPdf *_error_signal;
     RooAbsPdf *_error_background;
-    //RooArgSet* _constraints;
+
+    bool _using_tag;
 
     RooDataSet* _data;
     RooFitResult* _fit_result;
