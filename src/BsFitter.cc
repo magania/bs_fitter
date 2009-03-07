@@ -300,49 +300,23 @@ void BsFitter::plotVar(RooRealVar& x, const char* plot_file, Int_t bins,
 		} else {
 			projData = _data;
 		}
-		if (!_resolution && !_using_tag){
-			_model->plotOn(x_frame,
-					RooFit::ProjWData(RooArgSet(_p), *projData),
-					RooFit::LineColor(13));
-		}
-		if (!_resolution && _using_tag){
+		if (!_resolution){
 			_model->plotOn(x_frame,
 					RooFit::LineColor(13));
 		}
-		if (_resolution && _error_signal && _using_tag){
-			/*
-							if (_signal)
-								_model->plotOn(x_frame,
-										RooFit::Components(*_signal),
-			//							RooFit::ProjWData(RooArgSet(_et), projData),
-										RooFit::LineColor(kGreen));
-										//RooFit::Normalization(__xs));
-							if (_background)
-								_model->plotOn(x_frame,
-										RooFit::Components(*_background),
-			//							RooFit::ProjWData(RooArgSet(_et), projData),
-										RooFit::LineColor(kRed));
-										//RooFit::Normalization((1 - __xs) * __xp));
-			*/
-			_model->plotOn(x_frame,
-//					RooFit::ProjWData(RooArgSet(_et),projData),
-					RooFit::LineColor(13));
-		}
-		if (_resolution && !_error_signal && _using_tag){
-			/*
-							if (_signal)
-								_model->plotOn(x_frame,
-										RooFit::Components(*_signal),
-			//							RooFit::ProjWData(RooArgSet(_et), projData),
-										RooFit::LineColor(kGreen));
-										//RooFit::Normalization(__xs));
-							if (_background)
-								_model->plotOn(x_frame,
-										RooFit::Components(*_background),
-			//							RooFit::ProjWData(RooArgSet(_et), projData),
-										RooFit::LineColor(kRed));
-										//RooFit::Normalization((1 - __xs) * __xp));
-			*/
+		if (_resolution /*&& !_error_signal && !_using_tag*/){
+			if (_signal)
+				_model->plotOn(x_frame,
+						RooFit::Components(*_signal),
+						RooFit::ProjWData(RooArgSet(_et), *projData),
+						RooFit::LineColor(kGreen));
+			//RooFit::Normalization(__xs));
+			if (_background)
+				_model->plotOn(x_frame,
+						RooFit::Components(*_background),
+						RooFit::ProjWData(RooArgSet(_et), *projData),
+						RooFit::LineColor(kRed));
+						//RooFit::Normalization((1 - __xs) * __xp));
 			_model->plotOn(x_frame,
 					RooFit::ProjWData(RooArgSet(_et), *projData),
 					RooFit::LineColor(13));
@@ -451,8 +425,12 @@ RooAbsPdf* BsFitter::signal_model(Bool_t error_model, Bool_t tag_model) {
 		signal_time_angle = new RooAddPdf("signal_time_angle", "signal time angle",
 				*d_time_angle_bs, *d_time_angle_bsbar, *xbs);
 	} else {
+		RooRealVar *xbs = new RooRealVar("xbs", "xbs", 0);
+		_parameters->add(*xbs);
+
+		RooFormulaVar *one_xbs = new RooFormulaVar("one_xbs", "1-2*@0", RooArgSet(*xbs));
 		signal_time_angle = new RooBsTimeAngle("signal_time_angle",
-				"signal time angle pdf", _t, _cpsi, _ctheta, _phi, _p, *A0, *All2,
+				"signal time angle", _t, _cpsi, _ctheta, _phi, *one_xbs, *A0, *All2,
 				*Ap2, *DeltaGamma, *Tau, *DeltaMs, *Phi_s, *Delta_1, *Delta_2,
 				*_resolution, *_efficiency);
 	}
