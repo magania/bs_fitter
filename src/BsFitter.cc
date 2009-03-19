@@ -337,6 +337,7 @@ void BsFitter::plotVar(RooRealVar& x, const char* plot_file, Int_t bins,
 
 void BsFitter::writeResult(const char* file_name) {
 	ofstream out(file_name);
+	out.precision(15);
 	_fit_result->printMultiline(out, 0, kTRUE);
 	out << "minNll\t" << _fit_result->minNll() << endl;
 	out.close();

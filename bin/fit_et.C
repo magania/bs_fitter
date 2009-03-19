@@ -120,10 +120,10 @@ void fit_et() {
     RooAddPdf et_model("et_model", "et model", et_sig_model, et_bkg_model, xs);
 
   //  xs = xs.getVal() / (bkg_under_signal + xs.getVal());
-    et_model.fitTo(signal_data,
-    		RooFit::NumCPU(4),
-    		RooFit::Minos(false),
-    		RooFit::Hesse(false));
+  //  et_model.fitTo(signal_data,
+  //  		RooFit::NumCPU(4),
+  //  		RooFit::Minos(false),
+  //  		RooFit::Hesse(false));
 
     TCanvas *canvasres = new TCanvas("canvares", "canvas sidebands", 600, 600);
     tree.Draw("_et>>sb", bkg_cut);
@@ -135,7 +135,7 @@ void fit_et() {
     hsg->Draw();
     RooDataHist rhsg("rhsg", "signal", _et, hsg);
 
-    //    et_sig_model.fitTo(rhsg,RooFit::Minos(false),RooFit::Hesse(false));
+     et_sig_model.fitTo(rhsg,RooFit::Minos(false),RooFit::Hesse(false));
     et_sig_xl.setConstant(true);
     et_sig_mean.setConstant(true);
     et_sig_sigma.setConstant(true);
