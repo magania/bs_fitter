@@ -3,7 +3,8 @@
 //#include <root/RooDecay.h>
 
 void fit_et() {
-	const char *data_file = "fit.dat";
+    gROOT->SetStyle("Plain");
+    const char *data_file = "fit.dat";
 
     RooRealVar _m("_m", "m", 5.1, 5.7);
     RooRealVar _t("_t", "t", 0, -2, 12);
@@ -33,7 +34,7 @@ void fit_et() {
 
     RooPlot *m_frame = _m.frame();
     data.plotOn(m_frame);
-    model->plotOn(m_frame, RooFit::LineColor(13));
+    model.plotOn(m_frame, RooFit::LineColor(13));
     TCanvas *canvas_m = new TCanvas("canvas_m", "canvas mass", 600, 600);
     m_frame->Draw();
     canvas_m->Print("mass_cut.gif");
@@ -66,8 +67,8 @@ void fit_et() {
     RooRealVar et_bkg_xl("et_bkg_xl", "xl bkg", 0.1, 0, 1);
     RooRealVar et_bkg_mean("et_bkg_mean", "mean bkg", 0.06, 0, 1);
     RooRealVar et_bkg_sigma("et_bkg_sigma", "sigma bkg", 0.01, 0, 0.1);
-    RooRealVar et_bkg_tau_short("et_bkg_tau_short", "#tau short bkg", 0.05, 0.001, 0.5);
-    RooRealVar et_bkg_tau_long("et_bkg_tau_long", "#tau long bkg", 0.05, 0.001, 0.5);
+    RooRealVar et_bkg_tau_short("et_bkg_tau_short", "#tau short bkg", 0.05, 0.01, 0.5);
+    RooRealVar et_bkg_tau_long("et_bkg_tau_long", "#tau long bkg", 0.05, 0.01, 0.5);
     RooArgSet et_parameters(et_bkg_xl, et_bkg_mean, et_bkg_sigma, et_bkg_tau_short, et_bkg_tau_long);
 
     RooGaussModel et_bkg_gauss("gauss", "gauss", _et, et_bkg_mean, et_bkg_sigma);
@@ -126,8 +127,8 @@ void fit_et() {
   //  		RooFit::Hesse(false));
 
     TCanvas *canvasres = new TCanvas("canvares", "canvas sidebands", 600, 600);
-    tree.Draw("_et>>sb", bkg_cut);
-    tree.Draw("_et>>sg", signal_cut);
+    tree.Draw("_et>>sb(100,0,1)", bkg_cut);
+    tree.Draw("_et>>sg(100,0,1)", signal_cut);
     TH1D *hsg = (TH1D*) gROOT->Get("sg");
     TH1D *hsb = (TH1D*) gROOT->Get("sb");
     hsg->Sumw2();
