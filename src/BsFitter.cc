@@ -394,16 +394,14 @@ RooAbsPdf* BsFitter::signal_model(Bool_t error_model, Bool_t tag_model) {
 
 	RooAbsPdf* signal_time_angle = 0;
 	if (tag_model){
-		RooDataSet *d_data_bs = new RooDataSet("d_data_bs", "d_data_bs",_p);
-		RooDataSet *d_data_bsbar = new RooDataSet("d_data_bsbar", "d_data_bsbar",_p);
-		d_data_bs->read("d_data_bs.txt",_p);
-		d_data_bsbar->read("d_data_bsbar.txt",_p);
+		RooDataSet *d_data_bs = RooDataSet::read("d_data_bs.txt",_p);
+		RooDataSet *d_data_bsbar = RooDataSet::read("d_data_bsbar.txt",_p);
 
 		RooDataHist *d_hist_bs = new RooDataHist("d_hist_bs","d_hist_bs", _p, *d_data_bs);
 		RooDataHist *d_hist_bsbar = new RooDataHist("d_hist_bsbar","d_hist_bsbar", _p, *d_data_bsbar);
 
 		RooHistPdf *d_pdf_bs = new RooHistPdf("d_pdf_bs", "d_pdf_bs", _p, *d_hist_bs);
-		RooHistPdf *d_pdf_bsbar = new RooHistPdf("d_pdf_bsbar", "d_pdf_bsbar", _p, *d_hist_bs);
+		RooHistPdf *d_pdf_bsbar = new RooHistPdf("d_pdf_bsbar", "d_pdf_bsbar", _p, *d_hist_bsbar);
 
 		RooRealVar *var_plus_one = new RooRealVar("var_plus_one", "var plus one", 1);
 		RooRealVar *var_minus_one = new RooRealVar("var_minus_one", "var minus one", -1);
