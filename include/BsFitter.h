@@ -86,6 +86,13 @@ private:
     RooAbsPdf *_error_signal;
     RooAbsPdf *_error_background;
 
+	RooHistPdf *d_pdf_bs;
+	RooHistPdf *d_pdf_bsbar;
+	RooRealVar *_xbs;
+
+	RooHistPdf *d_pdf_bkg;
+	RooRealVar *_xs;
+
     bool _using_tag;
 
     RooDataSet* _data;
