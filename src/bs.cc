@@ -170,7 +170,7 @@ int main(int argc, char** argv) {
 
     if (generate) {
         cout << "Generating .." << endl;
-        bs.generate(2000, data);
+        bs.generate(10000, data);
     }
 
     if (fit || fit_eff) {
