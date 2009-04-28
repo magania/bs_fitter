@@ -40,7 +40,11 @@ bin/bs: src/bs.cc $(MYLIBS) obj/BsFitter.o obj/Dict.o
 bin/fitter: src/fitter.cc $(MYLIBS) obj/BsFitter.o obj/Dict.o
 	@echo $(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) $^ -o bin/fitter
 	$(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) $^ -o bin/fitter
-	
+
+static: src/bs.cc $(MYLIBS) obj/BsFitter.o obj/Dict.o
+	@echo $(CXX) $(CCFLAGS) $(INCLUDE) -c $< -o obj/bs.o
+	$(CXX) $(CCFLAGS) $(INCLUDE) -c $< -o obj/bs.o
+	$(CXX) -o bin/BS obj/* ~/local/static_root/libROOT.a -ldl -lm -lpthread
 clean:
 	rm $(MYLIBS)
 	rm Dict.cc Dict.h

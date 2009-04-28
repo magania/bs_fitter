@@ -12,6 +12,8 @@
 #include <getopt.h>
 #include <iostream>
 
+//#include <ROOT.h>
+
 /*
  *
  */
@@ -43,6 +45,13 @@ void usage(void) {
 }
 
 int main(int argc, char** argv) {
+ /* magic line from Rene - for future reference! */
+// gROOT->GetPluginManager()->AddHandler("TVirtualStreamerInfo",
+// "*",
+// "TStreamerInfo",
+// "RIO",
+// "TStreamerInfo()");
+
     static int resolution = false;
     static int signal = false;
     static int background = false;

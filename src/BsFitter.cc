@@ -16,6 +16,12 @@
 #include "BsFitter.h"
 #include "Efficiency.h"
 
+#include "TROOT.h"
+#include "TPluginManager.h"
+#include "TFile.h"
+#include "TNtuple.h"
+#include "TDirectory.h"
+
 BsFitter::BsFitter(Bool_t signal, Bool_t background,
 		Bool_t resolution, Bool_t error_model, Bool_t tag_model,
 		const char* efficiency_file) :
@@ -27,6 +33,13 @@ BsFitter::BsFitter(Bool_t signal, Bool_t background,
 	_phi("_phi", "#phi", 0),
 	_p("_p", "bs probability", 0) {
 	gROOT->SetStyle("Plain");
+
+ /* magic line from Rene - for future reference! */
+ gROOT->GetPluginManager()->AddHandler("TVirtualStreamerInfo",
+ "*",
+ "TStreamerInfo",
+ "RIO",
+ "TStreamerInfo()");
 
 	//    const char *range = "full";
 	//    _range = range;
