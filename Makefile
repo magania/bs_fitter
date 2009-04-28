@@ -3,7 +3,8 @@ CCFLAGS= -O3 -g -fPIC
 
 INCLUDE = $(shell root-config --cflags) -Iinclude
 LIBS    = $(shell root-config --libs) -lMinuit -lRooFit -lRooFitCore
-
+ROOTLIB = $(shell root-config --libdir)
+LIBSTDC = $(shell g++ -m32 -print-file-name=libstdc++.a)
 MYLIBS =  obj/Efficiency.o obj/RooBsTimeAngle.o obj/TransAngles.o obj/TransAnglesEfficiency.o
 
 #DFLAGS = -DRES_TRUE
@@ -11,7 +12,7 @@ MYLIBS =  obj/Efficiency.o obj/RooBsTimeAngle.o obj/TransAngles.o obj/TransAngle
 #DFLAGS = -DRES_GAUSS -DEFFICIENCY
 
 
-all: bin/bs
+all: static
 
 $(MYLIBS): obj/%.o : src/%.cc include/%.h
 	@echo $(CXX) $(CCFLAGS) $(INCLUDE)  -c $< -o $@
@@ -44,7 +45,18 @@ bin/fitter: src/fitter.cc $(MYLIBS) obj/BsFitter.o obj/Dict.o
 static: src/bs.cc $(MYLIBS) obj/BsFitter.o obj/Dict.o
 	@echo $(CXX) $(CCFLAGS) $(INCLUDE) -c $< -o obj/bs.o
 	$(CXX) $(CCFLAGS) $(INCLUDE) -c $< -o obj/bs.o
-	$(CXX) -o bin/BS obj/* ~/local/static_root/libROOT.a -ldl -lm -lpthread
+	@echo $(CXX) $(CCFLAGS) -o bin/BS obj/* ~/src/root/lib/libRoot.a ~/src/root/roofit/libRooFit.a -ldl -lm -lpthread 
+	$(CXX) -m32 $(CCFLAGS) -o bin/BS obj/*  \
+	     $(LIBSTDC) \
+         $(ROOTLIB)/../math/mathcore/src/TComplex.o \
+         $(ROOTLIB)/../math/minuit/src/TMinuit.o \
+         $(ROOTLIB)/../tree/tree/src/TTree.o \
+         $(ROOTLIB)/libRoot.a \
+         $(ROOTLIB)/libpcre.a \
+         $(ROOTLIB)/libAfterImage.a \
+         $(ROOTLIB)/libfreetype.a \
+         $(ROOTLIB)/../roofit/libRooFit.a \
+         -ldl -lm -lpthread -static-libgcc 
 clean:
 	rm $(MYLIBS)
 	rm Dict.cc Dict.h
