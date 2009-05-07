@@ -1,4 +1,3 @@
-#include <RooGlobalFunc.h>
 #include <RooAddPdf.h>
 
 #include <RooDataSet.h>
@@ -184,40 +183,48 @@ void BsFitter::setData(RooDataSet* data_set) {
 void BsFitter::generate(Int_t num, const char* data) {
 	_variables->Print();
 	if (_resolution) {
-		int num_bs, num_bsbar, num_bkg, num_sig;
+		int num_bkg, num_bkg0, num_sig, num_sig0;
 		num_sig   = (int) round((_signal && _background)?_xs->getVal()*num:num);
-		num_bs    = (int) round(num_sig*_xbs->getVal());
-		num_bsbar = num_sig - num_bs;
 		num_bkg   = num - num_sig;
+		num_sig0  = (int) round(num_sig*(1085./1329.));
+		num_sig  -= num_sig0;
+		cout << "num_bkg " <<  num_bkg << endl;
+		num_bkg0  = (int) round(num_bkg*(50059./55418.));
+		cout << "num_bkg0 " << num_bkg0 << endl;
+		num_bkg  -= num_bkg0;
 
 		_data = new RooDataSet("_data", "data", *_variables);
 		RooDataSet *data_et, *data_m, *data_p;
 		if (_signal) {
-			_p = -1;
-			data_et = _error_signal->generate(RooArgSet(_et), num_bs, kTRUE);
-			data_m  = _signal->generate(RooArgSet(_m, _t, _et, _cpsi,_ctheta, _phi), *data_et);
-			data_p  =  d_pdf_bs->generate(_p, num_bs);
-			data_m->merge(data_p);
-			_data->append(*data_m);
-			delete data_et;
-			delete data_m;
-			delete data_p;
-			_p = 1;
-			data_et = _error_signal->generate(RooArgSet(_et), num_bsbar, kTRUE);
-			data_m  = _signal->generate(RooArgSet(_m, _t, _et, _cpsi,_ctheta, _phi), *data_et);
-			data_p  =  d_pdf_bsbar->generate(_p, num_bsbar);
-			data_m->merge(data_p);
-			_data->append(*data_m);
-			delete data_et;
-			delete data_m;
-			delete data_p;
+                        _p = 0;
+                        data_et = _error_signal->generate(RooArgSet(_et,_p), num_sig0, kTRUE);
+                        data_m  = _signal->generate(RooArgSet(_m, _t, _et, _cpsi,_ctheta, _phi, _p), *data_et);
+                        _data->append(*data_m);
+                        delete data_et;
+                        delete data_m;
+
+		        data_et = _error_signal->generate(RooArgSet(_et), num_sig, kTRUE);
+                        data_p  =  d_pdf_bs->generate(_p, num_sig);
+                        data_p->merge(data_et);
+                        data_m  = _signal->generate(RooArgSet(_m, _t, _et, _cpsi,_ctheta, _phi, _p), *data_p);
+                        _data->append(*data_m);
+                        delete data_et;
+                        delete data_m;
+                        delete data_p;
 		}
 		if (_background){
 			_p = 0;
+                        data_et = _error_background->generate(RooArgSet(_et,_p), num_bkg0, kTRUE);
+                        data_m  = _background->generate(RooArgSet(_m, _t, _et, _cpsi,_ctheta, _phi, _p), *data_et);
+	                _data->append(*data_m);
+                        delete data_et;
+                        delete data_m;
+
+			cout << "num_bkg " << num_bkg << endl;
 			data_et = _error_background->generate(RooArgSet(_et), num_bkg, kTRUE);
-			data_m  = _background->generate(RooArgSet(_m, _t, _et, _cpsi,_ctheta, _phi), *data_et);
 			data_p  =  d_pdf_bkg->generate(_p, num_bkg);
-			data_m->merge(data_p);
+			data_p->merge(data_et);
+			data_m  = _background->generate(RooArgSet(_m, _t, _et, _cpsi,_ctheta, _phi, _p), *data_p);
 			_data->append(*data_m);
 			delete data_et;
 			delete data_m;
@@ -440,36 +447,36 @@ RooAbsPdf* BsFitter::signal_model(Bool_t error_model, Bool_t tag_model) {
 
 	RooAbsPdf* signal_time_angle = 0;
 
-//	_p.setBins(100);
-	    _p.setMin(-1);
-	    _p.setMax(1);
-		RooDataSet *d_data_bs = RooDataSet::read("d_data_bs.txt",_p);
-		RooDataSet *d_data_bsbar = RooDataSet::read("d_data_bsbar.txt",_p);
-		d_data_bs->Print();
+	_p.setBins(100);
+        _p.setMin(-1);
+	_p.setMax(1);
+	RooDataSet *d_data_bs = RooDataSet::read("pdf_signal_D",_p);
+//	RooDataSet *d_data_bsbar = RooDataSet::read("d_data_bsbar.txt",_p);
+	d_data_bs->Print();
 
-		RooDataHist *d_hist_bs = new RooDataHist("d_hist_bs","d_hist_bs", _p, *d_data_bs);
-		RooDataHist *d_hist_bsbar = new RooDataHist("d_hist_bsbar","d_hist_bsbar", _p, *d_data_bsbar);
+	RooDataHist *d_hist_bs = new RooDataHist("d_hist_bs","d_hist_bs", _p, *d_data_bs);
+//	RooDataHist *d_hist_bsbar = new RooDataHist("d_hist_bsbar","d_hist_bsbar", _p, *d_data_bsbar);
 
-		d_pdf_bs = new RooHistPdf("d_pdf_bs", "d_pdf_bs", _p, *d_hist_bs);
-		d_pdf_bsbar = new RooHistPdf("d_pdf_bsbar", "d_pdf_bsbar", _p, *d_hist_bsbar);
+	d_pdf_bs = new RooHistPdf("d_pdf_bs", "d_pdf_bs", _p, *d_hist_bs,0);
+//	d_pdf_bsbar = new RooHistPdf("d_pdf_bsbar", "d_pdf_bsbar", _p, *d_hist_bsbar);
 
-		RooRealVar *var_plus_one = new RooRealVar("var_plus_one", "var plus one", 1);
-		RooRealVar *var_minus_one = new RooRealVar("var_minus_one", "var minus one", -1);
+//	RooRealVar *var_plus_one = new RooRealVar("var_plus_one", "var plus one", 1);
+//	RooRealVar *var_minus_one = new RooRealVar("var_minus_one", "var minus one", -1);
 
-/*
+
 		d_hist_bs->Print();
 		d_pdf_bs->Print();
 
-
+/*
 		RooPlot *x_frame = _p.frame();
 		TCanvas *canvas = new TCanvas("canvas", "canvas", 800, 800);
 		d_data_bs->plotOn(x_frame);
 	//	d_hist_bs->plotOn(x_frame);
 		d_pdf_bs->plotOn(x_frame);
 		x_frame->Draw();
-		canvas->Print("d.png");*/
-
-		RooBsTimeAngle* time_angle_bs = new RooBsTimeAngle("time_angle_bs",
+		canvas->Print("d.png");
+*/
+/*		RooBsTimeAngle* time_angle_bs = new RooBsTimeAngle("time_angle_bs",
 				"time angle bs", _t, _cpsi, _ctheta, _phi, *var_minus_one, *A0, *All2,
 				*Ap2, *DeltaGamma, *Tau, *DeltaMs, *Phi_s, *Delta_1, *Delta_2,
 				*_resolution, *_efficiency);
@@ -491,7 +498,7 @@ RooAbsPdf* BsFitter::signal_model(Bool_t error_model, Bool_t tag_model) {
 	if (tag_model)
 		signal_time_angle = new RooAddPdf("signal_time_angle", "signal time angle",
 				*d_time_angle_bs, *d_time_angle_bsbar, *xbs);
-	else
+	else */
 		signal_time_angle = new RooBsTimeAngle("signal_time_angle",
 				"signal time angle", _t, _cpsi, _ctheta, _phi, _p, *A0, *All2,
 				*Ap2, *DeltaGamma, *Tau, *DeltaMs, *Phi_s, *Delta_1, *Delta_2,
@@ -601,13 +608,24 @@ RooAbsPdf* BsFitter::background_model(Bool_t error_model, Bool_t tag_model) {
 
 	RooArgSet *background_set = new RooArgSet(*mass_bkg, *angle_bkg);
 
-		RooDataSet *d_data_bkg = RooDataSet::read("d_data_bkg.txt",_p);
-		RooDataHist *d_hist_bkg = new RooDataHist("d_hist_bkg","d_hist_bkg", _p, *d_data_bkg);
-		d_pdf_bkg = new RooHistPdf("d_pdf_bkg", "d_pdf_bkg", _p, *d_hist_bkg);
+	RooDataSet *d_data_bkg = RooDataSet::read("pdf_bkg_D",_p);
+	RooDataHist *d_hist_bkg = new RooDataHist("d_hist_bkg","d_hist_bkg", _p, *d_data_bkg);
+	d_pdf_bkg = new RooHistPdf("d_pdf_bkg", "d_pdf_bkg", _p, *d_hist_bkg,0);
+	d_data_bkg->Print();
+	d_hist_bkg->Print();
+	d_pdf_bkg->Print();
 
-	if (tag_model) {
-		background_set->add(*d_pdf_bkg);
-	}
+/*		RooPlot *x_frame = _p.frame();
+                TCanvas *canvas = new TCanvas("canvas", "canvas", 800, 800);
+                d_data_bkg->plotOn(x_frame);
+        //      d_hist_bs->plotOn(x_frame);
+                d_pdf_bkg->plotOn(x_frame);
+                x_frame->Draw();
+                canvas->Print("d.png");
+*/
+//	if (tag_model) {
+//		background_set->add(*d_pdf_bkg);
+//	}
 
 	if (_resolution && error_model){
 		RooRealVar *et_bkg_xl = new RooRealVar("et_bkg_xl", "xl bkg", 0);

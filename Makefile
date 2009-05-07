@@ -12,7 +12,7 @@ MYLIBS =  obj/Efficiency.o obj/RooBsTimeAngle.o obj/TransAngles.o obj/TransAngle
 #DFLAGS = -DRES_GAUSS -DEFFICIENCY
 
 
-all: static
+all: bin/bs
 
 $(MYLIBS): obj/%.o : src/%.cc include/%.h
 	@echo $(CXX) $(CCFLAGS) $(INCLUDE)  -c $< -o $@
@@ -48,7 +48,7 @@ static: src/bs.cc $(MYLIBS) obj/BsFitter.o obj/Dict.o
 	@echo $(CXX) $(CCFLAGS) -o bin/BS obj/* ~/src/root/lib/libRoot.a ~/src/root/roofit/libRooFit.a -ldl -lm -lpthread 
 	$(CXX) -m32 $(CCFLAGS) -o bin/BS obj/*  \
 	     $(LIBSTDC) \
-         $(ROOTLIB)/../math/mathcore/src/TComplex.o \
+	     $(ROOTLIB)/../math/mathcore/src/TComplex.o \
          $(ROOTLIB)/../math/minuit/src/TMinuit.o \
          $(ROOTLIB)/../tree/tree/src/TTree.o \
          $(ROOTLIB)/libRoot.a \
@@ -56,8 +56,15 @@ static: src/bs.cc $(MYLIBS) obj/BsFitter.o obj/Dict.o
          $(ROOTLIB)/libAfterImage.a \
          $(ROOTLIB)/libfreetype.a \
          $(ROOTLIB)/../roofit/libRooFit.a \
-         -ldl -lm -lpthread -static-libgcc 
+         -ldl -lm -lpthread -static-libgcc  -lXpm -lXext -lX11 -lXft 
 clean:
 	rm $(MYLIBS)
 	rm Dict.cc Dict.h
 	rm bin/bs
+
+		 #$(ROOTLIB)/../graf2d/graf/src/*.o \
+	     #$(ROOTLIB)/../libMissing.a \
+         #$(ROOTLIB)/../math/mathcore/src/TComplex.o \
+         #$(ROOTLIB)/../math/minuit/src/TMinuit.o \
+         #$(ROOTLIB)/../tree/tree/src/TTree.o \
+	

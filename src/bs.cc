@@ -61,6 +61,7 @@ int main(int argc, char** argv) {
     static int tag_model = false;
 
     int jobs =1;
+    int n_generate = 10000;
     const char *data = "fit.dat";
     const char *parameters = "parameters.txt";
     const char *variables = "variables.txt";
@@ -83,7 +84,7 @@ int main(int argc, char** argv) {
         /* getopt_long stores the option index here. */
         int option_index = 0;
 
-        c = getopt_long(argc, argv, "d:p:e:o:v:j:",
+        c = getopt_long(argc, argv, "d:p:e:o:v:j:n:",
                 long_options, &option_index);
 
         /* Detect the end of the options. */
@@ -113,6 +114,9 @@ int main(int argc, char** argv) {
             case 'j':
                 jobs = atoi(optarg);
                 break;
+	    case 'n':
+		n_generate = atoi(optarg);
+		break;
             case '?':
                 usage();
             default:
@@ -179,7 +183,7 @@ int main(int argc, char** argv) {
 
     if (generate) {
         cout << "Generating .." << endl;
-        bs.generate(10000, data);
+        bs.generate(n_generate, data);
     }
 
     if (fit || fit_eff) {
