@@ -7,12 +7,7 @@ ROOTLIB = $(shell root-config --libdir)
 LIBSTDC = $(shell g++ -m32 -print-file-name=libstdc++.a)
 MYLIBS =  obj/Efficiency.o obj/RooBsTimeAngle.o obj/TransAngles.o obj/TransAnglesEfficiency.o
 
-#DFLAGS = -DRES_TRUE
-#DFLAGS = -DRES_GAUSS
-#DFLAGS = -DRES_GAUSS -DEFFICIENCY
-
-
-all: bin/bs
+all: static
 
 $(MYLIBS): obj/%.o : src/%.cc include/%.h
 	@echo $(CXX) $(CCFLAGS) $(INCLUDE)  -c $< -o $@
@@ -45,8 +40,8 @@ bin/fitter: src/fitter.cc $(MYLIBS) obj/BsFitter.o obj/Dict.o
 static: src/bs.cc $(MYLIBS) obj/BsFitter.o obj/Dict.o
 	@echo $(CXX) $(CCFLAGS) $(INCLUDE) -c $< -o obj/bs.o
 	$(CXX) $(CCFLAGS) $(INCLUDE) -c $< -o obj/bs.o
-	@echo $(CXX) $(CCFLAGS) -o bin/BS obj/* ~/src/root/lib/libRoot.a ~/src/root/roofit/libRooFit.a -ldl -lm -lpthread 
-	$(CXX) -m32 $(CCFLAGS) -o bin/BS obj/*  \
+	@echo $(CXX) $(CCFLAGS) -o bin/BS obj/* $(ROOTLIB)/../roofit/libRooFit.a $(LIBS)
+	$(CXX) -m32 -static $(CCFLAGS) -o bin/BS obj/*  \
 	     $(LIBSTDC) \
 	     $(ROOTLIB)/../math/mathcore/src/TComplex.o \
          $(ROOTLIB)/../math/minuit/src/TMinuit.o \
@@ -56,7 +51,7 @@ static: src/bs.cc $(MYLIBS) obj/BsFitter.o obj/Dict.o
          $(ROOTLIB)/libAfterImage.a \
          $(ROOTLIB)/libfreetype.a \
          $(ROOTLIB)/../roofit/libRooFit.a \
-         -ldl -lm -lpthread -static-libgcc  -lXpm -lXext -lX11 -lXft 
+         -ldl -lpthread -static-libgcc
 clean:
 	rm $(MYLIBS)
 	rm Dict.cc Dict.h
