@@ -1,0 +1,14 @@
+universe = grid
+globusscheduler = fngp-osg.fnal.gov/jobmanager-condor
+Executable = toy.sh
+Arguments  = fit.$(Process) 
+Log        = toy.log
+Output     = oe/$(Process).out
+Error      = oe/$(Process).err
+
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+transfer_input_files = BS, efficiency.txt, parameters.txt, pdf_bkg_D, pdf_signal_D, variables.txt
+transfer_output_files = fit.$(Process)
+
+Queue 1000
