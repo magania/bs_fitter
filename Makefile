@@ -7,7 +7,7 @@ ROOTLIB = $(shell root-config --libdir)
 LIBSTDC = $(shell g++ -m32 -print-file-name=libstdc++.a)
 MYLIBS =  obj/Efficiency.o obj/RooBsTimeAngle.o obj/TransAngles.o obj/TransAnglesEfficiency.o
 
-all: static
+all: bin/bs
 
 $(MYLIBS): obj/%.o : src/%.cc include/%.h
 	@echo $(CXX) $(CCFLAGS) $(INCLUDE)  -c $< -o $@
