@@ -26,10 +26,10 @@ public:
             RooRealVar& Dm,
             RooRealVar& sinphi,
             RooRealVar& cosphi,
-            RooRealVar& sindelta1,
-            RooRealVar& cosdelta1,
-            RooRealVar& sindelta2,
-            RooRealVar& cosdelta2,
+            RooAbsReal& sindelta1,
+            RooAbsReal& cosdelta1,
+            RooAbsReal& sindelta2,
+            RooAbsReal& cosdelta2,
             const RooResolutionModel& model,
             Efficiency &efficiency);
 
