@@ -467,15 +467,15 @@ RooAbsPdf* BsFitter::signal_model(Bool_t error_model, Bool_t tag_model) {
 		d_hist_bs->Print();
 		d_pdf_bs->Print();
 
-/*
+
 		RooPlot *x_frame = _p.frame();
 		TCanvas *canvas = new TCanvas("canvas", "canvas", 800, 800);
 		d_data_bs->plotOn(x_frame);
 	//	d_hist_bs->plotOn(x_frame);
 		d_pdf_bs->plotOn(x_frame);
 		x_frame->Draw();
-		canvas->Print("d.png");
-*/
+		canvas->Print("d_signal.png");
+
 /*		RooBsTimeAngle* time_angle_bs = new RooBsTimeAngle("time_angle_bs",
 				"time angle bs", _t, _cpsi, _ctheta, _phi, *var_minus_one, *A0, *All2,
 				*Ap2, *DeltaGamma, *Tau, *DeltaMs, *Phi_s, *Delta_1, *Delta_2,
@@ -615,14 +615,14 @@ RooAbsPdf* BsFitter::background_model(Bool_t error_model, Bool_t tag_model) {
 	d_hist_bkg->Print();
 	d_pdf_bkg->Print();
 
-/*		RooPlot *x_frame = _p.frame();
+		RooPlot *x_frame = _p.frame();
                 TCanvas *canvas = new TCanvas("canvas", "canvas", 800, 800);
                 d_data_bkg->plotOn(x_frame);
         //      d_hist_bs->plotOn(x_frame);
                 d_pdf_bkg->plotOn(x_frame);
                 x_frame->Draw();
-                canvas->Print("d.png");
-*/
+                canvas->Print("d_bkg.png");
+
 //	if (tag_model) {
 //		background_set->add(*d_pdf_bkg);
 //	}
