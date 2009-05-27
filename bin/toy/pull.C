@@ -12,19 +12,19 @@ void correctAngle(Double_t* angle){
 }
 
 bool transformDG(Double_t *DG, Double_t *Phi_s, Double_t *Delta_1, Double_t *Delta_2){
-	if ( (*DG)*cos(*Phi_s) < 0 )
-		return false;
+//	if ( (*DG)*cos(*Phi_s) < 0 )
+//		return false;
 
-	if ((*DG)<0 ) {
-		(*DG) = -(*DG);
-		(*Phi_s) = PI-(*Phi_s);
-		(*Delta_1) = PI-(*Delta_1);
-		(*Delta_1) = PI-(*Delta_2);
-	}
+//	if ((*DG)<0 ) {
+//		(*DG) = -(*DG);
+//		(*Phi_s) = PI-(*Phi_s);
+//		(*Delta_1) = PI-(*Delta_1);
+//		(*Delta_1) = PI-(*Delta_2);
+//	}
 
-	correctAngle(Phi_s);
-	correctAngle(Delta_1);
-	correctAngle(Delta_2);
+//	correctAngle(Phi_s);
+//	correctAngle(Delta_1);
+//	correctAngle(Delta_2);
 
 	return true;
 }
@@ -78,6 +78,10 @@ void plotVar(const char* var, RooRealVar &RR, const char* cuts ,TTree &fits){
  wiki << mean << " +/- " << mean_error << " | "
       << sigma << " +/- " << sigma_error << " | "<< endl;
 
+ stringstream image_file;
+ image_file << "plot/" << var << ".png";
+ canvas->Print(image_file.str().c_str());
+
 }
 
 
@@ -98,25 +102,25 @@ void pull(){
  RooRealVar rTau("Tau", "#tau", 0);
  //RooRealVar DeltaMs("DeltaMs", "#Delta M_{s}", 0);
 
- RooArgSet parameters(A0,A1,DeltaGamma,Delta_1, Delta_2, Phi_s, Tau);
- parameters.readFromFile("../parameters.txt");
+ RooArgSet parameters(rA0,rA1,rDeltaGamma,rDelta_1, rDelta_2, rPhi_s, rTau);
+ parameters.readFromFile("parameters.txt");
 
  Double_t A0,eA0,A1,eA1,DG,eDG,Delta_1,eDelta_1,Delta_2,eDelta_2,Phi_s,ePhi_s,Tau,eTau;
  TTree fits("fits","fits");
- fits.Branch("A0", &A0, "A0");
- fits.Branch("eA0", &eA0, "eA0");
- fits.Branch("A1", &A1, "A1");
- fits.Branch("eA1", e&A1, "eA1");
- fits.Branch("DeltaGamma", &DG, "DeltaGamma");
- fits.Branch("eDeltaGamma", &eDG, "eDeltaGamma");
- fits.Branch("Delta_1", &Delta_1, "Delta_1");
- fits.Branch("eDelta_1", &eDelta_1, "eDelta_1");
- fits.Branch("Delta_2", &Delta_2, "Delta_2");
- fits.Branch("eDelta_2", &eDelta_2, "eDelta_2");
- fits.Branch("Phi_s", &Phi_s, "Phi_s");
- fits.Branch("ePhi_s", &ePhi_s, "ePhi_s");
- fits.Branch("Tau", &Tau, "Tau");
- fits.Branch("eTau", &eTau, "eTau");
+ fits.Branch("A0", &A0, "A0/D");
+ fits.Branch("eA0", &eA0, "eA0/D");
+ fits.Branch("A1", &A1, "A1/D");
+ fits.Branch("eA1", &eA1, "eA1/D");
+ fits.Branch("DeltaGamma", &DG, "DeltaGamma/D");
+ fits.Branch("eDeltaGamma", &eDG, "eDeltaGamma/D");
+ fits.Branch("Delta_1", &Delta_1, "Delta_1/D");
+ fits.Branch("eDelta_1", &eDelta_1, "eDelta_1/D");
+ fits.Branch("Delta_2", &Delta_2, "Delta_2/D");
+ fits.Branch("eDelta_2", &eDelta_2, "eDelta_2/D");
+ fits.Branch("Phi_s", &Phi_s, "Phi_s/D");
+ fits.Branch("ePhi_s", &ePhi_s, "ePhi_s/D");
+ fits.Branch("Tau", &Tau, "Tau/D");
+ fits.Branch("eTau", &eTau, "eTau/D");
 
 
  ifstream fitdat("fits.dat");
@@ -124,13 +128,13 @@ void pull(){
  int corrected = 0;
  while (!fitdat.eof()){
 	 fitdat >> A0 >> eA0 >> A1 >> eA1 >> DG >> eDG >> Delta_1 >> eDelta_1 >> Delta_2 >> eDelta_2 >> Phi_s >> ePhi_s >> Tau >> eTau;
-	 total++;
-	 if (transformDG(*DG, *Phi_s, *Delta_1, *Delta_2)){
-		 tree.Fill();
+ //        cout  << A0 << eA0 << A1 << eA1 << DG << eDG << Delta_1 << eDelta_1 << Delta_2 << eDelta_2 << Phi_s << ePhi_s << Tau << eTau << endl;
+	total++;
+	 if (transformDG(&DG, &Phi_s, &Delta_1, &Delta_2)){
+		 fits.Fill();
 		 corrected++;
 	 }
  }
-
 
  const char * cuts = "";
  plotVar("A0", rA0, cuts, fits);
