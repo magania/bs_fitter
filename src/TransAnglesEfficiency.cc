@@ -47,7 +47,7 @@ static_ok(s_ok)
 }
 
 TransAnglesEfficiency::TransAnglesEfficiency(RooAbsReal* parent, const TransAnglesEfficiency& other, const char* name) :
-TransAngles(parent, other, name), 
+TransAngles(parent, other, name),
 _a1("_a1", parent, other._a1),
 _a2("_a2", parent, other._a2),
 _a3("_a3", parent, other._a3),
@@ -235,7 +235,8 @@ Double_t TransAnglesEfficiency::fe(Int_t i) const {
 }
 
 Double_t TransAnglesEfficiency::int_fe(Int_t i, Int_t code, const char* range) const {
-//    std::cout << "TAE: " << i << ' ' << code << ' ' << _ctheta << std::endl;
+    //std::cout << "TAE: " << i << ' ' << code << ' ' << range << std::endl;
+	//std::cout << "TAE: " << i << ' ' << code << ' ' << static_ok << ' ' << int_1 << ' ' << int_2 << ' ' << int_3 << ' ' << int_4 << ' ' << int_5 << ' ' << int_6  << std::endl;
 //    std::cout << _a1 << ' ' << _a2 << ' ' << _a3 << ' ' << _a4 << ' ' << _a5 << std::endl;
 //    std::cout << _b1 << ' ' << _b2 << ' ' << _b3 << ' ' << _b4 << ' ' << _b5 << std::endl;
 //    std::cout << _c1 << ' ' << _c2 << ' ' << _c3 << ' ' << _c4 << ' ' << _c5 << std::endl;

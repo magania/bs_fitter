@@ -15,12 +15,26 @@ ClassImp(RooBsTimeAngle)
 
 //_____________________________________________________________________________
 RooBsTimeAngle::RooBsTimeAngle(const char *name, const char *title,
-            RooRealVar& t, RooRealVar& cpsi, RooRealVar& ctheta, RooRealVar& phi, RooAbsReal& p,
-            RooAbsReal& A02, RooAbsReal& All2, RooAbsReal& Ap2,
-            RooRealVar& DG, RooRealVar& tau, RooRealVar& Dm,
-            RooRealVar& phi_s, RooRealVar& delta_1, RooRealVar& delta_2,
-            const RooResolutionModel& model, Efficiency &efficiency) :
-  RooAbsAnaConvPdf(name,title,model,t),
+        RooRealVar& t,
+        RooRealVar& cpsi,
+        RooRealVar& ctheta,
+        RooRealVar& phi,
+        RooAbsReal& p,
+        RooAbsReal& A02,
+        RooAbsReal& All2,
+        RooAbsReal& Ap2,
+        RooRealVar& DG,
+        RooRealVar& tau,
+        RooRealVar& Dm,
+        RooRealVar& sinphi,
+        RooRealVar& cosphi,
+        RooRealVar& sindelta1,
+        RooRealVar& cosdelta1,
+        RooRealVar& sindelta2,
+        RooRealVar& cosdelta2,
+        const RooResolutionModel& model,
+        Efficiency &efficiency) :
+  RooAbsAnaConvPdf(name, title, model, t),
   _t("_t", "time", this, t),
   _angles(this, cpsi, ctheta, phi, efficiency, true),
   _p("_p", "p", this, p),
@@ -30,9 +44,12 @@ RooBsTimeAngle::RooBsTimeAngle(const char *name, const char *title,
   _DG("DG", "#Delta#Gamma", this, DG),
   _tau("tau", "#tau", this, tau),
   _Dm("Dm", "#Delta m", this, Dm),
-  _phi_s("phi_s", "#phi_s", this, phi_s),
-  _delta_1("delta_1", "#Delta_1", this, delta_1),
-  _delta_2("delta_2", "#Delta_2", this, delta_2),
+  _sinphi("sinphi", "sin(#Phi_{s})", this, sinphi),
+  _cosphi("cosphi", "cos(#Phi_{s})", this, cosphi),
+  _sindelta1("sindelta1", "sin(#delta_{1})", this, sindelta1),
+  _cosdelta1("cosdelta1", "cos(#delta_{1})", this, cosdelta1),
+  _sindelta2("sindelta2", "sin(#delta_{2})", this, sindelta2),
+  _cosdelta2("cosdelta2", "cos(#delta_{2})", this, cosdelta2),
   _aleatorio(0)
 {
   // Constructor
@@ -54,9 +71,12 @@ RooBsTimeAngle::RooBsTimeAngle(const RooBsTimeAngle& other, const char* name) :
   _DG("DG", this, other._DG),
   _tau("tau", this, other._tau),
   _Dm("Dm", this, other._Dm),
-  _phi_s("phi_s", this, other._phi_s),
-  _delta_1("delta_1", this, other._delta_1),
-  _delta_2("delta_2", this, other._delta_2),
+  _sinphi("sinphi", this, other._sinphi),
+  _cosphi("cosphi", this, other._cosphi),
+  _sindelta1("sindelta1", this, other._sindelta1),
+  _cosdelta1("cosdelta1", this, other._cosdelta1),
+  _sindelta2("sindelta2", this, other._sindelta2),
+  _cosdelta2("cosdelta2", this, other._cosdelta2),
   _aleatorio(other._aleatorio),
   _basisExpCosh(other._basisExpCosh),
   _basisExpSinh(other._basisExpSinh),
@@ -93,39 +113,39 @@ inline Double_t RooBsTimeAngle::coeficiente( Int_t basisIndex, Int_t fIndex) con
   switch (fIndex) {
   case 1:
     if (basisIndex == _basisExpCosh) return  _A02;
-    if (basisIndex == _basisExpSinh) return -_A02 * TMath::Cos(_phi_s);
+    if (basisIndex == _basisExpSinh) return -_A02 * _cosphi;
     if (basisIndex == _basisExpCos)  return 0;
-    if (basisIndex == _basisExpSin)  return  _A02 * TMath::Sin(_phi_s);
+    if (basisIndex == _basisExpSin)  return  _A02 * _sinphi;
     return 0;
   case 2:
     if (basisIndex == _basisExpCosh) return _All2;
-    if (basisIndex == _basisExpSinh) return - _All2 * TMath::Cos(_phi_s);
+    if (basisIndex == _basisExpSinh) return -_All2 * _cosphi;
     if (basisIndex == _basisExpCos)  return 0;
-    if (basisIndex == _basisExpSin)  return _All2 * TMath::Sin(_phi_s);
+    if (basisIndex == _basisExpSin)  return _All2 * _sinphi;
     return 0;
   case 3:
     if (basisIndex == _basisExpCosh) return  _Ap2;
-    if (basisIndex == _basisExpSinh) return  _Ap2* TMath::Cos(_phi_s);
+    if (basisIndex == _basisExpSinh) return  _Ap2 * _cosphi;
     if (basisIndex == _basisExpCos)  return 0;
-    if (basisIndex == _basisExpSin)  return -_Ap2* TMath::Sin(_phi_s);
+    if (basisIndex == _basisExpSin)  return -_Ap2 * _sinphi;
     return 0;
   case 4:
     if (basisIndex == _basisExpCosh) return 0;
-    if (basisIndex == _basisExpSinh) return -TMath::Sqrt(_All2)*TMath::Sqrt(_Ap2) * TMath::Cos(_delta_1)*TMath::Sin(_phi_s);
-    if (basisIndex == _basisExpCos)  return  TMath::Sqrt(_All2)*TMath::Sqrt(_Ap2) * TMath::Sin(_delta_1);
-    if (basisIndex == _basisExpSin)  return -TMath::Sqrt(_All2)*TMath::Sqrt(_Ap2) * TMath::Cos(_delta_1)*TMath::Cos(_phi_s);
+    if (basisIndex == _basisExpSinh) return -TMath::Sqrt(_All2)*TMath::Sqrt(_Ap2) * _cosdelta1 * _sinphi;
+    if (basisIndex == _basisExpCos)  return  TMath::Sqrt(_All2)*TMath::Sqrt(_Ap2) * _sindelta1;
+    if (basisIndex == _basisExpSin)  return -TMath::Sqrt(_All2)*TMath::Sqrt(_Ap2) * _cosdelta1 * _cosphi;
     return 0;
   case 5:
-    if (basisIndex == _basisExpCosh) return  TMath::Sqrt(_A02)*TMath::Sqrt(_All2)*TMath::Cos(_delta_2-_delta_1);
-    if (basisIndex == _basisExpSinh) return -TMath::Sqrt(_A02)*TMath::Sqrt(_All2)*TMath::Cos(_delta_2-_delta_1) * TMath::Cos(_phi_s);
+    if (basisIndex == _basisExpCosh) return  TMath::Sqrt(_A02)*TMath::Sqrt(_All2) * (_cosdelta2*_cosdelta1+_sindelta2*_sindelta1);
+    if (basisIndex == _basisExpSinh) return -TMath::Sqrt(_A02)*TMath::Sqrt(_All2) * (_cosdelta2*_cosdelta1+_sindelta2*_sindelta1) * _cosphi;
     if (basisIndex == _basisExpCos)  return 0;
-    if (basisIndex == _basisExpSin)  return  TMath::Sqrt(_A02)*TMath::Sqrt(_All2)*TMath::Cos(_delta_2-_delta_1) * TMath::Sin(_phi_s);
+    if (basisIndex == _basisExpSin)  return  TMath::Sqrt(_A02)*TMath::Sqrt(_All2) * (_cosdelta2*_cosdelta1+_sindelta2*_sindelta1) * _sinphi;
     return 0;
   case 6:
     if (basisIndex == _basisExpCosh) return 0;
-    if (basisIndex == _basisExpSinh) return -TMath::Sqrt(_A02)*TMath::Sqrt(_Ap2) * TMath::Cos(_delta_2)*TMath::Sin(_phi_s);
-    if (basisIndex == _basisExpCos)  return  TMath::Sqrt(_A02)*TMath::Sqrt(_Ap2) * TMath::Sin(_delta_2);
-    if (basisIndex == _basisExpSin)  return -TMath::Sqrt(_A02)*TMath::Sqrt(_Ap2) * TMath::Cos(_delta_2)*TMath::Cos(_phi_s);
+    if (basisIndex == _basisExpSinh) return -TMath::Sqrt(_A02)*TMath::Sqrt(_Ap2) * _cosdelta2 * _sinphi;
+    if (basisIndex == _basisExpCos)  return  TMath::Sqrt(_A02)*TMath::Sqrt(_Ap2) * _sindelta2;
+    if (basisIndex == _basisExpSin)  return -TMath::Sqrt(_A02)*TMath::Sqrt(_Ap2) * _cosdelta2 * _cosphi;
     return 0;
   }
   return 0 ;
@@ -154,6 +174,8 @@ Double_t RooBsTimeAngle::coefAnalyticalIntegral(Int_t basisIndex, Int_t code, co
     Double_t val = 0;
     for (int i = 1; i <= 6; i++)
         val += coeficiente(basisIndex, i) * _angles.int_fe(i, code, range);
+
+//    cout << "CAI:"  << basisIndex << ' ' << val << endl;
 
     if (basisIndex == _basisExpCos || basisIndex == _basisExpSin)
         return -val*_p;
@@ -213,7 +235,7 @@ void RooBsTimeAngle::generateEvent(Int_t code) {
         }
 
         if (value > max) {
-            cout << "EE: Value > max " << value << endl;
+        	cout << "EE: Value > max " << value << endl;
             max = value * 1.05;
         }
 

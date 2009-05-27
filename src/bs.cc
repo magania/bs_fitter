@@ -182,7 +182,7 @@ int main(int argc, char** argv) {
         bs.setData(data);
 
     if (generate) {
-        cout << "Generating .." << endl;
+        cout << "Generating .. " << n_generate << endl;
         bs.generate(n_generate, data);
     }
 

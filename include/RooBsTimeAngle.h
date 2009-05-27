@@ -13,10 +13,25 @@
 class RooBsTimeAngle : public RooAbsAnaConvPdf {
 public:
     RooBsTimeAngle(const char *name, const char *title,
-            RooRealVar& t, RooRealVar& cpsi, RooRealVar& ctheta, RooRealVar& phi, RooAbsReal &p,
-            RooAbsReal& A02, RooAbsReal& All2, RooAbsReal& Ap2, RooRealVar& DG, RooRealVar& tau,
-            RooRealVar& Dm, RooRealVar& phi_s, RooRealVar& delta_1, RooRealVar& delta_2,
-            const RooResolutionModel& model, Efficiency &efficiency);
+            RooRealVar& t,
+            RooRealVar& cpsi,
+            RooRealVar& ctheta,
+            RooRealVar& phi,
+            RooAbsReal& p,
+            RooAbsReal& A02,
+            RooAbsReal& All2,
+            RooAbsReal& Ap2,
+            RooRealVar& DG,
+            RooRealVar& tau,
+            RooRealVar& Dm,
+            RooRealVar& sinphi,
+            RooRealVar& cosphi,
+            RooRealVar& sindelta1,
+            RooRealVar& cosdelta1,
+            RooRealVar& sindelta2,
+            RooRealVar& cosdelta2,
+            const RooResolutionModel& model,
+            Efficiency &efficiency);
 
     RooBsTimeAngle(const RooBsTimeAngle& other, const char* name = 0);
 
@@ -45,9 +60,12 @@ protected:
     RooRealProxy _DG;
     RooRealProxy _tau;
     RooRealProxy _Dm;
-    RooRealProxy _phi_s;
-    RooRealProxy _delta_1;
-    RooRealProxy _delta_2;
+    RooRealProxy _sinphi;
+    RooRealProxy _cosphi;
+    RooRealProxy _sindelta1;
+    RooRealProxy _cosdelta1;
+    RooRealProxy _sindelta2;
+    RooRealProxy _cosdelta2;
 
     TRandom3 _aleatorio;
 

@@ -403,25 +403,30 @@ RooAbsPdf* BsFitter::signal_model(Bool_t error_model, Bool_t tag_model) {
 	RooRealVar *A0 = new RooRealVar("A0", "A0", 0);
 	RooRealVar *A1 = new RooRealVar("A1", "A1", 0);
 	RooRealVar *DeltaGamma = new RooRealVar("DeltaGamma", "#Delta#Gamma", 0);
-	RooRealVar *Delta_1 = new RooRealVar("Delta_1", "#delta_{1}", 0);
-	RooRealVar *Delta_2 = new RooRealVar("Delta_2", "#delta_{2}", 0);
-	RooRealVar *Phi_s = new RooRealVar("Phi_s", "#phi_{s}", 0);
+	RooRealVar *SinPhi = new RooRealVar("SinPhi", "sin(#Phi_{s})", 0);
+	RooRealVar *CosPhi = new RooRealVar("CosPhi", "cos(#Phi_{s})", 0);
+	RooRealVar *SinDelta1 = new RooRealVar("SinDelta1", "sin(#delta_{1})", 0);
+	RooRealVar *CosDelta1 = new RooRealVar("CosDelta1", "cos(#delta_{1})", 0);
+	RooRealVar *SinDelta2 = new RooRealVar("SinDelta2", "sin(#delta_{2})", 0);
+	RooRealVar *CosDelta2 = new RooRealVar("CosDelta2", "cos(#delta_{2})", 0);
 	RooRealVar *Tau = new RooRealVar("Tau", "#tau", 0);
 	RooRealVar *DeltaMs = new RooRealVar("DeltaMs", "#Delta M_{s}", 0);
 
-	RooFormulaVar *All2 = new RooFormulaVar("All2", "(1-@0)*@1", RooArgList(
-			*A0, *A1));
-	RooFormulaVar *Ap2 = new RooFormulaVar("Ap2", "1-@0-@1", RooArgList(*A0,
-			*All2));
+	RooFormulaVar *All2 = new RooFormulaVar("All2", "(1-@0)*@1", RooArgList(*A0, *A1));
+	RooFormulaVar *Ap2 = new RooFormulaVar("Ap2", "1-@0-@1", RooArgList(*A0,*All2));
 
 	_parameters->add(*M);
 	_parameters->add(*Sigma);
 	_parameters->add(*A0);
 	_parameters->add(*A1);
 	_parameters->add(*DeltaGamma);
-	_parameters->add(*Delta_1);
-	_parameters->add(*Delta_2);
-	_parameters->add(*Phi_s);
+	_parameters->add(*SinPhi);
+	_parameters->add(*CosPhi);
+	_parameters->add(*SinDelta1);
+	_parameters->add(*CosDelta1);
+	_parameters->add(*SinDelta2);
+	_parameters->add(*CosDelta2);
+
 	_parameters->add(*Tau);
 	_parameters->add(*DeltaMs);
 
@@ -441,31 +446,18 @@ RooAbsPdf* BsFitter::signal_model(Bool_t error_model, Bool_t tag_model) {
 	 _constraints->add(*delta_2_constraint);
 	 */
 
-	RooGaussian *signal_mass = new RooGaussian("signal_mass", "signal_mass",
-			_m, *M, *Sigma);
-
-
+	RooGaussian *signal_mass = new RooGaussian("signal_mass", "signal_mass", _m, *M, *Sigma);
 	RooAbsPdf* signal_time_angle = 0;
 
 	_p.setBins(100);
         _p.setMin(-1);
 	_p.setMax(1);
 	RooDataSet *d_data_bs = RooDataSet::read("pdf_signal_D",_p);
-//	RooDataSet *d_data_bsbar = RooDataSet::read("d_data_bsbar.txt",_p);
 	d_data_bs->Print();
-
 	RooDataHist *d_hist_bs = new RooDataHist("d_hist_bs","d_hist_bs", _p, *d_data_bs);
-//	RooDataHist *d_hist_bsbar = new RooDataHist("d_hist_bsbar","d_hist_bsbar", _p, *d_data_bsbar);
-
 	d_pdf_bs = new RooHistPdf("d_pdf_bs", "d_pdf_bs", _p, *d_hist_bs,0);
-//	d_pdf_bsbar = new RooHistPdf("d_pdf_bsbar", "d_pdf_bsbar", _p, *d_hist_bsbar);
-
-//	RooRealVar *var_plus_one = new RooRealVar("var_plus_one", "var plus one", 1);
-//	RooRealVar *var_minus_one = new RooRealVar("var_minus_one", "var minus one", -1);
-
-
-		d_hist_bs->Print();
-		d_pdf_bs->Print();
+	d_hist_bs->Print();
+	d_pdf_bs->Print();
 
 
 		RooPlot *x_frame = _p.frame();
@@ -499,9 +491,10 @@ RooAbsPdf* BsFitter::signal_model(Bool_t error_model, Bool_t tag_model) {
 		signal_time_angle = new RooAddPdf("signal_time_angle", "signal time angle",
 				*d_time_angle_bs, *d_time_angle_bsbar, *xbs);
 	else */
-		signal_time_angle = new RooBsTimeAngle("signal_time_angle",
-				"signal time angle", _t, _cpsi, _ctheta, _phi, _p, *A0, *All2,
-				*Ap2, *DeltaGamma, *Tau, *DeltaMs, *Phi_s, *Delta_1, *Delta_2,
+		signal_time_angle = new RooBsTimeAngle("signal_time_angle", "signal time angle",
+				_t, _cpsi, _ctheta, _phi, _p,
+				*A0, *All2, *Ap2, *DeltaGamma, *Tau, *DeltaMs,
+				*SinPhi, *CosPhi, *SinDelta1, *CosDelta1, *SinDelta2, *CosDelta2,
 				*_resolution, *_efficiency);
 
 	if (_resolution && error_model) {
