@@ -404,7 +404,7 @@ RooAbsPdf* BsFitter::signal_model(Bool_t error_model, Bool_t tag_model) {
 	RooRealVar *A1 = new RooRealVar("A1", "A1", 0);
 	RooRealVar *DeltaGamma = new RooRealVar("DeltaGamma", "#Delta#Gamma", 0);
 	RooRealVar *SinPhi = new RooRealVar("SinPhi", "sin(#Phi_{s})", 0);
-	RooRealVar *CosPhi = new RooRealVar("CosPhi", "cos(#Phi_{s})", 0);
+//	RooRealVar *CosPhi = new RooRealVar("CosPhi", "cos(#Phi_{s})", 0);
 	RooRealVar *Delta1 = new RooRealVar("Delta1", "#delta_{1}", 0);
 	RooRealVar *Delta2 = new RooRealVar("Delta2", "#delta_{2}", 0);
 	RooRealVar *Tau = new RooRealVar("Tau", "#tau", 0);
@@ -412,6 +412,8 @@ RooAbsPdf* BsFitter::signal_model(Bool_t error_model, Bool_t tag_model) {
 
 	RooFormulaVar *All2 = new RooFormulaVar("All2", "(1-@0)*@1", RooArgList(*A0, *A1));
 	RooFormulaVar *Ap2 = new RooFormulaVar("Ap2", "1-@0-@1", RooArgList(*A0,*All2));
+
+	RooFormulaVar *CosPhi = new RooFormulaVar("CosPhi", "TMath::Sqrt(1-@0*@0)", *SinPhi);;
 
 	RooFormulaVar *SinDelta1 = new RooFormulaVar("SinDelta1", "sin(@0)", *Delta1);
 	RooFormulaVar *CosDelta1 = new RooFormulaVar("CosDelta1", "cos(@0)", *Delta1);
@@ -424,7 +426,7 @@ RooAbsPdf* BsFitter::signal_model(Bool_t error_model, Bool_t tag_model) {
 	_parameters->add(*A1);
 	_parameters->add(*DeltaGamma);
 	_parameters->add(*SinPhi);
-	_parameters->add(*CosPhi);
+//	_parameters->add(*CosPhi);
 	_parameters->add(*Delta1);
 	_parameters->add(*Delta2);
 	_parameters->add(*Tau);
