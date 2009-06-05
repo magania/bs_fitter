@@ -5,9 +5,9 @@ INCLUDE = $(shell root-config --cflags) -Iinclude
 LIBS    = $(shell root-config --libs) -lMinuit -lRooFit -lRooFitCore
 ROOTLIB = $(shell root-config --libdir)
 LIBSTDC = $(shell g++ -m32 -print-file-name=libstdc++.a)
-MYLIBS =  obj/Efficiency.o obj/RooBsTimeAngle.o obj/TransAngles.o obj/TransAnglesEfficiency.o
+MYLIBS =  obj/BsPdf.o obj/BsResolution.o obj/BsEtModel.o obj/BsSignal.o obj/BsBackground.o obj/Efficiency.o obj/RooBsTimeAngle.o obj/TransAngles.o obj/TransAnglesEfficiency.o
 
-all: bin/bs
+all: bin/bs-fit
 
 $(MYLIBS): obj/%.o : src/%.cc include/%.h
 	@echo $(CXX) $(CCFLAGS) $(INCLUDE)  -c $< -o $@
@@ -17,7 +17,7 @@ $(MYLIBS): obj/%.o : src/%.cc include/%.h
 
 obj/Dict.o: $(MYLIBS)
 	@echo rootcint -f Dict.cc  -c include/*
-	rootcint -f Dict.cc  -c include/BsFitter.h include/Efficiency.h include/RooBsTimeAngle.h include/TransAnglesEfficiency.h include/TransAngles.h
+	rootcint -f Dict.cc  -c include/BsPdf.h include/BsResolution.h include/BsEtModel.h include/BsSignal.h include/BsBackground.h include/Efficiency.h include/RooBsTimeAngle.h include/TransAngles.h include/TransAnglesEfficiency.h
 	@echo $(CXX) $(CCFLAGS) $(INCLUDE) -c Dict.cc -o obj/Dict.o
 	$(CXX) $(CCFLAGS) $(INCLUDE) -c Dict.cc -o obj/Dict.o
 #	$(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) -shared obj/Dict.o -o lib/libDict.so
@@ -32,6 +32,10 @@ obj/BsFitter.o: src/BsFitter.cc include/BsFitter.h $(MYLIBS) obj/Dict.o
 bin/bs: src/bs.cc $(MYLIBS) obj/BsFitter.o obj/Dict.o
 	@echo $(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) $^ -o bin/bs
 	$(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) $^ -o bin/bs
+	
+bin/bs-fit: src/bs-fit.cc $(MYLIBS) obj/BsFitter.o obj/Dict.o
+	@echo $(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) $^ -o bin/bs-fit
+	$(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) $^ -o bin/bs-fit
 
 bin/fitter: src/fitter.cc $(MYLIBS) obj/BsFitter.o obj/Dict.o
 	@echo $(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) $^ -o bin/fitter

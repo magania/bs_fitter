@@ -1,6 +1,6 @@
 #include "Efficiency.h"
 
-Efficiency::Efficiency() :
+Efficiency::Efficiency(const char* efficiency) :
 a1("a1", "a1", 0),
 a2("a2", "a2", 0),
 a3("a3", "a3", 0),
@@ -32,9 +32,6 @@ As(a1, a2, a3, a4, a5, a6, a7, a8, a9),
 Bs(b1, b2, b3, b4, b5, b6, b7, b8, b9),
 Cs(c1, c2, c3, c4, c5, c6, c7, c8, c9)
 {
-}
-
-void Efficiency::setEfficiency(const char* efficiency) {
     As.readFromFile(efficiency);
     Bs.readFromFile(efficiency);
     Cs.readFromFile(efficiency);

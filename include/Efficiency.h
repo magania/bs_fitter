@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   Efficiency.h
  * Author: magania
  *
@@ -14,13 +14,12 @@
 
 class Efficiency {
 public:
-    Efficiency();
-    void setEfficiency(const char* efficiency);
+    Efficiency(const char* efficiency);
     void writeEfficiency(const char* file);
     RooArgSet* getAs();
     RooArgSet* getBs();
     RooArgSet* getCs();
-    
+
     RooRealVar a1;
     RooRealVar a2;
     RooRealVar a3;
