@@ -56,8 +56,8 @@ BsFitter::BsFitter(){
 	A0 = new RooRealVar ("A0", "A0", 0);
 	A1 = new RooRealVar ("A1", "A1", 0);
 	DeltaGamma = new RooRealVar ("DeltaGamma", "#Delta#Gamma", 0);
-	SinPhi = new RooRealVar ("SinPhi", "sin(#Phi_{s})", 0);
-	CosPhi = new RooRealVar ("CosPhi", "cos(#Phi_{s})", 0);
+	Phi_s = new RooRealVar ("Phi_s", "#Phi_{s}", 0);
+	//CosPhi = new RooRealVar ("CosPhi", "cos(#Phi_{s})", 0);
 	Delta1 = new RooRealVar ("Delta1", "#delta_{1}", 0);
 	Delta2 = new RooRealVar ("Delta2", "#delta_{2}", 0);
 	Tau = new RooRealVar ("Tau", "#tau", 0);
@@ -103,7 +103,7 @@ BsSingleFitter::BsSingleFitter(const char* name, const char* name_et){
 	efficiency = new Efficiency(glue("efficiency",name));
 
 	signal = new BsSignal (name, m, t, cpsi, ctheta, phi, p,
-			M, Sigma, A0, A1, DeltaGamma, SinPhi, CosPhi, Delta1, Delta2, Tau, DeltaMs,
+			M, Sigma, A0, A1, DeltaGamma, Phi_s, Delta1, Delta2, Tau, DeltaMs,
 			Delta1_mean, Delta1_sigma, Delta2_mean, Delta2_sigma, DeltaMs_mean, DeltaMs_sigma,
 			resolution, et_sig, efficiency);
 
@@ -146,15 +146,15 @@ BsMultiFitter::BsMultiFitter(){
 	efficiency_v16 = new Efficiency("efficiency_v16");
 
 	signal_v14 = new BsSignal ("v14", m, t, cpsi, ctheta, phi, p,
-			M, Sigma, A0, A1, DeltaGamma, SinPhi, CosPhi, Delta1, Delta2, Tau, DeltaMs,
+			M, Sigma, A0, A1, DeltaGamma, Phi_s, Delta1, Delta2, Tau, DeltaMs,
 			Delta1_mean, Delta1_sigma, Delta2_mean, Delta2_sigma, DeltaMs_mean, DeltaMs_sigma,
 			resolution_IIa, et_sig_IIa, efficiency_v14);
 	signal_v15 = new BsSignal ("v15", m, t, cpsi, ctheta, phi, p,
-			M, Sigma, A0, A1, DeltaGamma, SinPhi, CosPhi, Delta1, Delta2, Tau, DeltaMs,
+			M, Sigma, A0, A1, DeltaGamma, Phi_s, Delta1, Delta2, Tau, DeltaMs,
 			Delta1_mean, Delta1_sigma, Delta2_mean, Delta2_sigma, DeltaMs_mean, DeltaMs_sigma,
 			resolution_IIb, et_sig_IIb, efficiency_v15);
 	signal_v16 = new BsSignal ("v16", m, t, cpsi, ctheta, phi, p,
-			M, Sigma, A0, A1, DeltaGamma, SinPhi, CosPhi, Delta1, Delta2, Tau, DeltaMs,
+			M, Sigma, A0, A1, DeltaGamma, Phi_s, Delta1, Delta2, Tau, DeltaMs,
 			Delta1_mean, Delta1_sigma, Delta2_mean, Delta2_sigma, DeltaMs_mean, DeltaMs_sigma,
 			resolution_IIb, et_sig_IIb, efficiency_v16);
 

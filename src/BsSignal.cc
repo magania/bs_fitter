@@ -19,8 +19,7 @@ BsSignal::BsSignal(const char* name,
 		RooRealVar *A0,
 		RooRealVar *A1,
 		RooRealVar *DeltaGamma,
-		RooRealVar *SinPhi,
-		RooRealVar *CosPhi,
+		RooRealVar *Phi_s,
 		RooRealVar *Delta1,
 		RooRealVar *Delta2,
 		RooRealVar *Tau,
@@ -45,6 +44,8 @@ BsSignal::BsSignal(const char* name,
 	RooFormulaVar *All2 = new RooFormulaVar("All2", "(1-@0)*@1", RooArgList(*A0, *A1));
 	RooFormulaVar *Ap2 = new RooFormulaVar("Ap2", "1-@0-@1", RooArgList(*A0,*All2));
 
+	RooFormulaVar *SinPhi = new RooFormulaVar("SinPhi", "sin(@0)", *Phi_s);
+	RooFormulaVar *CosPhi = new RooFormulaVar("CosPhi", "cos(@0)", *Phi_s);
 	RooFormulaVar *SinDelta1 = new RooFormulaVar("SinDelta1", "sin(@0)", *Delta1);
 	RooFormulaVar *CosDelta1 = new RooFormulaVar("CosDelta1", "cos(@0)", *Delta1);
 	RooFormulaVar *SinDelta2 = new RooFormulaVar("SinDelta2", "sin(@0)", *Delta2);

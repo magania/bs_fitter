@@ -42,7 +42,7 @@ protected:
 	char* glue(const char* a, const char *b);
 
     RooRealVar *m, *t, *et, *cpsi, *ctheta, *phi, *p;
-    RooRealVar *M, *Sigma, *A0, *A1, *DeltaGamma, *SinPhi, *CosPhi, *Delta1, *Delta2, *Tau, *DeltaMs;
+    RooRealVar *M, *Sigma, *A0, *A1, *DeltaGamma, *Phi_s, *Delta1, *Delta2, *Tau, *DeltaMs;
     RooRealVar *Delta1_mean, *Delta1_sigma, *Delta2_mean, *Delta2_sigma, *DeltaMs_mean, *DeltaMs_sigma;
 
     RooArgSet *variables;
