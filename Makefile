@@ -7,7 +7,7 @@ ROOTLIB = $(shell root-config --libdir)
 LIBSTDC = $(shell g++ -m32 -print-file-name=libstdc++.a)
 MYLIBS =  obj/BsPdf.o obj/BsResolution.o obj/BsEtModel.o obj/BsSignal.o obj/BsBackground.o obj/Efficiency.o obj/RooBsTimeAngle.o obj/TransAngles.o obj/TransAnglesEfficiency.o
 
-all: bin/bs-fit
+all: bin/bs-fit bin/bs-multifit
 
 $(MYLIBS): obj/%.o : src/%.cc include/%.h
 	@echo $(CXX) $(CCFLAGS) $(INCLUDE)  -c $< -o $@
@@ -36,6 +36,10 @@ bin/bs: src/bs.cc $(MYLIBS) obj/BsFitter.o obj/Dict.o
 bin/bs-fit: src/bs-fit.cc $(MYLIBS) obj/BsFitter.o obj/Dict.o
 	@echo $(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) $^ -o bin/bs-fit
 	$(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) $^ -o bin/bs-fit
+	
+bin/bs-multifit: src/bs-multifit.cc $(MYLIBS) obj/BsFitter.o obj/Dict.o
+	@echo $(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) $^ -o bin/bs-multifit
+	$(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) $^ -o bin/bs-multifit
 
 bin/fitter: src/fitter.cc $(MYLIBS) obj/BsFitter.o obj/Dict.o
 	@echo $(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) $^ -o bin/fitter

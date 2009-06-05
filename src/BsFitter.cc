@@ -95,8 +95,8 @@ BsSingleFitter::BsSingleFitter(const char* name, const char* name_et){
 	resolution = new BsResolution(name, t, et);
 	parameters->add(*resolution->getParameters());
 
-	et_sig = new BsEtModel (glue("sig",name_et), et);
-	et_bkg = new BsEtModel (glue("bkg",name_et), et);
+	et_sig = new BsEtModel(glue("sig",name_et), et);
+	et_bkg = new BsEtModel(glue("bkg",name_et), et);
 	parameters->add(*et_sig->getParameters());
 	parameters->add(*et_bkg->getParameters());
 
@@ -141,9 +141,9 @@ BsMultiFitter::BsMultiFitter(){
 	parameters->add(*et_bkg_IIa->getParameters());
 	parameters->add(*et_bkg_IIb->getParameters());
 
-	efficiency_v14 = new Efficiency("efficiency_v14.txt");
-	efficiency_v15 = new Efficiency("efficiency_v15.txt");
-	efficiency_v16 = new Efficiency("efficiency_v16.txt");
+	efficiency_v14 = new Efficiency("efficiency_v14");
+	efficiency_v15 = new Efficiency("efficiency_v15");
+	efficiency_v16 = new Efficiency("efficiency_v16");
 
 	signal_v14 = new BsSignal ("v14", m, t, cpsi, ctheta, phi, p,
 			M, Sigma, A0, A1, DeltaGamma, SinPhi, CosPhi, Delta1, Delta2, Tau, DeltaMs,
