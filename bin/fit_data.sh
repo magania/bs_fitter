@@ -38,11 +38,17 @@ fi
 ./fit_subdata.sh v14 IIa
 ./fit_subdata.sh v15 IIb
 ./fit_subdata.sh v16 IIb
-./bs fit --signal --bkg --resolution --efficiency --error --tag -j8 | tee fit.out
-./bs plot --bkg --resolution --efficiency -p parameters_out.txt > plot_bkg.out
-if [ ! -d plots_bkg ]; then
-   mkdir plots_bkg
-fi
-mv mass.gif time.gif cpsi.gif ctheta.gif phi.gif plot_bkg.out plots_bkg
 
-./bs plot --signal --bkg --resolution --efficiency -p parameters_out.txt > plot.out
+bash-3.00$ head  -n 18 initial_parameters.txt > parameters.txt
+bash-3.00$ cat parameters_vv14_out.txt | grep v14 >> parameters.txt 
+bash-3.00$ cat parameters_vv15_out.txt | grep v15 >> parameters.txt 
+bash-3.00$ cat parameters_vv16_out.txt | grep v16 >> parameters.txt 
+bash-3.00$ cat et_parameters_IIb >> parameters.txt 
+et_parameters_IIb
+bash-3.00$ cat et_parameters_IIa >> parameters.txt 
+et_parameters_IIa
+bash-3.00$ cat et_parameters_IIa >> parameters.txt 
+et_parameters_IIa
+bash-3.00$ cat et_parameters_IIa >> parameters.txt 
+bash-3.00$ cat et_parameters_IIb >> parameters.txt 
+
