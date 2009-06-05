@@ -75,8 +75,7 @@ BsFitter::BsFitter(){
 	parameters->add(*A0);
 	parameters->add(*A1);
 	parameters->add(*DeltaGamma);
-	parameters->add(*SinPhi);
-	parameters->add(*CosPhi);
+	parameters->add(*Phi_s);
 	parameters->add(*Delta1);
 	parameters->add(*Delta2);
 	parameters->add(*Tau);
@@ -119,7 +118,7 @@ BsSingleFitter::BsSingleFitter(const char* name, const char* name_et){
 
 BsMultiFitter::BsMultiFitter(){
     /* Variables */
-	category = new RooCategory();
+	category = new RooCategory("category","category");
 	category->defineType("v14");
 	category->defineType("v15");
 	category->defineType("v16");
