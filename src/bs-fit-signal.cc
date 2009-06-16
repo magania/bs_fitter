@@ -23,7 +23,6 @@ void usage(void) {
     printf("\t \033[1m-p\033[m parameters    \t Set parameters file.\n");
     printf("\t \033[1m-o\033[m out           \t Set file result file.\n");
     printf("\t \033[1m-n\033[m name          \t Set name of the parameters.\n");
-    printf("\t \033[1m-e\033[m name          \t Set name of the et parameters.\n\n");
     printf("\t \033[1m--verbose\033[m        \t Verbose fit.\n\n");
     printf("Report bugs to <magania@fnal.gov>.\n");
     exit(EXIT_FAILURE);
@@ -57,7 +56,7 @@ int main(int argc, char** argv) {
         /* getopt_long stores the option index here. */
         int option_index = 0;
 
-        c = getopt_long(argc, argv, "d:p:o:v:j:n:e:",
+        c = getopt_long(argc, argv, "d:p:o:v:j:n:",
                 long_options, &option_index);
 
         /* Detect the end of the options. */
@@ -81,9 +80,6 @@ int main(int argc, char** argv) {
             case 'n':
                 name = optarg;
                 break;
-            case 'e':
-                name_et = optarg;
-                break;
             case 'v':
                 variables = optarg;
                 break;
@@ -98,7 +94,7 @@ int main(int argc, char** argv) {
     }
 
     /* Do the real stuff */
-    BsSingleFitter bs(name, name_et);
+    BsSignalFitter bs(name);
     bs.setVariables(variables);
     bs.setParameters(parameters);
     bs.setData(data);

@@ -89,6 +89,21 @@ BsFitter::BsFitter(){
 	parameters->add(*DeltaMs_sigma);
 }
 
+BsSignalFitter::BsSignalFitter(const char* name){
+	/* PDF's */
+	resolution = new BsResolution(name, t, et);
+	parameters->add(*resolution->getParameters());
+
+	efficiency = new Efficiency(glue("efficiency",name));
+
+	signal = new BsSignal (name, m, t, cpsi, ctheta, phi, p,
+			M, Sigma, A0, A1, DeltaGamma, Phi_s, Delta1, Delta2, Tau, DeltaMs,
+			Delta1_mean, Delta1_sigma, Delta2_mean, Delta2_sigma, DeltaMs_mean, DeltaMs_sigma,
+			resolution, 0, efficiency);
+
+	pdf = signal->pdf();
+}
+
 BsSingleFitter::BsSingleFitter(const char* name, const char* name_et){
 	/* PDF's */
 	resolution = new BsResolution(name, t, et);

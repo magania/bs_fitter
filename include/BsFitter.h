@@ -53,6 +53,17 @@ protected:
     RooAbsPdf* pdf;
 };
 
+class BsSignalFitter : public BsFitter{
+public:
+	BsSignalFitter(const char* name);
+
+private:
+    BsResolution *resolution;
+    Efficiency *efficiency;
+    BsSignal *signal;
+    RooAddPdf *model;
+};
+
 class BsSingleFitter : public BsFitter{
 public:
 	BsSingleFitter(const char* name, const char* name_et);
