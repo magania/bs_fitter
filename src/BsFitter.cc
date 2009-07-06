@@ -104,6 +104,23 @@ BsSignalFitter::BsSignalFitter(const char* name){
 	pdf = signal->pdf();
 }
 
+Int_t BsSignalFitter::fit(Bool_t hesse, Bool_t minos, Bool_t verbose, Int_t cpu) {
+        if (!data) {
+                cout << "EE: No Data" << endl;
+                return kFALSE;
+        }
+
+        fit_result = pdf->fitTo(*data,
+                                        RooFit::ConditionalObservables(RooArgSet(*p,*et)),
+                                        RooFit::Save(kTRUE),
+                                        RooFit::Hesse(hesse),
+                                        RooFit::Minos(minos),
+                                        RooFit::NumCPU(cpu),
+                                        RooFit::Verbose(verbose)/*, RooFit::Strategy(2)*/);
+        return fit_result->status();
+}
+
+
 BsSingleFitter::BsSingleFitter(const char* name, const char* name_et){
 	/* PDF's */
 	resolution = new BsResolution(name, t, et);

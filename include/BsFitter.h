@@ -56,6 +56,7 @@ protected:
 class BsSignalFitter : public BsFitter{
 public:
 	BsSignalFitter(const char* name);
+  Int_t BsSignalFitter::fit(Bool_t hesse, Bool_t minos, Bool_t verbose, Int_t cpu);
 
 private:
     BsResolution *resolution;

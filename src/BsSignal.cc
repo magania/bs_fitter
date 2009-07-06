@@ -61,11 +61,11 @@ BsSignal::BsSignal(const char* name,
 	RooProdPdf *signal;
 	if (et_model){
 		signal = new RooProdPdf("signal", "signal",
-				RooArgSet(*signal_mass, *et_model->pdf(), *Delta1_constraint, *Delta2_constraint, *DeltaMs_constraint),
+				RooArgSet(*signal_mass, *et_model->pdf(), /* *Delta1_constraint, *Delta2_constraint,*/ *DeltaMs_constraint),
 				RooFit::Conditional(*signal_time_angle, RooArgSet(*m, *t, *cpsi, *ctheta, *phi, *p)));
 	} else {
 		signal = new RooProdPdf("signal", "signal",
-				RooArgSet(*signal_mass, *signal_time_angle, *Delta1_constraint, *Delta2_constraint, *DeltaMs_constraint));
+				RooArgSet(*signal_mass, *signal_time_angle, /* *Delta1_constraint, *Delta2_constraint,*/ *DeltaMs_constraint));
 	}
 
 	model = signal;

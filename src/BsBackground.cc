@@ -75,7 +75,7 @@ BsBackground::BsBackground( const char* name,
 	if ( et_model ){
 		background_set->add(*et_model->pdf());
 
-		background = new RooProdPdf(glue("background	",name), glue("background",name), *background_set,
+		background = new RooProdPdf(glue("background",name), glue("background",name), *background_set,
 				RooFit::Conditional(*time_bkg, RooArgSet(*m, *t, *cpsi, *ctheta, *phi)));
 	} else {
 		background_set->add(*time_bkg);

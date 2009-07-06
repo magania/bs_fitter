@@ -101,6 +101,8 @@ Double_t RooBsTimeAngle::coefficient(Int_t basisIndex) const {
     for (int i = 1; i <= 6; i++)
         val += coeficiente(basisIndex, i) * _angles.fe(i);
 
+  //  cout << "CA :"  << basisIndex << ' ' << val << endl;
+
     if (basisIndex == _basisExpCos || basisIndex == _basisExpSin)
         return -val*_p;
     else
@@ -175,7 +177,7 @@ Double_t RooBsTimeAngle::coefAnalyticalIntegral(Int_t basisIndex, Int_t code, co
     for (int i = 1; i <= 6; i++)
         val += coeficiente(basisIndex, i) * _angles.int_fe(i, code, range);
 
-//    cout << "CAI:"  << basisIndex << ' ' << val << endl;
+  //  cout << "CAI:"  << basisIndex << ' ' << val << endl;
 
     if (basisIndex == _basisExpCos || basisIndex == _basisExpSin)
         return -val*_p;
