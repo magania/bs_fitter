@@ -25,19 +25,19 @@ public:
 
     void writeResult(const char* file_name);
 
-    //    void plotVar(RooRealVar& x, const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
-    /*  void plotM(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
-        void plotM();
-        void plotT(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
-        void plotT();
-        void plotEt(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
-        void plotEt();
-        void plotCpsi(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
-        void plotCpsi();
-        void plotCtheta(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
-        void plotCtheta();
-        void plotPhi(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
-        void plotPhi(); */
+    virtual void plotVar(RooRealVar* x, const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
+    void plotM(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
+    void plotM();
+    void plotT(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
+    void plotT();
+    void plotEt(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
+    void plotEt();
+    void plotCpsi(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
+    void plotCpsi();
+    void plotCtheta(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
+    void plotCtheta();
+    void plotPhi(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
+    void plotPhi();
 protected:
 	char* glue(const char* a, const char *b);
 
@@ -56,9 +56,10 @@ protected:
 class BsSignalFitter : public BsFitter{
 public:
 	BsSignalFitter(const char* name);
-  Int_t BsSignalFitter::fit(Bool_t hesse, Bool_t minos, Bool_t verbose, Int_t cpu);
+    Int_t fit(Bool_t hesse, Bool_t minos, Bool_t verbose, Int_t cpu);
 
 private:
+	void plotVar(RooRealVar* x, const char* plot_file, Int_t bins,Int_t proj_bins, Bool_t log);
     BsResolution *resolution;
     Efficiency *efficiency;
     BsSignal *signal;

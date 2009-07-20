@@ -102,6 +102,12 @@ int main(int argc, char** argv) {
     bs.fit(true, false, verbose, jobs);
     bs.writeResult(out);
     bs.writeParameters("parameters_out.txt");
+    bs.plotM();
+    bs.plotT();
+    bs.plotCpsi();
+    bs.plotCtheta();
+    bs.plotPhi();
+
 
     return (EXIT_SUCCESS);
 }

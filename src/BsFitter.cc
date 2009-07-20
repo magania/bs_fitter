@@ -89,6 +89,59 @@ BsFitter::BsFitter(){
 	parameters->add(*DeltaMs_sigma);
 }
 
+void BsFitter::plotVar(RooRealVar* x, const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log) {
+	std::cout << "BsFitter::plotVar" << std::endl;
+}
+
+void BsFitter::plotM(const char* plot_file, Int_t bins, Int_t proj_bins,Bool_t log) {
+plotVar(m, plot_file, bins, proj_bins, log);
+}
+
+void BsFitter::plotM() {
+plotVar(m, "mass.gif", 0, 100, kFALSE);
+}
+
+void BsFitter::plotT(const char* plot_file, Int_t bins, Int_t proj_bins,Bool_t log) {
+plotVar(t, plot_file, bins, proj_bins, log);
+}
+
+void BsFitter::plotEt() {
+plotVar(et, "time_error.gif", 0, 100, kTRUE);
+}
+
+void BsFitter::plotEt(const char* plot_file, Int_t bins, Int_t proj_bins,Bool_t log) {
+plotVar(et, plot_file, bins, proj_bins, log);
+}
+
+void BsFitter::plotT() {
+plotVar(t, "time.gif", 0, 100, kTRUE);
+}
+
+void BsFitter::plotCpsi(const char* plot_file, Int_t bins, Int_t proj_bins,Bool_t log) {
+plotVar(cpsi, plot_file, bins, proj_bins, log);
+}
+
+void BsFitter::plotCpsi() {
+plotVar(cpsi, "cpsi.gif", 0, 100, kFALSE);
+}
+
+void BsFitter::plotCtheta(const char* plot_file, Int_t bins, Int_t proj_bins,
+Bool_t log) {
+plotVar(ctheta, plot_file, bins, proj_bins, log);
+}
+
+void BsFitter::plotCtheta() {
+plotVar(ctheta, "ctheta.gif", 0, 100, kFALSE);
+}
+
+void BsFitter::plotPhi(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log) {
+plotVar(phi, plot_file, bins, proj_bins, log);
+}
+
+void BsFitter::plotPhi() {
+plotVar(phi, "phi.gif", 0, 100, kFALSE);
+}
+
 BsSignalFitter::BsSignalFitter(const char* name){
 	/* PDF's */
 	resolution = new BsResolution(name, t, et);
@@ -120,6 +173,39 @@ Int_t BsSignalFitter::fit(Bool_t hesse, Bool_t minos, Bool_t verbose, Int_t cpu)
         return fit_result->status();
 }
 
+void BsSignalFitter::plotVar(RooRealVar* x, const char* plot_file, Int_t bins,Int_t proj_bins, Bool_t log) {
+	RooPlot *x_frame = x->frame();
+	if (data)
+		if (bins)
+			data->plotOn(x_frame, RooFit::Binning(bins));
+		else
+			data->plotOn(x_frame);
+
+	if (data) {
+		RooAbsData *projData;
+		if (proj_bins) {
+			et->setBins(proj_bins);
+			projData = new RooDataHist("projData", "projData",RooArgSet(*et, *p), *data);
+		} else {
+			projData = data;
+		}
+
+//		model->plotOn(x_frame,
+	//	RooFit::LineColor(13));
+		pdf->Print();
+		pdf->plotOn(x_frame,
+				RooFit::ProjWData(RooArgSet(*et), *projData),
+				RooFit::LineColor(kGreen));
+	} else {
+		model->plotOn(x_frame);
+	}
+
+	TCanvas *canvas = new TCanvas("canvas", "canvas", 800, 800);
+	x_frame->Draw();
+	if (log)
+		gPad->SetLogy(1);
+	canvas->Print(plot_file);
+}
 
 BsSingleFitter::BsSingleFitter(const char* name, const char* name_et){
 	/* PDF's */
@@ -146,6 +232,40 @@ BsSingleFitter::BsSingleFitter(const char* name, const char* name_et){
 
 	model = new RooAddPdf (glue("model",name), glue("model",name), *signal->pdf(), *bkg->pdf(), *xs);
 	pdf = model;
+}
+
+void BsSigleFitter::plotVar(RooRealVar* x, const char* plot_file, Int_t bins,Int_t proj_bins, Bool_t log) {
+	RooPlot *x_frame = x->frame();
+	if (data)
+		if (bins)
+			data->plotOn(x_frame, RooFit::Binning(bins));
+		else
+			data->plotOn(x_frame);
+
+	if (data) {
+		RooAbsData *projData;
+		if (proj_bins) {
+			et->setBins(proj_bins);
+			projData = new RooDataHist("projData", "projData",RooArgSet(*et, *p), *data);
+		} else {
+			projData = data;
+		}
+
+//		model->plotOn(x_frame,
+	//	RooFit::LineColor(13));
+		pdf->Print();
+		pdf->plotOn(x_frame,
+				RooFit::ProjWData(RooArgSet(*et), *projData),
+				RooFit::LineColor(kGreen));
+	} else {
+		model->plotOn(x_frame);
+	}
+
+	TCanvas *canvas = new TCanvas("canvas", "canvas", 800, 800);
+	x_frame->Draw();
+	if (log)
+		gPad->SetLogy(1);
+	canvas->Print(plot_file);
 }
 
 BsMultiFitter::BsMultiFitter(){
