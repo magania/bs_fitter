@@ -234,7 +234,7 @@ BsSingleFitter::BsSingleFitter(const char* name, const char* name_et){
 	pdf = model;
 }
 
-/*BsSigleFitter::plotVar(RooRealVar* x, const char* plot_file, Int_t bins,Int_t proj_bins, Bool_t log) {
+void BsSingleFitter::plotVar(RooRealVar* x, const char* plot_file, Int_t bins,Int_t proj_bins, Bool_t log) {
 	RooPlot *x_frame = x->frame();
 	if (data)
 		if (bins)
@@ -254,11 +254,17 @@ BsSingleFitter::BsSingleFitter(const char* name, const char* name_et){
 //		model->plotOn(x_frame,
 	//	RooFit::LineColor(13));
 		pdf->Print();
-		pdf->plotOn(x_frame,
-				RooFit::ProjWData(RooArgSet(*et), *projData),
+		pdf->plotOn(x_frame, RooFit::Components(*signal->pdf()),
+				RooFit::ProjWData(RooArgSet(*et), *projData), RooFit::Normalization(xs->getVal()),
 				RooFit::LineColor(kGreen));
+                bkg->pdf()->plotOn(x_frame,
+                                RooFit::ProjWData(RooArgSet(*et), *projData),  RooFit::Normalization((1-xs->getVal())),
+                                RooFit::LineColor(kRed));
+                pdf->plotOn(x_frame,
+                                RooFit::ProjWData(RooArgSet(*et), *projData),
+                                RooFit::LineColor(13));
 	} else {
-		model->plotOn(x_frame);
+		pdf->plotOn(x_frame);
 	}
 
 	TCanvas *canvas = new TCanvas("canvas", "canvas", 800, 800);
@@ -266,7 +272,7 @@ BsSingleFitter::BsSingleFitter(const char* name, const char* name_et){
 	if (log)
 		gPad->SetLogy(1);
 	canvas->Print(plot_file);
-}*/
+}
 
 BsMultiFitter::BsMultiFitter(){
     /* Variables */

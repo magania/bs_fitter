@@ -59,7 +59,7 @@ public:
     Int_t fit(Bool_t hesse, Bool_t minos, Bool_t verbose, Int_t cpu);
 
 private:
-	void plotVar(RooRealVar* x, const char* plot_file, Int_t bins,Int_t proj_bins, Bool_t log);
+    void plotVar(RooRealVar* x, const char* plot_file, Int_t bins,Int_t proj_bins, Bool_t log);
     BsResolution *resolution;
     Efficiency *efficiency;
     BsSignal *signal;
@@ -71,7 +71,7 @@ public:
 	BsSingleFitter(const char* name, const char* name_et);
 
 private:
-      // void plotVar(RooRealVar* x, const char* plot_file, Int_t bins,Int_t proj_bins, Bool_t log);
+    void plotVar(RooRealVar* x, const char* plot_file, Int_t bins,Int_t proj_bins, Bool_t log);
     BsResolution *resolution;
     BsEtModel *et_sig, *et_bkg;
     Efficiency *efficiency;
