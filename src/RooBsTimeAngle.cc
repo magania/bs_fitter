@@ -118,38 +118,45 @@ inline Double_t RooBsTimeAngle::coeficiente( Int_t basisIndex, Int_t fIndex) con
     if (basisIndex == _basisExpSinh) return -_A02 * _cosphi;
     if (basisIndex == _basisExpCos)  return 0;
     if (basisIndex == _basisExpSin)  return  _A02 * _sinphi;
+    std::cout << "ERROR bad basisIndex" << std::endl;
     return 0;
   case 2:
     if (basisIndex == _basisExpCosh) return _All2;
     if (basisIndex == _basisExpSinh) return -_All2 * _cosphi;
     if (basisIndex == _basisExpCos)  return 0;
     if (basisIndex == _basisExpSin)  return _All2 * _sinphi;
+    std::cout << "ERROR bad basisIndex" << std::endl;
     return 0;
   case 3:
     if (basisIndex == _basisExpCosh) return  _Ap2;
     if (basisIndex == _basisExpSinh) return  _Ap2 * _cosphi;
     if (basisIndex == _basisExpCos)  return 0;
     if (basisIndex == _basisExpSin)  return -_Ap2 * _sinphi;
+    std::cout << "ERROR bad basisIndex" << std::endl;
     return 0;
   case 4:
     if (basisIndex == _basisExpCosh) return 0;
     if (basisIndex == _basisExpSinh) return -TMath::Sqrt(_All2)*TMath::Sqrt(_Ap2) * _cosdelta1 * _sinphi;
     if (basisIndex == _basisExpCos)  return  TMath::Sqrt(_All2)*TMath::Sqrt(_Ap2) * _sindelta1;
     if (basisIndex == _basisExpSin)  return -TMath::Sqrt(_All2)*TMath::Sqrt(_Ap2) * _cosdelta1 * _cosphi;
+    std::cout << "ERROR bad basisIndex" << std::endl;
     return 0;
   case 5:
     if (basisIndex == _basisExpCosh) return  TMath::Sqrt(_A02)*TMath::Sqrt(_All2) * (_cosdelta2*_cosdelta1+_sindelta2*_sindelta1);
     if (basisIndex == _basisExpSinh) return -TMath::Sqrt(_A02)*TMath::Sqrt(_All2) * (_cosdelta2*_cosdelta1+_sindelta2*_sindelta1) * _cosphi;
     if (basisIndex == _basisExpCos)  return 0;
     if (basisIndex == _basisExpSin)  return  TMath::Sqrt(_A02)*TMath::Sqrt(_All2) * (_cosdelta2*_cosdelta1+_sindelta2*_sindelta1) * _sinphi;
+    std::cout << "ERROR bad basisIndex" << std::endl;
     return 0;
   case 6:
     if (basisIndex == _basisExpCosh) return 0;
     if (basisIndex == _basisExpSinh) return -TMath::Sqrt(_A02)*TMath::Sqrt(_Ap2) * _cosdelta2 * _sinphi;
     if (basisIndex == _basisExpCos)  return  TMath::Sqrt(_A02)*TMath::Sqrt(_Ap2) * _sindelta2;
     if (basisIndex == _basisExpSin)  return -TMath::Sqrt(_A02)*TMath::Sqrt(_Ap2) * _cosdelta2 * _cosphi;
+    std::cout << "ERROR bad basisIndex" << std::endl;
     return 0;
   }
+  std::cout << "ERROR bad fIndex" << std::endl;
   return 0 ;
 }
 

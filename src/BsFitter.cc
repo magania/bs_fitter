@@ -234,7 +234,7 @@ BsSingleFitter::BsSingleFitter(const char* name, const char* name_et){
 	pdf = model;
 }
 
-void BsSigleFitter::plotVar(RooRealVar* x, const char* plot_file, Int_t bins,Int_t proj_bins, Bool_t log) {
+/*BsSigleFitter::plotVar(RooRealVar* x, const char* plot_file, Int_t bins,Int_t proj_bins, Bool_t log) {
 	RooPlot *x_frame = x->frame();
 	if (data)
 		if (bins)
@@ -266,7 +266,7 @@ void BsSigleFitter::plotVar(RooRealVar* x, const char* plot_file, Int_t bins,Int
 	if (log)
 		gPad->SetLogy(1);
 	canvas->Print(plot_file);
-}
+}*/
 
 BsMultiFitter::BsMultiFitter(){
     /* Variables */
