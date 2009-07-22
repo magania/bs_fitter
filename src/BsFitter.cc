@@ -98,7 +98,7 @@ plotVar(m, plot_file, bins, proj_bins, log);
 }
 
 void BsFitter::plotM() {
-plotVar(m, "mass.gif", 0, 100, kFALSE);
+plotVar(m, "mass.png", 0, 100, kFALSE);
 }
 
 void BsFitter::plotT(const char* plot_file, Int_t bins, Int_t proj_bins,Bool_t log) {
@@ -106,7 +106,7 @@ plotVar(t, plot_file, bins, proj_bins, log);
 }
 
 void BsFitter::plotEt() {
-plotVar(et, "time_error.gif", 0, 100, kTRUE);
+plotVar(et, "time_error.png", 0, 100, kTRUE);
 }
 
 void BsFitter::plotEt(const char* plot_file, Int_t bins, Int_t proj_bins,Bool_t log) {
@@ -114,7 +114,7 @@ plotVar(et, plot_file, bins, proj_bins, log);
 }
 
 void BsFitter::plotT() {
-plotVar(t, "time.gif", 0, 100, kTRUE);
+plotVar(t, "time.png", 0, 100, kTRUE);
 }
 
 void BsFitter::plotCpsi(const char* plot_file, Int_t bins, Int_t proj_bins,Bool_t log) {
@@ -122,7 +122,7 @@ plotVar(cpsi, plot_file, bins, proj_bins, log);
 }
 
 void BsFitter::plotCpsi() {
-plotVar(cpsi, "cpsi.gif", 0, 100, kFALSE);
+plotVar(cpsi, "cpsi.png", 0, 100, kFALSE);
 }
 
 void BsFitter::plotCtheta(const char* plot_file, Int_t bins, Int_t proj_bins,
@@ -131,7 +131,7 @@ plotVar(ctheta, plot_file, bins, proj_bins, log);
 }
 
 void BsFitter::plotCtheta() {
-plotVar(ctheta, "ctheta.gif", 0, 100, kFALSE);
+plotVar(ctheta, "ctheta.png", 0, 100, kFALSE);
 }
 
 void BsFitter::plotPhi(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log) {
@@ -139,7 +139,7 @@ plotVar(phi, plot_file, bins, proj_bins, log);
 }
 
 void BsFitter::plotPhi() {
-plotVar(phi, "phi.gif", 0, 100, kFALSE);
+plotVar(phi, "phi.png", 0, 100, kFALSE);
 }
 
 BsSignalFitter::BsSignalFitter(const char* name){

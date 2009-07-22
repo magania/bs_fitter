@@ -10,6 +10,7 @@
 
 #include <BsResolution.h>
 #include <BsEtModel.h>
+#include <TMath.h>
 
 #include <BsPdf.h>
 
