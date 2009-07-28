@@ -7,7 +7,8 @@
 #include "RooSimultaneous.h"
 
 #include <BsSignal.h>
-#include <BsBackground.h>
+#include <BsMuBackground.h>
+#include <BsDMuBackground.h>
 #include <BsResolution.h>
 #include <BsEtModel.h>
 
@@ -77,7 +78,7 @@ private:
     Efficiency *efficiency;
 
     BsSignal *signal;
-    BsBackground *bkg;
+    BsMuBackground *bkg;
 
     RooRealVar *xs;
     RooAddPdf *model;
@@ -90,13 +91,14 @@ public:
 private:
     BsResolution *resolution_IIa, *resolution_IIb;
     BsEtModel *et_sig_IIa, *et_sig_IIb, *et_bkg_IIa, *et_bkg_IIb;
-    Efficiency *efficiency_v14, *efficiency_v15, *efficiency_v16;
+    Efficiency *efficiency_Mu, *efficiency_DMu;
 
-    BsSignal *signal_v14, *signal_v15, *signal_v16;
-    BsBackground *bkg_v14, *bkg_v15, *bkg_v16;
+    BsSignal *signal_IIaMu, *signal_IIbMu, *signal_IIaDMu, *signal_IIbDMu;
+    BsMuBackground *bkg_Mu;
+    BsDMuBackground *bkg_DMu;
 
-    RooRealVar *xs_v14, * xs_v15, *xs_v16;
-    RooAddPdf *model_v14, *model_v15, *model_v16;
+    RooRealVar *xs_Mu, *xs_DMu;
+    RooAddPdf *model_IIaMu, *model_IIbMu, *model_IIaDMu, *model_IIbDMu;
     RooCategory *category;
     RooSimultaneous *model;
 };

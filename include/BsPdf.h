@@ -33,6 +33,7 @@
 #include "RooPolynomial.h"
 #include "RooGenericPdf.h"
 #include "RooHistPdf.h"
+#include "RooArgusBG.h"
 
 class BsPdf{
 public:

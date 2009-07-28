@@ -208,7 +208,7 @@ void BsSignalFitter::plotVar(RooRealVar* x, const char* plot_file, Int_t bins,In
 }
 
 BsSingleFitter::BsSingleFitter(const char* name, const char* name_et){
-	/* PDF's */
+/*	/* PDF's /
 	resolution = new BsResolution(name, t, et);
 	parameters->add(*resolution->getParameters());
 
@@ -231,7 +231,7 @@ BsSingleFitter::BsSingleFitter(const char* name, const char* name_et){
 	parameters->add(*xs);
 
 	model = new RooAddPdf (glue("model",name), glue("model",name), *signal->pdf(), *bkg->pdf(), *xs);
-	pdf = model;
+	pdf = model;*/
 }
 
 void BsSingleFitter::plotVar(RooRealVar* x, const char* plot_file, Int_t bins,Int_t proj_bins, Bool_t log) {
@@ -277,9 +277,10 @@ void BsSingleFitter::plotVar(RooRealVar* x, const char* plot_file, Int_t bins,In
 BsMultiFitter::BsMultiFitter(){
     /* Variables */
 	category = new RooCategory("category","category");
-	category->defineType("v14");
-	category->defineType("v15");
-	category->defineType("v16");
+	category->defineType("IIa_Mu");
+	category->defineType("IIa_DMu");
+	category->defineType("IIb_Mu");
+	category->defineType("IIb_DMu");
 
 	variables->add(*category);
 
@@ -289,56 +290,57 @@ BsMultiFitter::BsMultiFitter(){
 	parameters->add(*resolution_IIa->getParameters());
 	parameters->add(*resolution_IIb->getParameters());
 
-	et_sig_IIa = new BsEtModel ("sig_IIa", et);
-	et_sig_IIb = new BsEtModel ("sig_IIb", et);
-	et_bkg_IIa = new BsEtModel ("bkg_IIa", et);
-	et_bkg_IIb = new BsEtModel ("bkg_IIb", et);
+	et_sig_IIa = new BsEtModel("sig_IIa", et);
+	et_sig_IIb = new BsEtModel("sig_IIb", et);
+	et_bkg_IIa = new BsEtModel("bkg_IIa", et);
+	et_bkg_IIb = new BsEtModel("bkg_IIb", et);
 	parameters->add(*et_sig_IIa->getParameters());
 	parameters->add(*et_sig_IIb->getParameters());
 	parameters->add(*et_bkg_IIa->getParameters());
 	parameters->add(*et_bkg_IIb->getParameters());
 
-	efficiency_v14 = new Efficiency("efficiency_v14");
-	efficiency_v15 = new Efficiency("efficiency_v15");
-	efficiency_v16 = new Efficiency("efficiency_v16");
+	efficiency_Mu = new Efficiency("efficiency_Mu");
+	efficiency_DMu = new Efficiency("efficiency_DMu");
 
-	signal_v14 = new BsSignal ("v14", m, t, cpsi, ctheta, phi, p,
+	signal_IIaMu = new BsSignal ("IIaMu", m, t, cpsi, ctheta, phi, p,
 			M, Sigma, A0, A1, DeltaGamma, Phi_s, Delta1, Delta2, Tau, DeltaMs,
 			Delta1_mean, Delta1_sigma, Delta2_mean, Delta2_sigma, DeltaMs_mean, DeltaMs_sigma,
-			resolution_IIa, et_sig_IIa, efficiency_v14);
-	signal_v15 = new BsSignal ("v15", m, t, cpsi, ctheta, phi, p,
-			M, Sigma, A0, A1, DeltaGamma, Phi_s, Delta1, Delta2, Tau, DeltaMs,
-			Delta1_mean, Delta1_sigma, Delta2_mean, Delta2_sigma, DeltaMs_mean, DeltaMs_sigma,
-			resolution_IIb, et_sig_IIb, efficiency_v15);
-	signal_v16 = new BsSignal ("v16", m, t, cpsi, ctheta, phi, p,
-			M, Sigma, A0, A1, DeltaGamma, Phi_s, Delta1, Delta2, Tau, DeltaMs,
-			Delta1_mean, Delta1_sigma, Delta2_mean, Delta2_sigma, DeltaMs_mean, DeltaMs_sigma,
-			resolution_IIb, et_sig_IIb, efficiency_v16);
+			resolution_IIa, et_sig_IIa, efficiency_Mu);
+        signal_IIaDMu = new BsSignal ("IIaDMu", m, t, cpsi, ctheta, phi, p,
+                        M, Sigma, A0, A1, DeltaGamma, Phi_s, Delta1, Delta2, Tau, DeltaMs,
+                        Delta1_mean, Delta1_sigma, Delta2_mean, Delta2_sigma, DeltaMs_mean, DeltaMs_sigma,
+                        resolution_IIa, et_sig_IIa, efficiency_DMu);
+        signal_IIbMu = new BsSignal ("IIbMu", m, t, cpsi, ctheta, phi, p,
+                        M, Sigma, A0, A1, DeltaGamma, Phi_s, Delta1, Delta2, Tau, DeltaMs,
+                        Delta1_mean, Delta1_sigma, Delta2_mean, Delta2_sigma, DeltaMs_mean, DeltaMs_sigma,
+                        resolution_IIb, et_sig_IIb, efficiency_Mu);
+        signal_IIbDMu = new BsSignal ("IIbDMu", m, t, cpsi, ctheta, phi, p,
+                        M, Sigma, A0, A1, DeltaGamma, Phi_s, Delta1, Delta2, Tau, DeltaMs,
+                        Delta1_mean, Delta1_sigma, Delta2_mean, Delta2_sigma, DeltaMs_mean, DeltaMs_sigma,
+                        resolution_IIb, et_sig_IIb, efficiency_DMu);
 
-	bkg_v14 = new BsBackground("v14", m, t, cpsi, ctheta, phi, p, resolution_IIa, et_bkg_IIa);
-	bkg_v15 = new BsBackground("v15", m, t, cpsi, ctheta, phi, p, resolution_IIb, et_bkg_IIb);
-	bkg_v16 = new BsBackground("v16", m, t, cpsi, ctheta, phi, p, resolution_IIb, et_bkg_IIb);
+	bkg_Mu = new BsMuBackground("Mu", m, t, cpsi, ctheta, phi, p, resolution_IIa, resolution_IIb, et_bkg_IIa, et_bkg_IIb);
+	parameters->add(*bkg_Mu->getParameters());
+        bkg_DMu = new BsDMuBackground("DMu", m, t, cpsi, ctheta, phi, p, resolution_IIa, resolution_IIb, et_bkg_IIa, et_bkg_IIb);
+        parameters->add(*bkg_DMu->getParameters());
 
-	parameters->add(*bkg_v14->getParameters());
-	parameters->add(*bkg_v15->getParameters());
-	parameters->add(*bkg_v16->getParameters());
+	xs_Mu = new RooRealVar ("xs_Mu", "x_s Mu", 0);
+	xs_DMu = new RooRealVar ("xs_DMu", "x_s DMu", 0);
+	RooRealVar *xs_DMu2 = new RooRealVar ("xs_DMu2", "x_s DMu2", 0.1, 0,1);
+       RooRealVar *xs_Mu2 = new RooRealVar ("xs_Mu2", "x_s Mu2", 0.1, 0,1);
+	parameters->add(*xs_Mu);
+	parameters->add(*xs_DMu);
 
-	xs_v14 = new RooRealVar ("xs_v14", "x_s v14", 0);
-	xs_v15 = new RooRealVar ("xs_v15", "x_s v15", 0);
-	xs_v16 = new RooRealVar ("xs_v16", "x_s v16", 0);
-	parameters->add(*xs_v14);
-	parameters->add(*xs_v15);
-	parameters->add(*xs_v16);
-
-	model_v14 = new RooAddPdf ("model_v14", "model_v14", *signal_v14->pdf(), *bkg_v14->pdf(), *xs_v14);
-	model_v15 = new RooAddPdf ("model_v15", "model_v15", *signal_v15->pdf(), *bkg_v15->pdf(), *xs_v15);
-	model_v16 = new RooAddPdf ("model_v16", "model_v16", *signal_v16->pdf(), *bkg_v16->pdf(), *xs_v16);
+	model_IIaMu = new RooAddPdf ("model_IIaMu", "model_IIaMu", *signal_IIaMu->pdf(), *bkg_Mu->pdf_2a(), *xs_Mu);
+        model_IIaDMu = new RooAddPdf ("model_IIaDMu", "model_IIaDMu", *signal_IIaDMu->pdf(), *bkg_DMu->pdf_2a(), *xs_DMu);
+	model_IIbMu = new RooAddPdf ("model_IIbMu", "model_IIbMu", *signal_IIbMu->pdf(), *bkg_Mu->pdf_2b(), *xs_Mu2);
+        model_IIbDMu = new RooAddPdf("model_IIbDMu", "model_IIbDMu", *signal_IIbDMu->pdf(), *bkg_DMu->pdf_2b(), *xs_DMu2);
 
 	model = new RooSimultaneous("model", "model", *category);
-	model->addPdf(*model_v14,"v14");
-	model->addPdf(*model_v15,"v15");
-	model->addPdf(*model_v16,"v16");
-
+	model->addPdf(*model_IIaMu,"IIa_Mu");
+	model->addPdf(*model_IIaDMu,"IIa_DMu");
+	model->addPdf(*model_IIbMu,"IIb_Mu");
+        model->addPdf(*model_IIbDMu,"IIb_DMu");
 	pdf=model;
 }
 

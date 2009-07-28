@@ -5,7 +5,7 @@ INCLUDE = $(shell root-config --cflags) -Iinclude
 LIBS    = $(shell root-config --libs) -lMinuit -lRooFit -lRooFitCore
 ROOTLIB = $(shell root-config --libdir)
 LIBSTDC = $(shell g++ -m32 -print-file-name=libstdc++.a)
-MYLIBS =  obj/BsPdf.o obj/BsResolution.o obj/BsEtModel.o obj/BsSignal.o obj/BsBackground.o obj/Efficiency.o obj/RooBsTimeAngle.o obj/TransAngles.o obj/TransAnglesEfficiency.o
+MYLIBS =  obj/BsPdf.o obj/BsResolution.o obj/BsEtModel.o obj/BsSignal.o obj/BsMuBackground.o obj/BsDMuBackground.o obj/Efficiency.o obj/RooBsTimeAngle.o obj/TransAngles.o obj/TransAnglesEfficiency.o 
 
 all: bin/bs-fit bin/bs-fit-signal bin/bs-fit-multi
 
@@ -17,7 +17,7 @@ $(MYLIBS): obj/%.o : src/%.cc include/%.h
 
 obj/Dict.o: $(MYLIBS)
 	@echo rootcint -f Dict.cc  -c include/*
-	rootcint -f Dict.cc  -c include/BsPdf.h include/BsResolution.h include/BsEtModel.h include/BsSignal.h include/BsBackground.h include/Efficiency.h include/RooBsTimeAngle.h include/TransAngles.h include/TransAnglesEfficiency.h
+	rootcint -f Dict.cc  -c include/BsPdf.h include/BsResolution.h include/BsEtModel.h include/BsSignal.h include/BsMuBackground.h include/BsMuBackground.h include/Efficiency.h include/RooBsTimeAngle.h include/TransAngles.h include/TransAnglesEfficiency.h
 	@echo $(CXX) $(CCFLAGS) $(INCLUDE) -c Dict.cc -o obj/Dict.o
 	$(CXX) $(CCFLAGS) $(INCLUDE) -c Dict.cc -o obj/Dict.o
 #	$(CXX) $(CCFLAGS) $(INCLUDE) $(LIBS) -shared obj/Dict.o -o lib/libDict.so
