@@ -42,6 +42,7 @@ int main(int argc, char** argv) {
     const char *variables = "variables.txt";
     const char *parameters = "parameters.txt";
     const char *out = "fit.txt";
+    const char *cut = "";
 
     int c;
     while (1) {
@@ -53,7 +54,7 @@ int main(int argc, char** argv) {
         /* getopt_long stores the option index here. */
         int option_index = 0;
 
-        c = getopt_long(argc, argv, "d:p:o:v:j:n:e:",
+        c = getopt_long(argc, argv, "d:p:o:v:j:n:e:c:",
                 long_options, &option_index);
 
         /* Detect the end of the options. */
@@ -80,6 +81,8 @@ int main(int argc, char** argv) {
             case 'j':
                 jobs = atoi(optarg);
                 break;
+            case 'c':
+            	cut = optarg;
             case '?':
                 usage();
             default:
@@ -88,7 +91,7 @@ int main(int argc, char** argv) {
     }
 
     /* Do the real stuff */
-    BsMultiFitter bs(data, "", parameters);
+    BsMultiFitter bs(data, cut , parameters);
     bs.writeParameters("parameters_read.txt");
     bs.fit(true, false, verbose, jobs);
     bs.writeResult(out);
