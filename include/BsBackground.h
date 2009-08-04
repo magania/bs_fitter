@@ -23,8 +23,17 @@ public:
 		RooRealVar *ctheta,
 		RooRealVar *phi,
 		RooRealVar *p,
+		RooRealVar *bdtI,
+		RooRealVar *bdtP,
 		BsResolution *resolution,
-		BsEtModel *et_model);
+		BsEtModel *et_model,
+		RooDataHist *bkg_hist_I, RooDataHist *bkg_hist_P);
+
+private:
+	RooAbsPdf* angle0( const char* name,
+			RooRealVar *cpsi,
+			RooRealVar *ctheta,
+			RooRealVar *phi);
 };
 
 #endif /* BSBACKGROUND_H_ */

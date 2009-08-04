@@ -14,6 +14,8 @@ BsSignal::BsSignal(const char* name,
 		RooRealVar *ctheta,
 		RooRealVar *phi,
 		RooRealVar *p,
+		RooRealVar *bdtI,
+		RooRealVar *bdtP,
 		RooRealVar *M,
 		RooRealVar *Sigma,
 		RooRealVar *A0,
@@ -27,7 +29,8 @@ BsSignal::BsSignal(const char* name,
 		RooRealVar *Delta1_mean, RooRealVar *Delta1_sigma,
 		RooRealVar *Delta2_mean, RooRealVar *Delta2_sigma,
 		RooRealVar *DeltaMs_mean, RooRealVar *DeltaMs_sigma,
-		BsResolution *resolution, BsEtModel *et_model, Efficiency *efficiency) :
+		BsResolution *resolution, BsEtModel *et_model, Efficiency *efficiency,
+		RooDataHist *hist_I, RooDataHist *hist_P) :
 			BsPdf()
 {
 	cout << glue("SIGNAL MODEL", name) << endl;
@@ -57,15 +60,27 @@ BsSignal::BsSignal(const char* name,
 			*SinPhi, *CosPhi, *SinDelta1, *CosDelta1, *SinDelta2, *CosDelta2,
 			*resolution->pdf(), *efficiency);
 
+	RooHistPdf *bdtinclusive, *bdtprompt;
+	if (hist_I && hist_P){
+		bdtinclusive = new RooHistPdf(glue("bdtinclusive_sig",name), glue("bdtinclusive_sig",name), RooArgSet(*bdtI), *hist_I);
+		bdtprompt = new RooHistPdf(glue("bdtprompt_sig",name), glue("bdtprompt_sig",name), RooArgSet(*bdtP), *hist_P);
+	}
+
 	/* Signal Pdf */
+	RooArgSet *signal_set = new RooArgSet(*signal_mass, /* *Delta1_constraint, *Delta2_constraint,*/ *DeltaMs_constraint);
+	if ( hist_I && hist_P){
+		signal_set->add(*bdtinclusive);
+		signal_set->add(*bdtprompt);
+	}
+
 	RooProdPdf *signal;
 	if (et_model){
+		signal_set->add(*et_model->pdf());
 		signal = new RooProdPdf("signal", "signal",
-				RooArgSet(*signal_mass, *et_model->pdf(), /* *Delta1_constraint, *Delta2_constraint,*/ *DeltaMs_constraint),
+				*signal_set,
 				RooFit::Conditional(*signal_time_angle, RooArgSet(*m, *t, *cpsi, *ctheta, *phi, *p)));
 	} else {
-		signal = new RooProdPdf("signal", "signal",
-				RooArgSet(*signal_mass, *signal_time_angle, /* *Delta1_constraint, *Delta2_constraint,*/ *DeltaMs_constraint));
+		signal = new RooProdPdf("signal", "signal", *signal_set);
 	}
 
 	model = signal;

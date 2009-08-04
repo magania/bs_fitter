@@ -88,10 +88,7 @@ int main(int argc, char** argv) {
     }
 
     /* Do the real stuff */
-    BsMultiFitter bs;
-    bs.setVariables(variables);
-    bs.setParameters(parameters);
-    bs.setData(data);
+    BsMultiFitter bs(data, "", parameters);
     bs.writeParameters("parameters_read.txt");
     bs.fit(true, false, verbose, jobs);
     bs.writeResult(out);

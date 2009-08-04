@@ -94,10 +94,7 @@ int main(int argc, char** argv) {
     }
 
     /* Do the real stuff */
-    BsSignalFitter bs(name);
-    bs.setVariables(variables);
-    bs.setParameters(parameters);
-    bs.setData(data);
+    BsSignalFitter bs(name, data, "",parameters);
     bs.writeParameters("parameters_read.txt");
     bs.fit(true, false, verbose, jobs);
     bs.writeResult(out);

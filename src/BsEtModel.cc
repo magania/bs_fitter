@@ -7,16 +7,17 @@
 
 #include <BsEtModel.h>
 
-BsEtModel::BsEtModel(const char* name, RooRealVar *et):
+BsEtModel::BsEtModel(const char* name, RooRealVar *et, RooDataHist *hist):
 	BsPdf()
 {
 	cout << glue("ET MODEL",name) << endl;
 
-	et_xl = new RooRealVar(glue("et_xl",name), glue("et_xl",name), 0);
-	et_mean = new RooRealVar(glue("et_mean",name), glue("et_mean",name), 0);
-	et_sigma = new RooRealVar(glue("et_sigma",name), glue("et_sigma",name), 0);
-	et_tau_short = new RooRealVar(glue("et_tau_short",name), glue("et_tau_short",name), 0);
-	et_tau_long = new RooRealVar(glue("et_tau_long",name), glue("et_tau_long",name), 0);
+	et_xl = new RooRealVar(glue("et_xl",name), glue("et_xl",name), 0.06, 0, 1);
+	et_mean = new RooRealVar(glue("et_mean",name), glue("et_mean",name), 0.04, 0, 1);
+	et_sigma = new RooRealVar(glue("et_sigma",name), glue("et_sigma",name), 0.01, 0,0.1);
+	et_tau_short = new RooRealVar(glue("et_tau_short",name), glue("et_tau_short",name), 0.03, 0.001, 1);
+	et_tau_long = new RooRealVar(glue("et_tau_long",name), glue("et_tau_long",name), 0.19, 0.001, 1);
+
 	parameters.add(*et_xl);
 	parameters.add(*et_mean);
 	parameters.add(*et_sigma);
@@ -28,6 +29,8 @@ BsEtModel::BsEtModel(const char* name, RooRealVar *et):
 	RooDecay *et_long = new RooDecay(glue("et_long",name), glue("et_long",name), *et, *et_tau_long, *et_gauss, RooDecay::SingleSided);
 	RooAddPdf *et_model = new RooAddPdf(glue("et_model",name), glue("et_model",name), *et_long, *et_short, *et_xl);
 
+	et_model->fitTo(*hist,RooFit::NumCPU(2));
+	setConstant();
 	model = et_model;
 }
 

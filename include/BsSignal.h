@@ -26,6 +26,8 @@ public:
 			RooRealVar *ctheta,
 			RooRealVar *phi,
 			RooRealVar *p,
+			RooRealVar *bdtI,
+			RooRealVar *bdtP,
 			RooRealVar *M,
 			RooRealVar *Sigma,
 			RooRealVar *A0,
@@ -39,7 +41,8 @@ public:
 			RooRealVar *Delta1_mean, RooRealVar *Delta1_sigma,
 			RooRealVar *Delta2_mean, RooRealVar *Delta2_sigma,
 			RooRealVar *DeltaMs_mean, RooRealVar *DeltaMs_sigma,
-			BsResolution *resolution, BsEtModel *et_model, Efficiency *efficiency);
+			BsResolution *resolution, BsEtModel *et_model, Efficiency *efficiency,
+			RooDataHist *hist_I = 0, RooDataHist *hist_P = 0);
 };
 
 #endif /* BSSIGNAL_H_ */

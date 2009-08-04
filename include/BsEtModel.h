@@ -12,7 +12,7 @@
 
 class BsEtModel : public BsPdf{
 public:
-	BsEtModel(const char *name, RooRealVar *et);
+	BsEtModel(const char *name, RooRealVar *et, RooDataHist *hist);
 	void setConstant();
 private:
 	RooRealVar *et_xl, *et_mean, *et_sigma, *et_tau_short, *et_tau_long;

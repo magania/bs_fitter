@@ -1,0 +1,20 @@
+M          =  5.3675 L(5.3 - 5.45)
+Sigma      =  0.0350 L(0.01 - 0.1)  
+A0         =  0.5    L(0 - 1) 
+A1         =  0.6    L(0 - 1) 
+DeltaGamma =  0.09   L(0 - 0.3)  
+Phi_s      =  0.01   L(-INF - +INF)  
+Delta1     =  1      L(-INF - +INF)  
+Delta2     =  2      L(-INF - +INF)
+Tau        =  1.47   L(0 - +INF)
+DeltaMs    =  17.77  L(17 - 19)         
+
+Delta1_mean   =  1      C                
+Delta1_sigma  =  0.05   C               
+Delta2_mean   =  2      C               
+Delta2_sigma  =  0.05   C               
+DeltaMs_mean  =  17.77  C                 
+DeltaMs_sigma =  0.12   C                
+
+S_v14 =  1.0000 L(0 - 2)
+

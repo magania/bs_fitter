@@ -21,25 +21,32 @@
 #include "TNtuple.h"
 #include "TDirectory.h"
 
-BsFitter::BsFitter(){
+BsFitter::BsFitter(const char* root_file, const char * cut){
 	gROOT->SetStyle("Plain");
 
 	/* magic line from Rene - for future reference! */
 	gROOT->GetPluginManager()->AddHandler("TVirtualStreamerInfo",
 			"*",
-			"TStreamerInfo",
 			"RIO",
+			"TStreamerInfo",
 			"TStreamerInfo()");
 
 	/* variables */
 	variables = new RooArgSet();
 	m = new RooRealVar("m", "m", 0, 5, 5.8);
-	t = new RooRealVar("t", "t", 0,-2, 12);
-	et = new RooRealVar("et", "et", 0, 0, 2);
-	cpsi = new RooRealVar("cpsi", "cos(#psi)", 0);
-	ctheta = new RooRealVar("ctheta", "cos(#theta)", 0);
-	phi = new RooRealVar("phi", "#phi", 0);
-	p = new RooRealVar("p", "bs probability", 0);
+	t = new RooRealVar("t", "t", 0,-3, 15);
+	et = new RooRealVar("et", "et", 0.01, 0, 2);
+	cpsi = new RooRealVar("cpsi", "cos(#psi)", -1, 1);
+	ctheta = new RooRealVar("ctheta", "cos(#theta)", -1 , 1);
+	phi = new RooRealVar("phi", "#phi", -TMath::Pi(), TMath::Pi());
+	p = new RooRealVar("p", "D", -10.5, 1);
+	bdtI = new RooRealVar("bdtI", "inclusive BDT", -0.5, 1);
+	bdtP = new RooRealVar("bdtP", "prompt BDT", -0.5, 1);
+	category = new RooCategory("category","category");
+	category->defineType("nseg0",0);
+	category->defineType("nseg1",1);
+	category->defineType("nseg2",2);
+	category->defineType("nseg3",3);
 
 	variables->add(*m);
 	variables->add(*t);
@@ -48,11 +55,14 @@ BsFitter::BsFitter(){
 	variables->add(*ctheta);
 	variables->add(*phi);
 	variables->add(*p);
+	variables->add(*bdtI);
+	variables->add(*bdtP);
+	variables->add(*category);
 
 	/* Parameters */
 	parameters = new RooArgSet();
-	M = new RooRealVar ("M", "M", 0);
-	Sigma = new RooRealVar ("Sigma", "#sigma", 0);
+	M = new RooRealVar ("M", "M", 5.26, 5.46);
+	Sigma = new RooRealVar ("Sigma", "#sigma", 0.023, 0.043);
 	A0 = new RooRealVar ("A0", "A0", 0);
 	A1 = new RooRealVar ("A1", "A1", 0);
 	DeltaGamma = new RooRealVar ("DeltaGamma", "#Delta#Gamma", 0);
@@ -70,8 +80,8 @@ BsFitter::BsFitter(){
 	DeltaMs_mean = new RooRealVar("DeltaMs_mean", "#delta_2 mean", 0);
 	DeltaMs_sigma = new RooRealVar("DeltaMs_sigma", "#delta_2 sigma", 0);
 
-	parameters->add(*M);
-	parameters->add(*Sigma);
+//	parameters->add(*M);
+//	parameters->add(*Sigma);
 	parameters->add(*A0);
 	parameters->add(*A1);
 	parameters->add(*DeltaGamma);
@@ -87,6 +97,150 @@ BsFitter::BsFitter(){
 	parameters->add(*Delta2_sigma);
 	parameters->add(*DeltaMs_mean);
 	parameters->add(*DeltaMs_sigma);
+
+	cout << "\033[1m" << " Reading data ..." << "\033[m" << endl;
+	TFile tree_file(root_file);
+	TTree *Tree = (TTree*) tree_file.Get("tree");
+	if (!Tree){
+		cout << "\033[1m" << " Tree not found." << "\033[m" << endl;
+		exit(EXIT_FAILURE);
+	}
+
+	cout << "\033[1m" << " Found tree in: " << root_file
+	     << " Entries:" << Tree->GetEntries() << "\033[m" << endl;
+
+	cout << "\033[1m" << " Extra cut: " << cut << "\033[m" << endl;
+	Tree->Draw(">>entry_list", cut, "entrylist");
+	TEntryList *entry_list = (TEntryList*)gDirectory->Get("entry_list");
+
+	Long64_t nevent = entry_list->GetN();
+	cout << "\033[1m" <<  " Selected: " << nevent << " events."<< "\033[m" << endl;
+	if (!nevent )
+		exit(EXIT_FAILURE);
+
+    Double_t t_m, t_pdl, t_epdl, t_cpsi, t_ctheta, t_phi, t_d;
+	Int_t t_defined, t_category, t_muplus_nseg, t_muminus_nseg;;
+	Float_t t_inclusive, t_prompt;
+
+	Double_t t_t, t_et, t_D;
+
+	Tree->SetBranchAddress("bs_mass",&t_m);
+	Tree->SetBranchAddress("bs_pdl",&t_pdl);
+	Tree->SetBranchAddress("bs_epdl",&t_epdl);
+	Tree->SetBranchAddress("bs_angle_cpsi",&t_cpsi);
+	Tree->SetBranchAddress("bs_angle_ctheta",&t_ctheta);
+	Tree->SetBranchAddress("bs_angle_phi",&t_phi);
+	Tree->SetBranchAddress("dilution",&t_d);
+	Tree->SetBranchAddress("dilution_defined", &t_defined);
+	Tree->SetBranchAddress("mu_plus_nseg", &t_muplus_nseg);
+	Tree->SetBranchAddress("mu_minus_nseg",&t_muminus_nseg);
+	Tree->SetBranchAddress("inclusiveBDT", &t_inclusive);
+	Tree->SetBranchAddress("promptBDT", &t_prompt);
+
+	data = new RooDataSet("data","data",*variables);
+	for (Long64_t i=0;i< nevent;i++) {
+		Tree->GetEntry(entry_list->GetEntry(i));
+
+		Double_t t_t= t_pdl/0.0299792458;
+		Double_t t_et=t_epdl/0.0299792458;
+		Double_t t_D=0;
+
+		if ( t_defined )
+			t_D = (fabs(t_d)>0.55)?  (t_d>0?0.5957:-0.5957) : 0.7895*t_d + 0.3390*t_d*fabs(t_d);
+
+		*m = t_m;
+		*t = t_t;
+		*et = t_et;
+		*cpsi = t_cpsi;
+		*ctheta = t_ctheta;
+		*phi = t_phi;
+		*p = t_D;
+		*bdtI = t_inclusive;
+		*bdtP = t_prompt;
+		category->setIndex(TMath::Min(t_muplus_nseg, t_muplus_nseg));
+        data->add(*variables);
+
+		if (!(i%10000))
+			cout << "Processed " << i << " ..." << endl;
+	 }
+	data->Print();
+}
+
+void BsFitter::histogram(const char *cut, RooDataHist *signal_hist_et, RooDataHist *bkg_hist_et,
+		RooDataHist *signal_hist_I, RooDataHist *bkg_hist_I,
+		RooDataHist *signal_hist_P, RooDataHist *bkg_hist_P){
+	cout << "\033[1m" << " Preliminary mass fit: gaus+line ..." << "\033[m" << endl;
+    RooRealVar *mm0 = new RooRealVar("mm0", "mm0", 0, -1/5.8, 1);
+    RooRealVar *xs0 = new RooRealVar("xs0", "xs0", 0.1, 0.01, 1);
+	RooGaussian gauss("gauss", "gauss", *m, *M, *Sigma);
+    RooPolynomial line("line", "line", *m, *mm0);
+
+    RooAddPdf model("model", "model", gauss, line, *xs0);
+    RooDataSet data_histo("data_histo", "data_histo", *variables, RooFit::Import(*data), RooFit::Cut(cut));
+	model.fitTo(data_histo/*, RooFit::Hesse(false), RooFit::Minos(false)*/, RooFit::NumCPU(2));
+
+	/*
+	RooPlot *m_frame = m.frame();
+	data.plotOn(m_frame);
+	    model.plotOn(m_frame, RooFit::LineColor(13));
+	    TCanvas *canvas_m = new TCanvas("canvas_m", "canvas mass", 600, 600);
+	    m_frame->Draw();
+	    ss_mass_png << "mass_" << name << ".png";
+	    canvas_m->Print(ss_mass_png.str().c_str());
+	*/
+
+	Double_t a = m->getMin();
+	Double_t b = M->getVal() - 3 * Sigma->getVal();
+	Double_t c = M->getVal() + 3 * Sigma->getVal();
+	Double_t d = m->getMax();
+
+	Double_t all = (d-a) + mm0->getVal()*(d-a)*(d-a)/2;
+	Double_t under = (c-b) + mm0->getVal()*(c-b)*(c-b)/2;
+	//Double_t u = (1-xs0->getVal())*all/under;
+	//Double_t x_u = xs0->getVal()/(xs0->getVal() + u);
+	Double_t x_u = under/(all - under);
+
+	bkg_cut = "m < ";
+	bkg_cut += b;
+	bkg_cut += " || m > ";
+	bkg_cut += c;
+	signal_cut = "m > ";
+	signal_cut += b;
+	signal_cut += " && m < ";
+	signal_cut += c;
+
+	cout << "Bkg Cut: " << bkg_cut << endl;
+	cout << "Signal Cut: " << signal_cut << endl;
+	cout << "\033[1m" << " Events\tSignal\tBkg\tS/sqrt(N)\txs\txu" << "\033[m" << endl;
+	unsigned int N = data_histo.numEntries();
+	cout << "\033[1m " << N << '\t'
+		 << N*xs0->getVal() << '\t'
+		 << N*(1-xs0->getVal()) << '\t'
+		 << N*xs0->getVal()/sqrt(N) << "\t\t"
+		 << xs0->getVal() << '\t'
+		 << x_u << '\t'
+		 << "\033[m" << endl;
+
+	signal_hist_et->add(data_histo, signal_cut, 1.0);
+	signal_hist_et->add(data_histo, bkg_cut, -x_u);
+	bkg_hist_et->add(data_histo, bkg_cut, x_u);
+	signal_hist_et->Print();
+	bkg_hist_et->Print();
+
+	signal_hist_I->add(data_histo, signal_cut, 1.0);
+	signal_hist_I->add(data_histo, bkg_cut, -x_u);
+	bkg_hist_I->add(data_histo, bkg_cut, x_u);
+	signal_hist_I->Print();
+	bkg_hist_I->Print();
+
+	signal_hist_P->add(data_histo, signal_cut, 1.0);
+	signal_hist_P->add(data_histo, bkg_cut, -x_u);
+	bkg_hist_P->add(data_histo, bkg_cut, x_u);
+	signal_hist_P->Print();
+	bkg_hist_P->Print();
+
+	delete mm0;
+	delete xs0;
 }
 
 void BsFitter::plotVar(RooRealVar* x, const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log) {
@@ -142,19 +296,22 @@ void BsFitter::plotPhi() {
 plotVar(phi, "phi.png", 0, 100, kFALSE);
 }
 
-BsSignalFitter::BsSignalFitter(const char* name){
+BsSignalFitter::BsSignalFitter(const char* name, const char* root_file, const char* cut, const char* parameters_file) :
+	BsFitter(root_file, cut)
+{
 	/* PDF's */
 	resolution = new BsResolution(name, t, et);
 	parameters->add(*resolution->getParameters());
 
 	efficiency = new Efficiency(glue("efficiency",name));
 
-	signal = new BsSignal (name, m, t, cpsi, ctheta, phi, p,
+	signal = new BsSignal (name, m, t, cpsi, ctheta, phi, p, bdtI, bdtP,
 			M, Sigma, A0, A1, DeltaGamma, Phi_s, Delta1, Delta2, Tau, DeltaMs,
 			Delta1_mean, Delta1_sigma, Delta2_mean, Delta2_sigma, DeltaMs_mean, DeltaMs_sigma,
 			resolution, 0, efficiency);
 
 	pdf = signal->pdf();
+	parameters->readFromFile(parameters_file);
 }
 
 Int_t BsSignalFitter::fit(Bool_t hesse, Bool_t minos, Bool_t verbose, Int_t cpu) {
@@ -207,24 +364,37 @@ void BsSignalFitter::plotVar(RooRealVar* x, const char* plot_file, Int_t bins,In
 	canvas->Print(plot_file);
 }
 
-BsSingleFitter::BsSingleFitter(const char* name, const char* name_et){
+BsSingleFitter::BsSingleFitter(const char* name, const char* name_et, const char* root_file, const char *cut, const char* parameters_file) :
+	BsFitter(root_file, cut)
+{
+	RooDataHist *signal_hist_et = new RooDataHist("signal_hist_et", "signal_hist_et", RooArgSet(*et));
+	RooDataHist *bkg_hist_et = new RooDataHist("bkg_hist_et", "bkg_hist_et", RooArgSet(*et));
+
+	RooDataHist *signal_hist_I = new RooDataHist("signal_hist_I", "signal_hist_I", RooArgSet(*bdtI));
+	RooDataHist *bkg_hist_I = new RooDataHist("bkg_hist_I", "bkg_hist_I", RooArgSet(*bdtI));
+
+	RooDataHist *signal_hist_P = new RooDataHist("signal_hist_P", "signal_hist_P", RooArgSet(*bdtP));
+	RooDataHist *bkg_hist_P = new RooDataHist("bkg_hist_P", "bkg_hist_P", RooArgSet(*bdtP));
+
+	histogram("", signal_hist_et, bkg_hist_et, signal_hist_I, bkg_hist_I, signal_hist_P, bkg_hist_P);
+
 	/* PDF's */
 	resolution = new BsResolution(name, t, et);
 	parameters->add(*resolution->getParameters());
 
-	et_sig = new BsEtModel(glue("sig",name_et), et);
-	et_bkg = new BsEtModel(glue("bkg",name_et), et);
+	et_sig = new BsEtModel(glue("sig",name_et), et, signal_hist_et);
+	et_bkg = new BsEtModel(glue("bkg",name_et), et, bkg_hist_et);
 	parameters->add(*et_sig->getParameters());
 	parameters->add(*et_bkg->getParameters());
 
 	efficiency = new Efficiency(glue("efficiency",name));
 
-	signal = new BsSignal (name, m, t, cpsi, ctheta, phi, p,
+	signal = new BsSignal (name, m, t, cpsi, ctheta, phi, p, bdtI, bdtP,
 			M, Sigma, A0, A1, DeltaGamma, Phi_s, Delta1, Delta2, Tau, DeltaMs,
 			Delta1_mean, Delta1_sigma, Delta2_mean, Delta2_sigma, DeltaMs_mean, DeltaMs_sigma,
-			resolution, et_sig, efficiency);
+			resolution, et_sig, efficiency, signal_hist_I, signal_hist_P);
 
-	bkg = new BsBackground(name, m, t, cpsi, ctheta, phi, p, resolution, et_bkg);
+	bkg = new BsBackground(name, m, t, cpsi, ctheta, phi, p, bdtI, bdtP, resolution, et_bkg, bkg_hist_I, bkg_hist_P);
 	parameters->add(*bkg->getParameters());
 
 	xs = new RooRealVar (glue("xs",name), glue("x_s",name), 0);
@@ -232,6 +402,7 @@ BsSingleFitter::BsSingleFitter(const char* name, const char* name_et){
 
 	model = new RooAddPdf (glue("model",name), glue("model",name), *signal->pdf(), *bkg->pdf(), *xs);
 	pdf = model;
+	parameters->readFromFile(parameters_file);
 }
 
 void BsSingleFitter::plotVar(RooRealVar* x, const char* plot_file, Int_t bins,Int_t proj_bins, Bool_t log) {
@@ -274,72 +445,92 @@ void BsSingleFitter::plotVar(RooRealVar* x, const char* plot_file, Int_t bins,In
 	canvas->Print(plot_file);
 }
 
-BsMultiFitter::BsMultiFitter(){
-    /* Variables */
-	category = new RooCategory("category","category");
-	category->defineType("v14");
-	category->defineType("v15");
-	category->defineType("v16");
+BsMultiFitter::BsMultiFitter(const char* root_file, const char* cut, const char* parameters_file) :
+	BsFitter(root_file, cut)
+{
+	RooDataHist *signal_hist_et0 = new RooDataHist("signal_hist_et0", "signal_hist_et0", RooArgSet(*et));
+	RooDataHist *bkg_hist_et0 = new RooDataHist("bkg_hist_et0", "bkg_hist_et0", RooArgSet(*et));
+	RooDataHist *signal_hist_I0 = new RooDataHist("signal_hist_I0", "signal_hist_I0", RooArgSet(*bdtI));
+	RooDataHist *bkg_hist_I0 = new RooDataHist("bkg_hist_I0", "bkg_hist_I0", RooArgSet(*bdtI));
+	RooDataHist *signal_hist_P0 = new RooDataHist("signal_hist_P0", "signal_hist_P0", RooArgSet(*bdtP));
+	RooDataHist *bkg_hist_P0 = new RooDataHist("bkg_hist_P0", "bkg_hist_P0", RooArgSet(*bdtP));
+	histogram("category == 0", signal_hist_et0, bkg_hist_et0, signal_hist_I0, bkg_hist_I0, signal_hist_P0, bkg_hist_P0);
 
-	variables->add(*category);
+	RooDataHist *signal_hist_et1 = new RooDataHist("signal_hist_et1", "signal_hist_et1", RooArgSet(*et));
+	RooDataHist *bkg_hist_et1 = new RooDataHist("bkg_hist_et1", "bkg_hist_et1", RooArgSet(*et));
+	RooDataHist *signal_hist_I1 = new RooDataHist("signal_hist_I1", "signal_hist_I1", RooArgSet(*bdtI));
+	RooDataHist *bkg_hist_I1 = new RooDataHist("bkg_hist_I1", "bkg_hist_I1", RooArgSet(*bdtI));
+	RooDataHist *signal_hist_P1 = new RooDataHist("signal_hist_P1", "signal_hist_P1", RooArgSet(*bdtP));
+	RooDataHist *bkg_hist_P1 = new RooDataHist("bkg_hist_P1", "bkg_hist_P1", RooArgSet(*bdtP));
+	histogram("category == 1", signal_hist_et1, bkg_hist_et1, signal_hist_I1, bkg_hist_I1, signal_hist_P1, bkg_hist_P1);
+
+	RooDataHist *signal_hist_et3 = new RooDataHist("signal_hist_et3", "signal_hist_et3", RooArgSet(*et));
+	RooDataHist *bkg_hist_et3 = new RooDataHist("bkg_hist_et3", "bkg_hist_et3", RooArgSet(*et));
+	RooDataHist *signal_hist_I3 = new RooDataHist("signal_hist_I3", "signal_hist_I3", RooArgSet(*bdtI));
+	RooDataHist *bkg_hist_I3 = new RooDataHist("bkg_hist_I3", "bkg_hist_I3", RooArgSet(*bdtI));
+	RooDataHist *signal_hist_P3 = new RooDataHist("signal_hist_P3", "signal_hist_P3", RooArgSet(*bdtP));
+	RooDataHist *bkg_hist_P3 = new RooDataHist("bkg_hist_P3", "bkg_hist_P3", RooArgSet(*bdtP));
+	histogram("category == 3", signal_hist_et3, bkg_hist_et3, signal_hist_I3, bkg_hist_I3, signal_hist_P3, bkg_hist_P3);
 
 	/* PDF's */
-	resolution_IIa = new BsResolution("IIa", t, et);
-	resolution_IIb = new BsResolution("IIb", t, et);
-	parameters->add(*resolution_IIa->getParameters());
-	parameters->add(*resolution_IIb->getParameters());
+	resolution = new BsResolution("", t, et);
+	parameters->add(*resolution->getParameters());
 
-	et_sig_IIa = new BsEtModel ("sig_IIa", et);
-	et_sig_IIb = new BsEtModel ("sig_IIb", et);
-	et_bkg_IIa = new BsEtModel ("bkg_IIa", et);
-	et_bkg_IIb = new BsEtModel ("bkg_IIb", et);
-	parameters->add(*et_sig_IIa->getParameters());
-	parameters->add(*et_sig_IIb->getParameters());
-	parameters->add(*et_bkg_IIa->getParameters());
-	parameters->add(*et_bkg_IIb->getParameters());
+	et_sig_0 = new BsEtModel ("sig_0", et, signal_hist_et0);
+	et_sig_1 = new BsEtModel ("sig_1", et, signal_hist_et1);
+	et_sig_3 = new BsEtModel ("sig_3", et, signal_hist_et3);
+	et_bkg_0 = new BsEtModel ("bkg_0", et, bkg_hist_et0);
+	et_bkg_1 = new BsEtModel ("bkg_1", et, bkg_hist_et1);
+	et_bkg_3 = new BsEtModel ("bkg_3", et, bkg_hist_et3);
 
-	efficiency_v14 = new Efficiency("efficiency_v14");
-	efficiency_v15 = new Efficiency("efficiency_v15");
-	efficiency_v16 = new Efficiency("efficiency_v16");
+//	parameters->add(*et_sig_IIa->getParameters());
+//	parameters->add(*et_sig_IIb->getParameters());
+//	parameters->add(*et_bkg_IIa->getParameters());
+//	parameters->add(*et_bkg_IIb->getParameters());
 
-	signal_v14 = new BsSignal ("v14", m, t, cpsi, ctheta, phi, p,
+	efficiency_0 = new Efficiency("efficiency_0");
+	efficiency_1 = new Efficiency("efficiency_1");
+	efficiency_3 = new Efficiency("efficiency_3");
+
+	signal_0 = new BsSignal ("0", m, t, cpsi, ctheta, phi, p, bdtI, bdtP,
 			M, Sigma, A0, A1, DeltaGamma, Phi_s, Delta1, Delta2, Tau, DeltaMs,
 			Delta1_mean, Delta1_sigma, Delta2_mean, Delta2_sigma, DeltaMs_mean, DeltaMs_sigma,
-			resolution_IIa, et_sig_IIa, efficiency_v14);
-	signal_v15 = new BsSignal ("v15", m, t, cpsi, ctheta, phi, p,
+			resolution, et_sig_0, efficiency_0);
+	signal_1 = new BsSignal ("1", m, t, cpsi, ctheta, phi, p, bdtI, bdtP,
 			M, Sigma, A0, A1, DeltaGamma, Phi_s, Delta1, Delta2, Tau, DeltaMs,
 			Delta1_mean, Delta1_sigma, Delta2_mean, Delta2_sigma, DeltaMs_mean, DeltaMs_sigma,
-			resolution_IIb, et_sig_IIb, efficiency_v15);
-	signal_v16 = new BsSignal ("v16", m, t, cpsi, ctheta, phi, p,
+			resolution, et_sig_1, efficiency_1);
+	signal_3 = new BsSignal ("3", m, t, cpsi, ctheta, phi, p, bdtI, bdtP,
 			M, Sigma, A0, A1, DeltaGamma, Phi_s, Delta1, Delta2, Tau, DeltaMs,
 			Delta1_mean, Delta1_sigma, Delta2_mean, Delta2_sigma, DeltaMs_mean, DeltaMs_sigma,
-			resolution_IIb, et_sig_IIb, efficiency_v16);
+			resolution, et_sig_3, efficiency_3);
 
-	bkg_v14 = new BsBackground("v14", m, t, cpsi, ctheta, phi, p, resolution_IIa, et_bkg_IIa);
-	bkg_v15 = new BsBackground("v15", m, t, cpsi, ctheta, phi, p, resolution_IIb, et_bkg_IIb);
-	bkg_v16 = new BsBackground("v16", m, t, cpsi, ctheta, phi, p, resolution_IIb, et_bkg_IIb);
+	bkg_0 = new BsBackground("0", m, t, cpsi, ctheta, phi, p, bdtI, bdtP, resolution, et_bkg_0, bkg_hist_I0, bkg_hist_P0);
+	bkg_1 = new BsBackground("1", m, t, cpsi, ctheta, phi, p, bdtI, bdtP, resolution, et_bkg_1, bkg_hist_I1, bkg_hist_P1);
+	bkg_3 = new BsBackground("3", m, t, cpsi, ctheta, phi, p, bdtI, bdtP, resolution, et_bkg_3, bkg_hist_I3, bkg_hist_P3);
 
-	parameters->add(*bkg_v14->getParameters());
-	parameters->add(*bkg_v15->getParameters());
-	parameters->add(*bkg_v16->getParameters());
+	parameters->add(*bkg_0->getParameters());
+	parameters->add(*bkg_1->getParameters());
+	parameters->add(*bkg_3->getParameters());
 
-	xs_v14 = new RooRealVar ("xs_v14", "x_s v14", 0);
-	xs_v15 = new RooRealVar ("xs_v15", "x_s v15", 0);
-	xs_v16 = new RooRealVar ("xs_v16", "x_s v16", 0);
-	parameters->add(*xs_v14);
-	parameters->add(*xs_v15);
-	parameters->add(*xs_v16);
+	xs_0 = new RooRealVar ("xs_0", "x_s 0", 0);
+	xs_1 = new RooRealVar ("xs_1", "x_s 1", 0);
+	xs_3 = new RooRealVar ("xs_3", "x_s 3", 0);
+	parameters->add(*xs_0);
+	parameters->add(*xs_1);
+	parameters->add(*xs_3);
 
-	model_v14 = new RooAddPdf ("model_v14", "model_v14", *signal_v14->pdf(), *bkg_v14->pdf(), *xs_v14);
-	model_v15 = new RooAddPdf ("model_v15", "model_v15", *signal_v15->pdf(), *bkg_v15->pdf(), *xs_v15);
-	model_v16 = new RooAddPdf ("model_v16", "model_v16", *signal_v16->pdf(), *bkg_v16->pdf(), *xs_v16);
+	model_0 = new RooAddPdf ("model_0", "model_0", *signal_0->pdf(), *bkg_0->pdf(), *xs_0);
+	model_1 = new RooAddPdf ("model_1", "model_1", *signal_1->pdf(), *bkg_1->pdf(), *xs_1);
+	model_3 = new RooAddPdf ("model_3", "model_3", *signal_3->pdf(), *bkg_3->pdf(), *xs_3);
 
 	model = new RooSimultaneous("model", "model", *category);
-	model->addPdf(*model_v14,"v14");
-	model->addPdf(*model_v15,"v15");
-	model->addPdf(*model_v16,"v16");
+	model->addPdf(*model_0,"nseg0");
+	model->addPdf(*model_1,"nseg1");
+	model->addPdf(*model_3,"nseg3");
 
 	pdf=model;
+	parameters->readFromFile(parameters_file);
 }
 
 
@@ -351,31 +542,12 @@ char *BsFitter::glue(const char* a, const char *b){
 	return tmp;
 }
 
-void BsFitter::setVariables(const char* vars) {
-	variables->readFromFile(vars);
-	cpsi->setMax(1);
-	cpsi->setMin(-1);
-	ctheta->setMax(1);
-	ctheta->setMin(-1);
-	phi->setMax(TMath::Pi());
-	phi->setMin(-TMath::Pi());
-	p->setMin(-1);
-	p->setMax(1);
-}
-
-void BsFitter::setParameters(const char* params) {
-	parameters->readFromFile(params);
-}
-
 void BsFitter::writeParameters(const char* file) {
 	//ofstream out(file);
 	parameters->writeToFile(file);
 //	out.close();
 }
 
-void BsFitter::setData(const char* data_file) {
-	data = RooDataSet::read(data_file, *variables);
-}
 
 Int_t BsFitter::fit(Bool_t hesse, Bool_t minos, Bool_t verbose, Int_t cpu) {
 	if (!data) {

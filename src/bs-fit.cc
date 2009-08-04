@@ -46,6 +46,7 @@ int main(int argc, char** argv) {
     const char *out = "fit.txt";
     const char *name = "";
     const char *name_et = "";
+    const char *cut ="";
 
     int c;
     while (1) {
@@ -57,7 +58,7 @@ int main(int argc, char** argv) {
         /* getopt_long stores the option index here. */
         int option_index = 0;
 
-        c = getopt_long(argc, argv, "d:p:o:v:j:n:e:",
+        c = getopt_long(argc, argv, "d:p:o:v:j:n:e:c:",
                 long_options, &option_index);
 
         /* Detect the end of the options. */
@@ -90,6 +91,9 @@ int main(int argc, char** argv) {
             case 'j':
                 jobs = atoi(optarg);
                 break;
+            case 'c':
+                cut = optarg;
+                break;
             case '?':
                 usage();
             default:
@@ -98,10 +102,7 @@ int main(int argc, char** argv) {
     }
 
     /* Do the real stuff */
-    BsSingleFitter bs(name, name_et);
-    bs.setVariables(variables);
-    bs.setParameters(parameters);
-    bs.setData(data);
+    BsSingleFitter bs(name, name_et, data, cut, parameters);
     bs.writeParameters("parameters_read.txt");
     bs.fit(true, false, verbose, jobs);
     bs.writeResult(out);

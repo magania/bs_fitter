@@ -67,7 +67,8 @@ static: src/bs.cc $(MYLIBS) obj/BsFitter.o obj/Dict.o
 clean:
 	rm $(MYLIBS)
 	rm Dict.cc Dict.h
-	rm bin/bs
+	rm obj/BsFitter.o obj/Dict.o
+	rm bin/bs-fit bin/bs-fit-multi bin/bs-fit-signal
 
 		 #$(ROOTLIB)/../graf2d/graf/src/*.o \
 	     #$(ROOTLIB)/../libMissing.a \
