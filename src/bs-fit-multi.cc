@@ -83,6 +83,7 @@ int main(int argc, char** argv) {
                 break;
             case 'c':
             	cut = optarg;
+            	break;
             case '?':
                 usage();
             default:

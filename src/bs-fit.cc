@@ -39,6 +39,7 @@ int main(int argc, char** argv) {
 
     static int verbose = false;
     int jobs = 1;
+    int angle_pdf = -1;
 
     const char *data = "fit.dat";
     const char *variables = "variables.txt";
@@ -58,7 +59,7 @@ int main(int argc, char** argv) {
         /* getopt_long stores the option index here. */
         int option_index = 0;
 
-        c = getopt_long(argc, argv, "d:p:o:v:j:n:e:c:",
+        c = getopt_long(argc, argv, "d:p:o:v:j:n:e:c:a:",
                 long_options, &option_index);
 
         /* Detect the end of the options. */
@@ -91,6 +92,9 @@ int main(int argc, char** argv) {
             case 'j':
                 jobs = atoi(optarg);
                 break;
+            case 'a':
+                angle_pdf = atoi(optarg);
+                break;
             case 'c':
                 cut = optarg;
                 break;
@@ -102,7 +106,7 @@ int main(int argc, char** argv) {
     }
 
     /* Do the real stuff */
-    BsSingleFitter bs(name, name_et, data, cut, parameters);
+    BsSingleFitter bs(name, name_et, data, cut, parameters, angle_pdf);
     bs.writeParameters("parameters_read.txt");
     bs.fit(true, false, verbose, jobs);
     bs.writeResult(out);
@@ -112,6 +116,9 @@ int main(int argc, char** argv) {
     bs.plotCpsi();
     bs.plotCtheta();
     bs.plotPhi();
+    bs.plotD();
+    bs.plotI();
+    bs.plotP();
 
     return (EXIT_SUCCESS);
 }

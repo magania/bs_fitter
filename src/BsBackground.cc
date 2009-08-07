@@ -18,13 +18,14 @@ BsBackground::BsBackground( const char* name,
 		RooRealVar *bdtP,
 		BsResolution *resolution,
 		BsEtModel *et_model,
-		RooDataHist *hist_I, RooDataHist *hist_P ) :
+		RooDataHist *hist_I, RooDataHist *hist_P, RooDataHist* hist_D,
+		int angle_pdf) :
 		BsPdf()
 {
 	cout << glue("BACKGROUND MODEL",name) << endl;
 	/* Mass Pdf parameters */
 	RooRealVar *m_a1 = new RooRealVar(glue("m_a1",name), glue("m_a1",name), 0);
-//	RooRealVar *m_a2 = new RooRealVar("m_a2", "m_p_a2", 0);
+	RooRealVar *m_a2 = new RooRealVar(glue("m_a2",name), glue("m_a2",name), 0);
 	/* Time Pdf parameters */
 	RooRealVar *t_m = new RooRealVar(glue("t_m",name), glue("t_m",name), 0);
 	RooRealVar *t_p = new RooRealVar(glue("t_p",name), glue("t_p",name), 0);
@@ -34,6 +35,7 @@ BsBackground::BsBackground( const char* name,
     RooRealVar *fp = new RooRealVar(glue("fp",name), glue("fp",name), 0);
 
 	parameters.add(*m_a1);
+	parameters.add(*m_a2);
 	parameters.add(*xp);
 	parameters.add(*t_m);
 	parameters.add(*t_p);
@@ -42,30 +44,45 @@ BsBackground::BsBackground( const char* name,
 	parameters.add(*fp);
 
 	/* Mass Pdf */
-	RooPolynomial *mass_bkg = new RooPolynomial(glue("mass_bkg",name), glue("mass_bkg",name), *m, RooArgList(*m_a1));
+	RooPolynomial *mass_p_bkg = new RooPolynomial(glue("mass_p_bkg",name), glue("mass_p_bkg",name), *m, RooArgList(*m_a1));
+	RooPolynomial *mass_np_bkg = new RooPolynomial(glue("mass_np_bkg",name), glue("mass_np_bkg",name), *m, RooArgList(*m_a2));
 
 	/* Time Pdf */
 	RooDecay *exp_minus = new RooDecay(glue("exp_minus",name), glue("exp_minus",name), *t, *t_m, *resolution->pdf(), RooDecay::Flipped);
 	RooDecay *exp_plus = new RooDecay(glue("exp_plus",name), glue("exp_plus",name), *t, *t_p, *resolution->pdf(), RooDecay::SingleSided);
 	RooDecay *exp_plus_plus = new RooDecay(glue("exp_plus_plus",name), glue("exp_plus_plus",name), *t, *t_pp, *resolution->pdf(), RooDecay::SingleSided);
 
-	RooAddPdf *time_bkg = new RooAddPdf(glue("time_bkg",name), glue("time_bkg",name),
-			RooArgSet(*resolution->pdf(), *exp_minus, *exp_plus, *exp_plus_plus),
-			RooArgSet(*xp, *fm, *fp), true);
+	RooAddPdf *time_np = new RooAddPdf(glue("time_np",name), glue("time_np",name),
+			RooArgSet(*exp_minus, *exp_plus, *exp_plus_plus),
+			RooArgSet(*fm, *fp), true);
 
-	RooHistPdf *bdtinclusive = new RooHistPdf(glue("bdtinclusive",name), glue("bdtinclusive",name), RooArgSet(*bdtI), *hist_I);
-	RooHistPdf *bdtprompt = new RooHistPdf(glue("bdtprompt",name), glue("bdtprompt",name), RooArgSet(*bdtP), *hist_P);
+	RooProdPdf *mass_time_p = new RooProdPdf(glue("mass_time_p",name), glue("mass_time_p",name), RooArgSet(*mass_p_bkg,*resolution->pdf() ));
+	RooProdPdf *mass_time_np = new RooProdPdf(glue("mass_time_np",name), glue("mass_time_np",name), RooArgSet(*mass_np_bkg, *time_np));
 
-//	RooAbsPdf *angle = angle0(name, cpsi, ctheta, phi);
-	RooArgSet *background_set = new RooArgSet(*mass_bkg, *bdtinclusive, *bdtprompt);
+	RooAddPdf *mass_time = new RooAddPdf(glue("mass_time",name), glue("mass_time",name), *mass_time_p, *mass_time_np, *xp);
+
+
+	RooHistPdf *bdtinclusive = new RooHistPdf(glue("bdtinclusive_bkg",name), glue("bdtinclusive_bkg",name), RooArgSet(*bdtI), *hist_I);
+	RooHistPdf *bdtprompt = new RooHistPdf(glue("bdtprompt_bkg",name), glue("bdtprompt_bkg",name), RooArgSet(*bdtP), *hist_P);
+	RooHistPdf *dilution_bkg = new RooHistPdf(glue("dilution_bkg",name), glue("dilution_bkg",name), RooArgSet(*p), *hist_D);
+
+	RooAbsPdf *angle = 0;
+	if (angle_pdf == 0 )
+		angle = angle0(name, cpsi, ctheta, phi);
+	if (angle_pdf == 3)
+		angle = angle3(name, cpsi, ctheta, phi);
+
+	RooArgSet *background_set = new RooArgSet(/*bdtinclusive, *bdtprompt, *dilution_bkg*/);
+	if (angle)
+		background_set->add(*angle);
 	RooProdPdf *background;
 	if ( et_model ){
 		background_set->add(*et_model->pdf());
 
 		background = new RooProdPdf(glue("background",name), glue("background",name), *background_set,
-				RooFit::Conditional(*time_bkg, RooArgSet(*m, *t, *cpsi, *ctheta, *phi)));
+				RooFit::Conditional(*mass_time, RooArgSet(*m, *t, *cpsi, *ctheta, *phi)));
 	} else {
-		background_set->add(*time_bkg);
+		background_set->add(*mass_time);
 		background = new RooProdPdf(glue("background",name), glue("background",name), *background_set);
 	}
 
@@ -113,4 +130,48 @@ RooAbsPdf* BsBackground::angle0( const char* name,
 	RooProdPdf *angle_bkg = new RooProdPdf(glue("angle_bkg",name), glue("angle_bkg",name), RooArgSet(*model_cpsi, *model_ctheta, *model_phi));
 
 	return angle_bkg;
+}
+
+RooAbsPdf* BsBackground::angle3( const char* name,
+		RooRealVar *cpsi,
+		RooRealVar *ctheta,
+		RooRealVar *phi) {
+	/* Angle Pdf parameters */
+	/* cpsi */
+	/* ctheta */
+	RooRealVar *ctheta_a1 = new RooRealVar(glue("ctheta_a1",name), glue("ctheta_a1",name), 0);
+	RooRealVar *ctheta_a2 = new RooRealVar(glue("ctheta_a2",name), glue("ctheta_a2",name), 0);
+	/* phi */
+	RooRealVar *phi_a1 = new RooRealVar(glue("phi_a1",name), glue("phi_a1",name), 0);
+	RooRealVar *phi_a2 = new RooRealVar(glue("phi_a2",name), glue("phi_a2",name), 0);
+	RooRealVar *phi_a3 = new RooRealVar(glue("phi_a3",name), glue("phi_a3",name), 0);
+	RooRealVar *phi_a4 = new RooRealVar(glue("phi_a4",name), glue("phi_a4",name), 0);
+	RooRealVar *phi_a5 = new RooRealVar(glue("phi_a5",name), glue("phi_a5",name), 0);
+	RooRealVar *phi_a6 = new RooRealVar(glue("phi_a6",name), glue("phi_a6",name), 0);
+	RooRealVar *phi_a7 = new RooRealVar(glue("phi_a7",name), glue("phi_a7",name), 0);
+
+	parameters.add(*ctheta_a1);
+	parameters.add(*ctheta_a2);
+	parameters.add(*phi_a1);
+	parameters.add(*phi_a2);
+	parameters.add(*phi_a3);
+	parameters.add(*phi_a4);
+	parameters.add(*phi_a5);
+	parameters.add(*phi_a6);
+	parameters.add(*phi_a7);
+
+
+	 /* Angle */
+	/* cpsi */
+	RooPolynomial *model_cpsi = new RooPolynomial(glue("model_cpsi", name), glue("model_cpsi", name), *cpsi, RooArgList());
+	/* ctheta */
+	RooPolynomial *model_ctheta = new RooPolynomial(glue("model_ctheta",name), glue("model_ctheta",name), *ctheta,
+			RooArgList(RooFit::RooConst(0), *ctheta_a1, RooFit::RooConst(0), *ctheta_a2));
+	/* phi */
+	RooPolynomial *model_phi = new RooPolynomial(glue("model_phi",name), glue("model_phi",name), *phi,
+			RooArgList(*phi_a1, *phi_a2, *phi_a3, *phi_a4, *phi_a5, *phi_a6, *phi_a7));
+
+	RooProdPdf *angle = new RooProdPdf(glue("angle",name), glue("angle",name), RooArgList(*model_cpsi, *model_ctheta, *model_phi));
+
+	return angle;
 }

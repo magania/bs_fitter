@@ -27,10 +27,15 @@ public:
 		RooRealVar *bdtP,
 		BsResolution *resolution,
 		BsEtModel *et_model,
-		RooDataHist *bkg_hist_I, RooDataHist *bkg_hist_P);
+		RooDataHist *hist_I, RooDataHist *hist_P, RooDataHist *hist_D,
+		int angle_pdf);
 
 private:
 	RooAbsPdf* angle0( const char* name,
+			RooRealVar *cpsi,
+			RooRealVar *ctheta,
+			RooRealVar *phi);
+	RooAbsPdf* angle3( const char* name,
 			RooRealVar *cpsi,
 			RooRealVar *ctheta,
 			RooRealVar *phi);

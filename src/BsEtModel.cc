@@ -31,7 +31,10 @@ BsEtModel::BsEtModel(const char* name, RooRealVar *et, RooDataHist *hist):
 
 	et_model->fitTo(*hist,RooFit::NumCPU(2));
 	setConstant();
+
 	model = et_model;
+
+	//model = new RooHistPdf(glue("et_model",name), glue("et_model",name), *et ,*hist);
 }
 
 void BsEtModel::setConstant(){

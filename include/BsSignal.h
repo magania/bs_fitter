@@ -42,7 +42,7 @@ public:
 			RooRealVar *Delta2_mean, RooRealVar *Delta2_sigma,
 			RooRealVar *DeltaMs_mean, RooRealVar *DeltaMs_sigma,
 			BsResolution *resolution, BsEtModel *et_model, Efficiency *efficiency,
-			RooDataHist *hist_I = 0, RooDataHist *hist_P = 0);
+			RooDataHist *hist_I = 0, RooDataHist *hist_P = 0, RooDataHist *hist_D = 0);
 };
 
 #endif /* BSSIGNAL_H_ */

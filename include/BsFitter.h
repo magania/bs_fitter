@@ -38,11 +38,19 @@ public:
     void plotCtheta();
     void plotPhi(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
     void plotPhi();
+
+    //void plotD(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
+    void plotD();
+    //void plotI(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
+    void plotI();
+    //void plotP(const char* plot_file, Int_t bins, Int_t proj_bins, Bool_t log);
+    void plotP();
 protected:
 	char* glue(const char* a, const char *b);
 	void histogram(const char *cut, RooDataHist *signal_hist_et, RooDataHist *bkg_hist_et,
 			RooDataHist *signal_hist_I, RooDataHist *bkg_hist_I,
-			RooDataHist *signal_hist_P, RooDataHist *bkg_hist_P);
+			RooDataHist *signal_hist_P, RooDataHist *bkg_hist_P,
+			RooDataHist *signal_hist_D, RooDataHist *bkg_hist_D);
 
 //	double x_u;
     RooRealVar *m, *t, *et, *cpsi, *ctheta, *phi, *p, *bdtI, *bdtP;
@@ -76,7 +84,7 @@ private:
 
 class BsSingleFitter : public BsFitter{
 public:
-	BsSingleFitter(const char* name, const char* name_et, const char* root_file, const char* cut, const char* parameters_file);
+	BsSingleFitter(const char* name, const char* name_et, const char* root_file, const char* cut, const char* parameters_file, int angle_pdf);
 
 private:
     void plotVar(RooRealVar* x, const char* plot_file, Int_t bins,Int_t proj_bins, Bool_t log);
