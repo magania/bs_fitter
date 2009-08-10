@@ -85,7 +85,7 @@ BsSignal::BsSignal(const char* name,
 				*signal_set,
 				RooFit::Conditional(*signal_time_angle, RooArgSet(*m, *t, *cpsi, *ctheta, *phi, *p)));
 	} else {
-		signal_set->add(*signal_time_ange);
+		signal_set->add(*signal_time_angle);
 		signal = new RooProdPdf("signal", "signal", *signal_set);
 	}
 
