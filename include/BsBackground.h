@@ -39,6 +39,7 @@ private:
 			RooRealVar *cpsi,
 			RooRealVar *ctheta,
 			RooRealVar *phi);
+	RooAbsPdf* angle4( const char*, RooRealVar*,RooRealVar*,RooRealVar*);
 };
 
 #endif /* BSBACKGROUND_H_ */

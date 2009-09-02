@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
     int jobs = 1;
     int angle_pdf = -1;
 
-    const char *data = "fit.dat";
+    const char *data = "fit.root";
     const char *variables = "variables.txt";
     const char *parameters = "parameters.txt";
     const char *out = "fit.txt";

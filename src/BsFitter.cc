@@ -409,8 +409,8 @@ BsSingleFitter::BsSingleFitter(const char* name, const char* name_et, const char
 	resolution = new BsResolution(name, t, et);
 	parameters->add(*resolution->getParameters());
 
-	et_sig = new BsEtModel(glue("sig",name_et), et, signal_hist_et);
-	et_bkg = new BsEtModel(glue("bkg",name_et), et, bkg_hist_et);
+	et_sig = new BsEtModel(glue("sig",name_et), et, signal_hist_et, 2);
+	et_bkg = new BsEtModel(glue("bkg",name_et), et, bkg_hist_et, 1);
 	parameters->add(*et_sig->getParameters());
 	parameters->add(*et_bkg->getParameters());
 
@@ -520,10 +520,10 @@ BsMultiFitter::BsMultiFitter(const char* root_file, const char* cut, const char*
 	resolution = new BsResolution("", t, et);
 	parameters->add(*resolution->getParameters());
 
-	et_sig_1 = new BsEtModel ("sig_1", et, signal_hist_et1);
-	et_sig_3 = new BsEtModel ("sig_3", et, signal_hist_et3);
-	et_bkg_1 = new BsEtModel ("bkg_1", et, bkg_hist_et1);
-	et_bkg_3 = new BsEtModel ("bkg_3", et, bkg_hist_et3);
+	et_sig_1 = new BsEtModel ("sig_1", et, signal_hist_et1, 1);
+	et_sig_3 = new BsEtModel ("sig_3", et, signal_hist_et3, 1);
+	et_bkg_1 = new BsEtModel ("bkg_1", et, bkg_hist_et1, 1);
+	et_bkg_3 = new BsEtModel ("bkg_3", et, bkg_hist_et3, 1);
 
 //	parameters->add(*et_sig_IIa->getParameters());
 //	parameters->add(*et_sig_IIb->getParameters());
