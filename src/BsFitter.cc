@@ -119,19 +119,20 @@ BsFitter::BsFitter(const char* root_file, const char * cut){
 		exit(EXIT_FAILURE);
 
     Double_t t_m, t_pdl, t_epdl, t_cpsi, t_ctheta, t_phi, t_d;
-	Int_t t_defined, t_category, t_muplus_nseg, t_muminus_nseg;;
+	Int_t t_defined, t_category, t_muplus_nseg, t_muminus_nseg, t_run;
 	Float_t t_inclusive, t_prompt;
 
 	Double_t t_t, t_et, t_D;
 
+        Tree->SetBranchAddress("run",&t_run);
 	Tree->SetBranchAddress("bs_mass",&t_m);
 	Tree->SetBranchAddress("bs_pdl",&t_pdl);
 	Tree->SetBranchAddress("bs_epdl",&t_epdl);
 	Tree->SetBranchAddress("bs_angle_cpsi",&t_cpsi);
 	Tree->SetBranchAddress("bs_angle_ctheta",&t_ctheta);
 	Tree->SetBranchAddress("bs_angle_phi",&t_phi);
-	Tree->SetBranchAddress("dilution",&t_d);
-	Tree->SetBranchAddress("dilution_defined", &t_defined);
+	Tree->SetBranchAddress("newtag_ost",&t_d);
+	Tree->SetBranchAddress("newtag_ost_defined", &t_defined);
 	Tree->SetBranchAddress("mu_plus_nseg", &t_muplus_nseg);
 	Tree->SetBranchAddress("mu_minus_nseg",&t_muminus_nseg);
 	Tree->SetBranchAddress("inclusiveBDT", &t_inclusive);
@@ -145,8 +146,13 @@ BsFitter::BsFitter(const char* root_file, const char * cut){
 		Double_t t_et=t_epdl/0.0299792458;
 		Double_t t_D=0;
 
-		if ( t_defined )
-			t_D = (fabs(t_d)>0.55)?  (t_d>0?0.5957:-0.5957) : 0.7895*t_d + 0.3390*t_d*fabs(t_d);
+	        if ( t_defined )
+			if ( t_run  < 221993 )
+				t_D = (fabs(t_d)>0.6)?  (t_d>0?0.904:-0.904) : 2.359*t_d - 9.239*t_d*fabs(t_d) + 13.204*t_d*fabs(t_d)*fabs(t_d); // RunIIa
+			else
+				t_D = (fabs(t_d)>0.6)?  (t_d>0?0.488:-0.488) : 1.105*t_d - 1.464*t_d*fabs(t_d) + 2.419*t_d*fabs(t_d)*fabs(t_d); // RunIIb
+
+		if (fabs(t_D)>1) cout << "EE: Wrong Dilution" << t_D << endl;
 
 		*m = t_m;
 		*t = t_t;
