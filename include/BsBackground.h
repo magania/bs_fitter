@@ -11,6 +11,7 @@
 #include <BsResolution.h>
 #include <BsEtModel.h>
 #include <TMath.h>
+#include <RooArgusBG.h>
 
 #include <BsPdf.h>
 

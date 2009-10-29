@@ -35,7 +35,7 @@ BsFitter::BsFitter(const char* root_file, const char * cut){
 	variables = new RooArgSet();
 	m = new RooRealVar("m", "m", 0, 5, 5.8);
 	t = new RooRealVar("t", "t", 0,-3, 15);
-	et = new RooRealVar("et", "et", 0.01, 0, 1);
+	et = new RooRealVar("et", "et", 0.01, 0, 0.201);
 	cpsi = new RooRealVar("cpsi", "cos(#psi)", -1, 1);
 	ctheta = new RooRealVar("ctheta", "cos(#theta)", -1 , 1);
 	phi = new RooRealVar("phi", "#phi", -TMath::Pi(), TMath::Pi());
@@ -147,10 +147,7 @@ BsFitter::BsFitter(const char* root_file, const char * cut){
 		Double_t t_D=0;
 
 	        if ( t_defined )
-			if ( t_run  < 221993 )
-				t_D = (fabs(t_d)>0.6)?  (t_d>0?0.904:-0.904) : 2.359*t_d - 9.239*t_d*fabs(t_d) + 13.204*t_d*fabs(t_d)*fabs(t_d); // RunIIa
-			else
-				t_D = (fabs(t_d)>0.6)?  (t_d>0?0.488:-0.488) : 1.105*t_d - 1.464*t_d*fabs(t_d) + 2.419*t_d*fabs(t_d)*fabs(t_d); // RunIIb
+			t_D = 0.6914/(1 + TMath::Exp( (0.3136 - TMath::Abs(t_d))/0.1361 ) ) - 0.6914/(1 + TMath::Exp(0.3136/0.1361) );
 
 		if (fabs(t_D)>1) cout << "EE: Wrong Dilution" << t_D << endl;
 

@@ -24,8 +24,11 @@ BsBackground::BsBackground( const char* name,
 {
 	cout << glue("BACKGROUND MODEL",name) << endl;
 	/* Mass Pdf parameters */
-	RooRealVar *m_a1 = new RooRealVar(glue("m_a1",name), glue("m_a1",name), 0);
-	RooRealVar *m_a2 = new RooRealVar(glue("m_a2",name), glue("m_a2",name), 0);
+//	RooRealVar *m_a1 = new RooRealVar(glue("m_a1",name), glue("m_a1",name), 0);
+      RooRealVar *m_m0 = new RooRealVar(glue("m_m0",name), glue("m_m0",name), 0);
+      RooRealVar *m_c = new RooRealVar(glue("m_c",name), glue("m_c",name), 0);
+      RooRealVar *m_p = new RooRealVar(glue("m_p",name), glue("m_p",name), 0);
+	RooRealVar *m_t = new RooRealVar(glue("m_t",name), glue("m_t",name), 0);
 	/* Time Pdf parameters */
 	RooRealVar *t_m = new RooRealVar(glue("t_m",name), glue("t_m",name), 0);
 	RooRealVar *t_p = new RooRealVar(glue("t_p",name), glue("t_p",name), 0);
@@ -34,8 +37,10 @@ BsBackground::BsBackground( const char* name,
 	RooRealVar *fm = new RooRealVar(glue("fm",name), glue("fm",name), 0);
     RooRealVar *fp = new RooRealVar(glue("fp",name), glue("fp",name), 0);
 
-	parameters.add(*m_a1);
-	parameters.add(*m_a2);
+	parameters.add(*m_m0);
+        parameters.add(*m_c);
+        parameters.add(*m_p);
+	parameters.add(*m_t);
 	parameters.add(*xp);
 	parameters.add(*t_m);
 	parameters.add(*t_p);
@@ -44,8 +49,9 @@ BsBackground::BsBackground( const char* name,
 	parameters.add(*fp);
 
 	/* Mass Pdf */
-	RooPolynomial *mass_p_bkg = new RooPolynomial(glue("mass_p_bkg",name), glue("mass_p_bkg",name), *m, RooArgList(*m_a1));
-	RooPolynomial *mass_np_bkg = new RooPolynomial(glue("mass_np_bkg",name), glue("mass_np_bkg",name), *m, RooArgList(*m_a2));
+//	RooPolynomial *mass_p_bkg = new RooPolynomial(glue("mass_p_bkg",name), glue("mass_p_bkg",name), *m, RooArgList(*m_a1));
+	RooArgusBG *mass_p_bkg = new RooArgusBG(glue("mass_p_bkg",name), glue("mass_p_bkg",name), *m, *m_m0, *m_c, *m_p);
+	RooExponential *mass_np_bkg = new RooExponential(glue("mass_np_bkg",name), glue("mass_np_bkg",name), *m, *m_t);
 
 	/* Time Pdf */
 	RooDecay *exp_minus = new RooDecay(glue("exp_minus",name), glue("exp_minus",name), *t, *t_m, *resolution->pdf(), RooDecay::Flipped);

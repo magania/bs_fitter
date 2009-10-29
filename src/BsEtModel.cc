@@ -21,7 +21,7 @@ BsEtModel::BsEtModel(const char* name, RooRealVar *et, RooDataHist *hist, int th
 	if (the_model == 1) {
 	  et_xl = new RooRealVar(glue("et_xl",name), glue("et_xl",name), 0.05, 0, 1);
 	  et_tau_short = new RooRealVar(glue("et_tau_short",name), glue("et_tau_short",name), 0.001, 0.0001, 1);
-	  et_tau_long = new RooRealVar(glue("et_tau_long",name), glue("et_tau_long",name), 0.19, 0.001, 2);
+	  et_tau_long = new RooRealVar(glue("et_tau_long",name), glue("et_tau_long",name), 0.2, 0.001, 2);
 
 	  parameters.add(*et_xl);
 	  parameters.add(*et_tau_short);
