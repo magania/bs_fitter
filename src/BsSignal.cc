@@ -38,7 +38,7 @@ BsSignal::BsSignal(const char* name,
 	/* Constraints */
 	RooGaussian *Delta1_constraint = new RooGaussian("Delta1_constraint", "#delta_{1} Gaussian Constraint", *Delta1, *Delta1_mean, *Delta1_sigma);
 	RooGaussian *Delta2_constraint = new RooGaussian("Delta2_constraint", "#delta_{2} Gaussian Constraint", *Delta2, *Delta2_mean, *Delta2_sigma);
-	RooGaussian *DeltaMs_constraint = new RooGaussian("DeltaMs_constraint", "#Delta m_{s} Gaussian Constraint", *DeltaMs, *DeltaMs_mean, *DeltaMs_sigma);
+	RooGaussian *DeltaMs_constraint = new RooGaussian("DeltaMs_constraint", "#Delta m_{s} Gaussian Constraint", *DeltaMs, RooFit::RooConst(17.77), RooFit::RooConst(0.12));
 
 	/* Mass Pdf */
 	RooGaussian *signal_mass = new RooGaussian("signal_mass", "signal_mass", *m, *M, *Sigma);
